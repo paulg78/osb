@@ -7,6 +7,7 @@ var express     = require("express"),
     LocalStrategy = require("passport-local"),
     flash        = require("connect-flash"),
     Campground  = require("./models/campground"),
+    Student     = require("./models/student"),
     Comment     = require("./models/comment"),
     User        = require("./models/user"),
     session = require("express-session"),
@@ -16,7 +17,8 @@ var express     = require("express"),
 //requiring routes
 var commentRoutes    = require("./routes/comments"),
     campgroundRoutes = require("./routes/campgrounds"),
-    indexRoutes      = require("./routes/index")
+    studentRoutes   = require("./routes/students"),
+    indexRoutes      = require("./routes/index");
     
 mongoose.connect("mongodb://localhost/yelp_camp_v9");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -51,6 +53,7 @@ app.use(function(req, res, next){
 
 app.use("/", indexRoutes);
 app.use("/campgrounds", campgroundRoutes);
+app.use("/students", studentRoutes);
 app.use("/campgrounds/:id/comments", commentRoutes);
 
 app.listen(process.env.PORT, process.env.IP, function(){

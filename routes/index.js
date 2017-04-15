@@ -15,7 +15,7 @@ router.get("/register", function(req, res){
 
 //handle sign up logic
 router.post("/register", function(req, res){
-    var newUser = new User({username: req.body.username});
+    var newUser = new User({username: req.body.username, school: req.body.school});
     User.register(newUser, req.body.password, function(err, user){
         if(err){
             console.log(err);
@@ -37,9 +37,11 @@ router.get("/login", function(req, res){
 //handling login logic
 router.post("/login", passport.authenticate("local", 
     {
-        successRedirect: "/campgrounds",
+        successRedirect: "/students",
         failureRedirect: "/login"
     }), function(req, res){
+        // console.log("logged in!!"); this doesn't work ... nothing in log
+        // console.log(res);
 });
 
 // logout route

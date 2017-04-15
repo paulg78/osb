@@ -1,0 +1,24 @@
+<% include ../partials/header %> 
+
+     <header class="jumbotron">
+         <div class="container">
+             <!--<h1><span class="glyphicon glyphicon-tent"></span> Students</h1>-->
+             <h1>Students</h1>
+             <p>put School Name here</p>
+             <p>
+                <a class="btn btn-primary btn-lg" href="/students/new">Add New Student</a>
+             </p>
+         </div>
+     </header>
+     <h2>First Name  Last Name  Gender  Grade School</h2>
+     <% students.forEach(function(student){ %>
+        <li>
+            <%= student.fname %>
+            <%= student.lname %>
+            <%= student.gender %>
+            <%= student.grade %>
+            <%= student.school %>
+        </li>
+    <% }); %>
+
+<% include ../partials/footer %>
