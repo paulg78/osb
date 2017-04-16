@@ -4,7 +4,7 @@
          <div class="container">
              <!--<h1><span class="glyphicon glyphicon-tent"></span> Students</h1>-->
              <h1>Students</h1>
-             <p>put School Name here</p>
+             <p><%= school%></p>
              <p>
                 <a class="btn btn-primary btn-lg" href="/students/new">Add New Student</a>
              </p>
@@ -18,6 +18,10 @@
             <%= student.gender %>
             <%= student.grade %>
             <%= student.school %>
+            <form style="display: inline" action="/students/<%=student._id%>?_method=DELETE" method="POST">
+                <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
+                <button class="btn btn-xs btn-danger">DELETE</button>
+            </form>
         </li>
     <% }); %>
 

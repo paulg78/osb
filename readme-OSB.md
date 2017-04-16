@@ -1,10 +1,14 @@
 #OSB
 
 TODOS
+edit student (how to get to edit button)
+
+done:
 add school to registration
 show list of students for school associated with user
 see middleware index.js for user check
 fill in school automatically as user's school
+
 
 RESTFUL ROUTES
 

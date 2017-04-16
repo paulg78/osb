@@ -23,8 +23,8 @@ router.post("/register", function(req, res){
             return res.render("register");
         }
         passport.authenticate("local")(req, res, function(){
-           req.flash("success", "Successfully Signed Up! Nice to meet you " + req.body.username);
-           res.redirect("/campgrounds"); 
+           req.flash("success", "Successfully Signed Up!" + req.body.username);
+           res.redirect("/students"); 
         });
     });
 });
@@ -40,15 +40,13 @@ router.post("/login", passport.authenticate("local",
         successRedirect: "/students",
         failureRedirect: "/login"
     }), function(req, res){
-        // console.log("logged in!!"); this doesn't work ... nothing in log
-        // console.log(res);
 });
 
 // logout route
 router.get("/logout", function(req, res){
    req.logout();
    req.flash("success", "LOGGED YOU OUT!");
-   res.redirect("/campgrounds");
+   res.redirect("/students");
 });
 
 

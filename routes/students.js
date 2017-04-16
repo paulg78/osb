@@ -11,12 +11,20 @@ router.get("/", function(req, res){
     // console.log("currentUser.school=" + currentUser.school);
     // console.log("res:");
     // console.log(res);
-    console.log("*** current user=" + res.locals.currentUser.school);
-    Student.find({school: res.locals.currentUser.school}, function(err, allStudents){
+    var userSchool;
+    if (res.locals.currentUser == undefined) {
+        userSchool = "";
+        console.log("*** current user is undefined");
+    }
+    else {
+        userSchool = res.locals.currentUser.school;
+    }
+    
+    Student.find({school: userSchool}, function(err, queryResponse){
        if(err){
            console.log(err);
        } else {
-          res.render("students/index",{students:allStudents});
+          res.render("students/index",{students:queryResponse, school: userSchool});
          }
     });
 });
@@ -24,12 +32,22 @@ router.get("/", function(req, res){
 //CREATE - add new student to DB
 router.post("/", middleware.isLoggedIn, function(req, res){
     // get data from form and add to students collection
+    
+    var userSchool;
+    if (res.locals.currentUser == undefined) {
+        userSchool = "";
+        console.log("*** current user is undefined");
+    }
+    else {
+        userSchool = res.locals.currentUser.school;
+    }
+    
     var newStudent = {
         fname: req.body.firstName,
         lname: req.body.lastName,
         gender: req.body.gender,
         grade: req.body.grade,
-        school: req.body.school}
+        school: userSchool}
 
     // Create a new student and save to DB
     Student.create(newStudent, function(err, newlyCreated){
@@ -48,7 +66,7 @@ router.get("/new", middleware.isLoggedIn, function(req, res){
   res.render("students/new"); 
 });
 
-// // SHOW - shows more info about one student
+// SHOW - shows more info about one student
 // router.get("/:id", function(req, res){
 //     //find the student with provided ID
 //     Student.findById(req.params.id).populate("comments").exec(function(err, foundStudent){
@@ -62,31 +80,40 @@ router.get("/new", middleware.isLoggedIn, function(req, res){
 //     });
 // });
 
-// router.get("/:id/edit", middleware.checkUserStudent, function(req, res){
-//     console.log("IN EDIT!");
-//     //find the student with provided ID
-//     Student.findById(req.params.id, function(err, foundStudent){
-//         if(err){
-//             console.log(err);
-//         } else {
-//             //render show template with that student
-//             res.render("students/edit", {student: foundStudent});
-//         }
-//     });
-// });
+router.get("/:id/edit", function(req, res){
+    console.log("IN EDIT!");
+    //find the student with provided ID
+    Student.findById(req.params.id, function(err, foundStudent){
+        if(err){
+            console.log(err);
+        } else {
+            //render show template with that student
+            res.render("students/edit", {student: foundStudent});
+        }
+    });
+});
 
-// router.put("/:id", function(req, res){
-//     var newData = {name: req.body.name, image: req.body.image, description: req.body.desc};
-//     Student.findByIdAndUpdate(req.params.id, {$set: newData}, function(err, student){
-//         if(err){
-//             req.flash("error", err.message);
-//             res.redirect("back");
-//         } else {
-//             req.flash("success","Successfully Updated!");
-//             res.redirect("/students/" + student._id);
-//         }
-//     });
-// });
+router.put("/:id", function(req, res){
+      console.log("IN put (update student)!");
+      var newData = {
+        fname: req.body.firstName,
+        lname: req.body.lastName,
+        gender: req.body.gender,
+        grade: req.body.grade };
+        
+    Student.findByIdAndUpdate(req.params.id, {$set: newData}, function(err, student){
+        if(err){
+            console.log("edit error");
+            req.flash("error", err.message);
+            res.redirect("back");
+        } else {
+            console.log("Updating student");
+            req.flash("success","Successfully Updated!");
+            // res.redirect("/students/" + student._id);
+            res.redirect("/students");            
+        }
+    });
+});
 
 
 //middleware

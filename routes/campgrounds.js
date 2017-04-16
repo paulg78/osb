@@ -78,7 +78,8 @@ router.get("/:id/edit", middleware.checkUserCampground, function(req, res){
 });
 
 router.put("/:id", function(req, res){
-    var newData = {name: req.body.name, image: req.body.image, description: req.body.desc};
+    console.log("IN campground put!");
+    var newData = {name: req.body.name, image: req.body.image, description: req.body.description};
     Campground.findByIdAndUpdate(req.params.id, {$set: newData}, function(err, campground){
         if(err){
             req.flash("error", err.message);
