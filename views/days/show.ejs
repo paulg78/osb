@@ -1,0 +1,24 @@
+<% include ../partials/header %>
+  <h1 style="text-align: center">Add Students <%= day.date %></h1>
+  <div style="width: 30%; margin: 25px auto;"class="well">
+      <a href="/days">Go Back</a>
+  </div>
+
+  <ul class="list-group">
+      <% students.forEach(function(student) { %>
+        <li class="list-group-item"><%= student.fname + " " + student.lname %><span name="studentId" class="hidden"><%= student._id %></span></li>
+      <% }) %>
+  </ul>
+
+   <% day.slots.forEach(function(slot){ %>
+      <div class="row well">
+        <%= slot.time %>
+        <%= slot.max %>
+        <% slot.students.forEach(function(student){ %>
+          <%= student.fname + " " + student.lname %>
+        <% }) %>
+        <button type="button" class="btn" name="addStudent">Add Student</button>
+      </div>
+  <% }) %>
+  <script type="text/javascript" src="/scripts/selectStudent.js"></script>
+<% include ../partials/footer %>

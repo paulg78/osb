@@ -37,7 +37,7 @@ router.get("/login", function(req, res){
 //handling login logic
 router.post("/login", passport.authenticate("local", 
     {
-        successRedirect: "/students",
+        successRedirect: "/days",
         failureRedirect: "/login"
     }), function(req, res){
 });

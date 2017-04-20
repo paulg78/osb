@@ -1,0 +1,20 @@
+<% include ../partials/header %>
+    <div class="row">
+        <h1 style="text-align: center">Add New Slot to day <%= day.date %></h1>
+        <div style="width: 30%; margin: 25px auto;">
+            <form action="/days/<%= day._id %>/slots" method="POST">
+                <div class="form-group">
+                    <input class="form-control" type="text" name="time" placeholder="8:15 a.m.">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="max" placeholder="number">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-lg btn-primary btn-block">Submit!</button>
+                </div>
+            </form>
+            <a href="/slots">Go Back</a>
+        </div>
+    </div>
+<% include ../partials/footer %>
+

@@ -1,13 +1,15 @@
 #OSB
 
 TODOS
-edit student (how to get to edit button)
+can I add slots without doing http?
+fix delete student
 
 done:
 add school to registration
 show list of students for school associated with user
-see middleware index.js for user check
+student create, read, update 
 fill in school automatically as user's school
+added days: list, create, edit
 
 
 RESTFUL ROUTES
