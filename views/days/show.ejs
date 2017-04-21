@@ -17,7 +17,7 @@
         <% slot.students.forEach(function(student){ %>
           <%= student.fname + " " + student.lname %>
         <% }) %>
-        <button type="button" class="btn" name="addStudent">Add Student</button>
+        <button type="button" class="btn" name="addStudent">Add Student<span name="slotId" class="hidden"><%= slot._id %></span></button>
       </div>
   <% }) %>
   <script type="text/javascript" src="/scripts/selectStudent.js"></script>

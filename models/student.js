@@ -5,7 +5,8 @@ var studentSchema = new mongoose.Schema({
    lname: String,
    gender: String,
    grade: String,
-   school: String
+   school: String,
+   slot: mongoose.Schema.Types.ObjectId
 });
 
 module.exports = mongoose.model("Student", studentSchema);

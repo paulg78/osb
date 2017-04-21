@@ -1,21 +1,14 @@
 /* global $ */
 
 // alert("called selectStudent");
-
 // console.log("called alertStudent");
 
-// $(document).ready(function() {
-//   $(".list-group-item").live('click', function(){ 
-//     $('.active').removeClass('active');
-//     $(this).addClass('active');
-//     console.log($(this).html());
-//     console.lot("clicked");
-//     // Code here whatever you want or you can call other function here
-//     alert("click");
-//   });
-// });
+// *** problem here -- can't find file because require is not defined on client/browser side*** 
+// http://stackoverflow.com/questions/19059580/client-on-node-uncaught-referenceerror-require-is-not-defined
+// var Slot = require("../../models/slot");
+// var Student = require("../../models/student");
 
-// http://stackoverflow.com/questions/34590661/handle-bootstrap-list-group-click
+// // http://stackoverflow.com/questions/34590661/handle-bootstrap-list-group-click
 $('.list-group-item').on('click', function() {
     var $this = $(this);
     // var $alias = $this.data('alias
@@ -34,9 +27,39 @@ function myfunction($this, studentId) {
     console.log("student id=" + studentId);
 }
 
-$( ".btn" ).on('click', function() {
+// add slot id to student schema
+// put slot id hidden in each add student button
+// when button is clicked, get the slot id, find in db by id
+// push the student id in
+// save the slot
+// find student by id
+// update student with slot id
+// save the student
+// refresh page
+$(".btn").on('click', function() {
     console.log("clicked add student");
     console.log($(this));
-    console.log("put this id in the slot:" + $('.active')["0"].lastElementChild.innerText);
-});
+    var studentId = $('.active')["0"].lastElementChild.innerText;
+    var slotId = $("[name='slotId']")["1"].outerText;
+    console.log("studentId=" + studentId);
+    console.log("slotId=" + slotId);
 
+    // find slot by id
+    // Slot.findById(slotId).exec(function(err, foundSlot){
+    //     if(err){
+    //         console.log(err);
+    //     } else {
+    //         // push the student id into slots
+    //         foundSlot.slots.push(studentId);
+    //         foundSlot.save();
+    //         Student.findById(studentId).exec(function(err, foundStudent) {
+    //             if (err) {
+    //                 console.log(err);
+    //             } else {
+    //                 foundStudent.slot = slotId;
+    //                 foundStudent.save();
+    //             }
+    //         })
+    //     }
+    // });
+});

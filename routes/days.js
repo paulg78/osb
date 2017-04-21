@@ -4,7 +4,6 @@ var Day = require("../models/day");
 var Student = require("../models/student");
 var User = require("../models/user");
 var middleware = require("../middleware");
-var request = require("request");
 
 //INDEX - show all days
 router.get("/", function(req, res){
@@ -103,7 +102,6 @@ router.put("/:id", function(req, res){
         }
     });
 });
-
 
 //middleware
 // function isLoggedIn(req, res, next){
