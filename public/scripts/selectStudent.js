@@ -13,6 +13,9 @@ $('.list-group-item').on('click', function() {
     var $this = $(this);
     $('.active').removeClass('active');
     $this.toggleClass('active');
+    // enable add student buttons
+    $("[name='addStudentBtn']").attr("disabled",false);
+    console.log($("[name='addStudentBtn']"));
     // var studentId = $('.active')["0"].lastElementChild.innerText; // figured this out using console in browser tools
     // $("#selectedStudentId")["0"].innerText = studentId;
    console.log($this.text());  // logs to console in browser since this is client side code

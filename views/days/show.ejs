@@ -16,14 +16,13 @@
         <%= slot.max %>
         <%= "students:" %>
         <% slot.students.forEach(function(student){ %>
-          <%= student %>
+          <%= student.fname + " " + student.lname %>
         <% }) %>
             <form action="/slots/<%=slot._id%>?_method=PUT" method="POST">
                 <div class="form-group">
                     <input class="hidden" type="text" name="selectedStudentId">
                     <!--<input class="form-control" type="text" name="selectedStudentId" value="58f2a0db206fa46d1a105671">-->
-                    <input type="submit" value="Add student">
-                    <!--<button class="btn btn-lg btn-primary" name="addStudentBtn">Add student!</button>-->
+                    <input type="submit" disabled=disabled name="addStudentBtn" value="Add student">
                 </div>
             </form>        
       </div>

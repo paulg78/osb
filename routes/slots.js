@@ -57,9 +57,6 @@ router.post("/",middleware.isLoggedIn,function(req, res){
 //put student into a slot
 router.put("/:id", function(req, res){
     var slotId = req.params.id;
-    console.log("****** start req  *****");
-    console.log(req.body);
-        console.log("****** end req  *****");
     var studentId = req.body.selectedStudentId;
     console.log("in slot put; adding student to slot");
     console.log("studentId=" + studentId);
@@ -81,7 +78,6 @@ router.put("/:id", function(req, res){
             }
         });
         //   console.log("slot=" + slotFound);
-        console.log("slot found");
           res.redirect("/days/");
       }
   }); 

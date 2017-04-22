@@ -50,24 +50,32 @@ router.get("/new", function(req, res){
 // SHOW - shows more info about one day
 router.get("/:id", function(req, res){
     //find the day with provided ID
-    Day.findById(req.params.id).populate("slots").exec(function(err, foundDay){
+    // Day.findById(req.params.id).populate("slots").exec(function(err, foundDay) {  // populates slots but not students
+    Day.findById(req.params.id)
+        .populate({
+            path: 'slots',
+            model: 'Slot',
+            populate: {
+                path: 'students',
+                model: 'Student'
+            }
+            })
+        .exec(function(err, foundDay) {
         if(err){
             console.log(err);
         } else {
-            // console.log(foundDay);
             // console.log("user id=" + req.user._id);
- 
             User.findById(req.user._id, function(err, userFound) {
             if (err) {
                 console.log(err);
             } else {
                 // console.log("school=" + userFound.school);
-                Student.find({school: userFound.school}, function(err, queryResponse){
+                Student.find({school: userFound.school, slot: undefined}, function(err, queryResponse){
                 if(err){
                    console.log(err);
                 } else {
                     // console.log("students=" + queryResponse);
-                    //render show template with that day
+                    // console.log(foundDay);
                     res.render("days/show", {day: foundDay, students: queryResponse});
                 }
         });
