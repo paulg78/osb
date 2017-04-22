@@ -9,7 +9,6 @@
         <li class="list-group-item"><%= student.fname + " " + student.lname %><span name="studentId" class="hidden"><%= student._id %></span></li>
       <% }) %>
   </ul>
- <!--<p id=selectedStudentId </p>-->
    <% day.slots.forEach(function(slot){ %>
       <div class="row well">
         <%= slot.time %>

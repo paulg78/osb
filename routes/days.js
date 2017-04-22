@@ -70,6 +70,7 @@ router.get("/:id", function(req, res){
                 console.log(err);
             } else {
                 // console.log("school=" + userFound.school);
+                // find the unassigned students
                 Student.find({school: userFound.school, slot: undefined}, function(err, queryResponse){
                 if(err){
                    console.log(err);
