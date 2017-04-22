@@ -70,14 +70,14 @@ router.put("/:id", function(req, res){
         //   res.render("edit");
       } else {
         // push the student id into array of students in slot
-        // slotFound.students.push(studentId);
-        // slotFound.save();
+        slotFound.students.push(studentId);
+        slotFound.save();
         Student.findById(studentId).exec(function(err, foundStudent) {
             if (err) {
                 console.log(err);
             } else {
-                // foundStudent.slot = slotId;
-                // foundStudent.save();
+                foundStudent.slot = slotId;
+                foundStudent.save();
             }
         });
         //   console.log("slot=" + slotFound);

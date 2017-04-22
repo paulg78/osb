@@ -27,15 +27,11 @@ $('.list-group-item').on('click', function() {
 // update student with slot id
 // save the student
 // refresh page
-$(":button").on('click', function() {
+$(":input").on('click', function() {
     console.log("clicked add student");
-    console.log($(this));
     var studentId = $('.active')["0"].lastElementChild.innerText; // figured this out using console in browser tools
-    console.log("studentId=" + studentId);
-    // var $this = $(this);
-    // $this.("[name='selectedStudentId']")
-    // $("[name='selectedStudentId']", this).text(studentId);
-    // console.log("selected student?" + $("[name='selectedStudentId']", this));
-    $("[name='selectedStudentId']", $(this)).text(studentId);
-    console.log("selected student?" + $("[name='selectedStudentId']", $(this)));
+    // console.log("studentId=" + studentId);
+    // console.log($(this).parent().children("[name='selectedStudentId']").val());
+    $(this).parent().children("[name='selectedStudentId']").val(studentId);
+    // console.log($(this).parent().children("[name='selectedStudentId']").val());
 });
