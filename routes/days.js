@@ -57,19 +57,19 @@ router.get("/:id", function(req, res){
             // console.log(foundDay);
             // console.log("user id=" + req.user._id);
  
-    User.findById(req.user._id, function(err, userFound) {
-        if (err) {
-            console.log(err);
-        } else {
-            // console.log("school=" + userFound.school);
-            Student.find({school: userFound.school}, function(err, queryResponse){
-            if(err){
-               console.log(err);
+            User.findById(req.user._id, function(err, userFound) {
+            if (err) {
+                console.log(err);
             } else {
-                // console.log("students=" + queryResponse);
-                //render show template with that day
-                res.render("days/show", {day: foundDay, students: queryResponse});
-            }
+                // console.log("school=" + userFound.school);
+                Student.find({school: userFound.school}, function(err, queryResponse){
+                if(err){
+                   console.log(err);
+                } else {
+                    // console.log("students=" + queryResponse);
+                    //render show template with that day
+                    res.render("days/show", {day: foundDay, students: queryResponse});
+                }
         });
         }
     });
@@ -91,7 +91,7 @@ router.get("/:id/edit", middleware.isLoggedIn, function(req, res){
 });
 
 router.put("/:id", function(req, res){
-    console.log("IN day put!");
+    console.log("IN day put! looking for id=" + req.params.id);
     Day.findByIdAndUpdate(req.params.id, {date: req.body.date}, function(err, day){
         if(err){
             req.flash("error", err.message);

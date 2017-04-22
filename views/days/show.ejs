@@ -9,7 +9,7 @@
         <li class="list-group-item"><%= student.fname + " " + student.lname %><span name="studentId" class="hidden"><%= student._id %></span></li>
       <% }) %>
   </ul>
-
+ <!--<p id=selectedStudentId </p>-->
    <% day.slots.forEach(function(slot){ %>
       <div class="row well">
         <%= slot.time %>
@@ -17,7 +17,11 @@
         <% slot.students.forEach(function(student){ %>
           <%= student.fname + " " + student.lname %>
         <% }) %>
-        <button type="button" class="btn" name="addStudent">Add Student<span name="slotId" class="hidden"><%= slot._id %></span></button>
+            <form action="/slots/<%=slot._id%>?_method=PUT" method="POST">
+                <div class="form-group">
+                    <button class="btn btn-lg btn-primary" name="addStudentBtn">Add student!<span name="selectedStudentId">*</span></button>
+                </div>
+            </form>        
       </div>
   <% }) %>
   <script type="text/javascript" src="/scripts/selectStudent.js"></script>
