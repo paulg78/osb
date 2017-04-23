@@ -48,10 +48,10 @@ router.get("/new", function(req, res){
 });
 
 // SHOW - shows more info about one day
-router.get("/:id", function(req, res){
+router.get("/:dayId", function(req, res){
     //find the day with provided ID
-    // Day.findById(req.params.id).populate("slots").exec(function(err, foundDay) {  // populates slots but not students
-    Day.findById(req.params.id)
+    // Day.findById(req.params.dayId).populate("slots").exec(function(err, foundDay) {  // populates slots but not students
+    Day.findById(req.params.dayId)
         .populate({
             path: 'slots',
             model: 'Slot',
@@ -77,7 +77,7 @@ router.get("/:id", function(req, res){
                 } else {
                     // console.log("students=" + queryResponse);
                     // console.log(foundDay);
-                    res.render("days/show", {day: foundDay, students: queryResponse});
+                    res.render("days/show", {day: foundDay, students: queryResponse, school: userFound.school});
                 }
         });
         }
@@ -86,10 +86,10 @@ router.get("/:id", function(req, res){
     });
 });
 
-router.get("/:id/edit", middleware.isLoggedIn, function(req, res){
+router.get("/:dayId/edit", middleware.isLoggedIn, function(req, res){
     console.log("IN EDIT!");
     //find the day with provided ID
-    Day.findById(req.params.id).populate("slots").exec(function(err, foundDay){
+    Day.findById(req.params.dayId).populate("slots").exec(function(err, foundDay){
         if(err){
             console.log(err);
         } else {
@@ -99,9 +99,9 @@ router.get("/:id/edit", middleware.isLoggedIn, function(req, res){
     });
 });
 
-router.put("/:id", function(req, res){
-    console.log("IN day put! looking for id=" + req.params.id);
-    Day.findByIdAndUpdate(req.params.id, {date: req.body.date}, function(err, day){
+router.put("/:dayId", function(req, res){
+    console.log("IN day put! looking for id=" + req.params.dayId);
+    Day.findByIdAndUpdate(req.params.dayId, {date: req.body.date}, function(err, day){
         if(err){
             req.flash("error", err.message);
             res.redirect("back");
