@@ -32,9 +32,16 @@ $('.list-group-item').on('click', function() {
 // refresh page
 $(":input").on('click', function() {
     console.log("clicked add student");
-    var studentId = $('.active')["0"].lastElementChild.innerText; // figured this out using console in browser tools
-    // console.log("studentId=" + studentId);
-    // console.log($(this).parent().children("[name='selectedStudentId']").val());
-    $(this).parent().children("[name='selectedStudentId']").val(studentId);
-    // console.log($(this).parent().children("[name='selectedStudentId']").val());
+    
+        var slotId=$(this).parent().children("[name='slotId']").val();
+          var studentId=$('.active')["0"].lastElementChild.innerText;
+          var dayId = $("#dayId").text();
+          $(this)[0].form.action ="/days/" + dayId + "/slots/" + slotId + "/students/" + studentId + "?_method=PUT";
+    
+    // var studentId = $('.active')["0"].lastElementChild.innerText; // figured this out using console in browser tools
+    // // console.log("studentId=" + studentId);
+    // // console.log($(this).parent().children("[name='selectedStudentId']").val());
+    // console.log("this=" + $(this));
+    // $(this).parent().children("[name='selectedStudentId']").val(studentId);
+    // // console.log($(this).parent().children("[name='selectedStudentId']").val());
 });

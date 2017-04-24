@@ -1,4 +1,5 @@
 <% include ../partials/header %>
+ <span class="hidden" id="dayId"><%= day._id %></span>
   <h1 style="text-align: center">Add Students <%= day.date %></h1>
   <div style="width: 30%; margin: 25px auto;"class="well">
       <a href="/days">Go Back</a>
@@ -19,9 +20,9 @@
             <%= student.fname + " " + student.lname %>
         <% } %>
         <% }) %>
-             <form action="/days/<%= day._id %>/slots/<%=slot._id%>/scheduleStudent?_method=PUT" method="POST">
+             <form method="POST">
                 <div class="form-group">
-                    <input class="hidden" type="text" name="selectedStudentId">
+                    <input class="hidden" type="text" name="slotId" value="<%= slot._id %>">
                     <!--<input class="form-control" type="text" name="selectedStudentId" value="58f2a0db206fa46d1a105671">-->
                     <input type="submit" disabled=disabled name="addStudentBtn" value="Add student">
                 </div>
