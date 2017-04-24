@@ -46,7 +46,9 @@ CREATE  days/:id/slots      POST	add new slot to db
 EDIT	days/:id/slots/:id/edit	get	display slot edit form
 Update	   days/:id/slots/:id 	put	update slot in db
 Delete	   days/:id/slots/:id	delete	delete slot from db
+Add student	days/:id/slots/:id/students/:id  	put	add student to slot in db 
 
+This way worked but changed this route to the above version.
 Add student	days/:id/slots/:id/scheduleStudent  	put	add student to slot in db 
 (not post since we aren’t creating something new, just updating (:id typically not sent with post because it 
 doesn’t yet exist when creating. Makes sense because it is modifying a slot but can’t use days/:id/slots/:id put 

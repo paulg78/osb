@@ -55,12 +55,16 @@ router.post("/",middleware.isLoggedIn,function(req, res){
 //     })
 // });
 
-//put student into a slot
-// router.put("/:id", function(req, res){
-// router.put("/:slotId/scheduleStudent", function(req, res){
+
+// find slot in db by id
+// push the student id into slot array
+// save the slot
+// find student by id
+// update student with slot id
+// save the student
+
 router.put("/:slotId/students/:studentId", function(req, res){
     var slotId = req.params.slotId;
-    // var studentId = req.body.selectedStudentId;
     var studentId = req.params.studentId;
     console.log("in slot put; adding student to slot");
     console.log("studentId=" + studentId);
@@ -68,7 +72,6 @@ router.put("/:slotId/students/:studentId", function(req, res){
     Slot.findById(slotId, function(err, slotFound){
       if(err){
           console.log("slot not found");
-        //   res.render("edit");
       } else {
         // push the student id into array of students in slot
         slotFound.students.push(studentId);
