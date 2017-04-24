@@ -11,20 +11,13 @@ router.get("/", function(req, res){
     Day.find({}, function(err, allDays){
        if(err){
            console.log(err);
-       } else {
-        //   request('https://maps.googleapis.com/maps/api/geocode/json?address=sardine%20lake%20ca&key=AIzaSyBtHyZ049G_pjzIXDKsJJB5zMohfN67llM', function (error, response, body) {
-        //     if (!error && response.statusCode == 200) {
-        //         console.log(body); // Show the HTML for the Modulus homepage.
-                res.render("days/index",{days:allDays});
-
+        } else {
+        res.render("days/index",{days:allDays});
         }
     });
-// });
 });
-    // });
 
 // CREATE - add new day to DB
-// router.post("/", middleware.isLoggedIn, function(req, res){
 router.post("/", function(req, res){
     // get data from form and add to days array
 
@@ -48,7 +41,7 @@ router.get("/new", function(req, res){
 });
 
 // SHOW - shows more info about one day
-router.get("/:dayId", function(req, res){
+    router.get("/:dayId", middleware.isLoggedIn, function(req, res){
     //find the day with provided ID
     // Day.findById(req.params.dayId).populate("slots").exec(function(err, foundDay) {  // populates slots but not students
     Day.findById(req.params.dayId)
@@ -112,14 +105,4 @@ router.put("/:dayId", function(req, res){
     });
 });
 
-//middleware
-// function isLoggedIn(req, res, next){
-//     if(req.isAuthenticated()){
-//         return next();
-//     }
-//     req.flash("error", "You must be signed in to do that!");
-//     res.redirect("/login");
-// }
-
 module.exports = router;
-

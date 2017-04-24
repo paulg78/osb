@@ -3,6 +3,9 @@
 TODOS
 Allow student to be added only if there is space left in a slot
 fix delete student
+add roles: 
+  admin: create schedule
+  school: add/schedule students
 
 done:
 add school to registration

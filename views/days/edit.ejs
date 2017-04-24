@@ -1,5 +1,5 @@
 <% include ../partials/header %>
-    <div class="row">
+ 
         <h1 style="text-align: center">Edit <%= day.date %></h1>
         <div style="width: 30%; margin: 25px auto;">
             <form action="/days/<%=day._id%>?_method=PUT" method="POST">
@@ -12,25 +12,22 @@
             </form>
             <a href="/days">Go Back</a>
         </div>
-            <div class="well">
-                <div class="text-right">
-                    <a class="btn btn-success" href="/days/<%= day._id %>/slots/new">Add New Slot</a>
-                 </div>
-                <hr>
-                <% day.slots.forEach(function(slot){ %>
-                    <div class="row">
-                            <%= slot.time %> 
-                            <%= slot.max %>                            
-                                <form style="display: inline" class="pull-right" action="/days/<%=day._id%>/slots/<%=slot._id%>?_method=DELETE" method="POST">
-                                    <button class="btn btn-xs btn-danger">DELETE</button>
-                                    <a href="/days/<%=day._id%>/slots/<%=slot._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
-                                </form>
-                           
-                       </div>
-                        </div>
-                    </div>
-                <% }) %>
+ 
+            <div class="form-group" style="width: 30%; margin: 25px auto; text-align: center">
+                <a class="btn btn-success" href="/days/<%= day._id %>/slots/new">Add New Slot</a>
             </div>
-    </div>
+
+        <div class="form-group" style="width: 50%; margin: 25px auto;">
+            <% day.slots.forEach(function(slot){ %>
+                <div class="row" style="text-align: center">
+                        <%= slot.time %>
+                        <%= slot.max %>                            
+                            <form style="display: inline" class="pull-right" action="/days/<%=day._id%>/slots/<%=slot._id%>?_method=DELETE" method="POST">
+                                <button class="btn btn-xs btn-danger">DELETE</button>
+                                <a href="/days/<%=day._id%>/slots/<%=slot._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
+                            </form>
+                </div>
+            <% }) %>
+        </div>                
 <% include ../partials/footer %>
 

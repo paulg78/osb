@@ -8,20 +8,21 @@ var middleware = require("../middleware");
 //Slots New
 router.get("/new", middleware.isLoggedIn, function(req, res){
     // find day by id
-    console.log(req.params.id);
-    Day.findById(req.params.id, function(err, day){
+    console.log(req.params.dayId);
+    Day.findById(req.params.dayId, function(err, day){
         if(err){
             console.log(err);
         } else {
+            console.log("date=" + day.date);
              res.render("slots/new", {day: day});
         }
-    })
+    });
 });
 
 //Slots Create
 router.post("/",middleware.isLoggedIn,function(req, res){
   //lookup day using ID
-  Day.findById(req.params.id, function(err, day){
+  Day.findById(req.params.dayId, function(err, day){
       if(err){
           console.log(err);
           res.redirect("/days");
@@ -36,7 +37,7 @@ router.post("/",middleware.isLoggedIn,function(req, res){
               day.save();
               console.log(slot);
               req.flash('success', 'Created a slot!');
-              res.redirect('/days/' + day._id);
+              res.redirect('/days/' + day._id + '/edit');
           }
         });
       }
@@ -49,7 +50,7 @@ router.post("/",middleware.isLoggedIn,function(req, res){
 //         if(err){
 //             console.log(err);
 //         } else {
-//              res.render("slots/edit", {day_id: req.params.id, slot: slot});
+//              res.render("slots/edit", {day_id: req.params.dayId, slot: slot});
 //         }
 //     })
 // });
@@ -89,7 +90,7 @@ router.put("/:slotId/scheduleStudent", function(req, res){
 //         if(err){
 //             console.log("PROBLEM!");
 //         } else {
-//             res.redirect("/days/" + req.params.id);
+//             res.redirect("/days/" + req.params.dayId);
 //         }
 //     })
 // });
