@@ -4,19 +4,23 @@
   "description": "Operation School Bell",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js"
   },
   "author": "Paul Gilbert",
   "license": "ISC",
   "dependencies": {
+    "async": "^2.3.0",
+    "bcrypt-nodejs": "0.0.3",
     "body-parser": "^1.14.1",
     "connect-flash": "^0.1.1",
     "ejs": "^2.3.4",
     "express": "^4.13.3",
-    "express-session": "^1.11.3",
+    "express-session": "^1.15.2",
     "method-override": "^2.3.5",
-    "mongoose": "^4.1.12",
-    "passport": "^0.3.0",
+    "mongoose": "^4.9.6",
+    "nodemailer": "^4.0.1",
+    "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^4.0.0",
     "request": "^2.65.0"

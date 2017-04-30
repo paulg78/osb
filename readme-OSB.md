@@ -4,8 +4,8 @@ TODOS
 Allow student to be added only if there is space left in a slot
 fix delete student
 add roles: 
-  admin: create schedule
-  school: add/schedule students
+  al:     modify schedule (days and slots); view all students
+  school: add/schedule/view their students
 
 done:
 add school to registration
@@ -41,12 +41,12 @@ UPDATE /days/:id	put	update day in db
 SHOW    /days/:id	get	show info about one a day--with add student (so show probably isn’t the right word)
 Cannot PUT /slots/58fc0b3ebbe6421c18cc457f
 
-NEW     days/:id/slots/new    GET	display slot create form
-CREATE  days/:id/slots      POST	add new slot to db
-EDIT	days/:id/slots/:id/edit	get	display slot edit form
-Update	   days/:id/slots/:id 	put	update slot in db
-Delete	   days/:id/slots/:id	delete	delete slot from db
-Add student	days/:id/slots/:id/students/:id  	put	add student to slot in db 
+NEW           days/:id/slots/new              GET	    display slot create form
+CREATE        days/:id/slots                  POST	  add new slot to db
+EDIT	        days/:id/slots/:id/edit	        get     display slot edit form
+Update	      days/:id/slots/:id 	            put	    update slot in db
+Delete	      days/:id/slots/:id	            delete  delete slot from db
+Add student   days/:id/slots/:id/students/:id  	put	  add student to slot in db 
 
 This way worked but changed this route to the above version.
 Add student	days/:id/slots/:id/scheduleStudent  	put	add student to slot in db 
