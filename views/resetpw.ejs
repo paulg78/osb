@@ -3,21 +3,20 @@
     <div class="row">
         <h1 style="text-align: center">Login</h1>
         <div style="width: 30%; margin: 25px auto;">
-            <form action="/login" method="post">
+            <form action="/resetpw/<%=user.resetPasswordToken%>" method="post">
                 <div class="form-group">
-                    <input class="form-control" type="text" name="username" placeholder="username">
+                    <input class="form-control" type="password" name="password" placeholder="new password">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="password" name="password" placeholder="password">
+                    <input class="form-control" type="password" name="confirm" placeholder="confirm password">
                 </div>
                 <div class="form-group">
-                    <button class="btn btn-lg btn-primary btn-block">Login</button>
+                    <button class="btn btn-lg btn-primary btn-block">Update Password</button>
                 </div>
             </form>
             <a href="/days">Go Back</a>
-            <a href="/forgotpw">   Go to Reset Password</a>            
+            <a href="/forgotpw">Reset Password</a>            
         </div>
     </div>
 </div>
 <% include ./partials/footer %>
-

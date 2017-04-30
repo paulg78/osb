@@ -6,6 +6,7 @@ fix delete student
 add roles: 
   al:     modify schedule (days and slots); view all students
   school: add/schedule/view their students
+fix: need error message on bad password
 
 done:
 add school to registration

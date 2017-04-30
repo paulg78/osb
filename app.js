@@ -15,7 +15,6 @@ var express     = require("express"),
     methodOverride = require("method-override");
 
 // added for password set/reset features
-// var nodemailer = require('nodemailer');
 var LocalStrategy = require('passport-local').Strategy;
 var async = require('async');
 var crypto = require('crypto');
@@ -79,6 +78,7 @@ app.use(function(req, res, next){
 });
 
 app.use("/", indexRoutes);
+app.use("/resetpw/:token", indexRoutes);
 app.use("/campgrounds", campgroundRoutes);
 app.use("/students", studentRoutes);
 app.use("/days", dayRoutes);
