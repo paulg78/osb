@@ -35,7 +35,9 @@ router.post("/", function(req, res){
 });
 
 // upload days and slots (schedule of fittings)
-router.get("/getFileName", middleware.isLoggedIn, function(req, res){
+// router.get("/getFileName", middleware.isLoggedIn, function(req, res){
+router.get("/getFileName", function(req, res){
+
     res.render("days/getFileName");
 });
 
