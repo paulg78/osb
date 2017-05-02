@@ -1,0 +1,31 @@
+<% include ../partials/header %>
+    <link rel="stylesheet" href="/stylesheets/main.css">
+    <div class="row">
+        <h1 style="text-align: center">Upload schedule (days/slots)</h1>
+        <div style="width: 30%; margin: 25px auto;">      
+        <div id="dvImportSegments" class="fileupload ">
+            <fieldset>
+                <legend>Upload your CSV File</legend>
+                <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
+            </fieldset>
+        </div>
+        </div>
+    </div>
+    
+   <form action="/days/createSchedule" method="POST">
+    <table id="schedule" name="schedule"></table>
+    <div class="form-group">
+        <button type=submit class="btn btn-lg btn-primary btn-block">Submit!</button>
+    </div>
+    </form>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.8.3/jquery.csv.min.js"></script>
+    <script src="/scripts/uploadSchedule.js"></script>    
+    <script>  
+        $(document).ready(function() {
+        // The event listener for the file upload
+        console.log("setting file upload listener");
+        document.getElementById('txtFileUpload').addEventListener('change', addSubmitForm, false);
+        });
+    </script>
+<% include ../partials/footer %>

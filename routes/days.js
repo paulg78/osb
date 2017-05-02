@@ -34,6 +34,17 @@ router.post("/", function(req, res){
     });
 });
 
+// upload days and slots (schedule of fittings)
+router.get("/getFileName", middleware.isLoggedIn, function(req, res){
+    res.render("days/getFileName");
+});
+
+// update database with days and slots (schedule of fittings)
+router.post("/createSchedule", function(req,res) {
+    console.log(req.body);
+    res.redirect("/days");
+});
+
 //NEW - show form to create new day
 // router.get("/new", middleware.isLoggedIn, function(req, res){
 router.get("/new", function(req, res){
@@ -105,4 +116,4 @@ router.put("/:dayId", function(req, res){
     });
 });
 
-module.exports = router;
+module.exports = router
