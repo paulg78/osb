@@ -69,7 +69,7 @@ router.post('/login', function(req, res, next) {
     }
     req.logIn(user, function(err) {
       if (err) return next(err);
-      return res.redirect('/days');
+      return res.redirect('/events');
     });
   })(req, res, next);
 });

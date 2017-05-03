@@ -1,0 +1,25 @@
+<% include ../partials/header %> 
+
+     <header class="jumbotron">
+         <div class="container">
+             <h1>Events</h1>
+             <p>
+                <a class="btn btn-primary btn-lg" href="/events/new">Add New Event</a>
+             </p>
+         </div>
+     </header>
+     
+     <% events.forEach(function(event){ %>
+        <li>
+            <%= event.name %>
+            <form style="display: inline" action="/events/<%=event._id%>?_method=DELETE" method="POST">
+                <a href="/events/<%=event._id%>/uploadCsv" class="btn btn-xs btn-info">Upload Schedule</a>               
+                <a href="/events/<%=event._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
+                <a href="/events/<%=event._id%>" class="btn btn-xs btn-info">SHOW</a>
+                <button class="btn btn-xs btn-danger">DELETE</button>
+            </form>
+        </li>        
+       <% }); %>
+
+
+<% include ../partials/footer %>

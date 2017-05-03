@@ -10,6 +10,7 @@ var express     = require("express"),
     Student     = require("./models/student"),
     Comment     = require("./models/comment"),
     User        = require("./models/user"),
+    Event        = require("./models/event"),
     session = require("express-session"),
     seedDB      = require("./seeds"),
     methodOverride = require("method-override");
@@ -23,8 +24,9 @@ var crypto = require('crypto');
 var commentRoutes    = require("./routes/comments"),
     campgroundRoutes = require("./routes/campgrounds"),
     studentRoutes   = require("./routes/students"),
-    slotRoutes      = require("./routes/slots"),
-    dayRoutes       = require("./routes/days"),
+    // slotRoutes      = require("./routes/slots"),
+    // dayRoutes       = require("./routes/days"),
+    eventRoutes       = require("./routes/events"),
     indexRoutes      = require("./routes/index");
     
 mongoose.connect("mongodb://localhost/yelp_camp_v9");
@@ -81,9 +83,10 @@ app.use("/", indexRoutes);
 app.use("/resetpw/:token", indexRoutes);
 app.use("/campgrounds", campgroundRoutes);
 app.use("/students", studentRoutes);
-app.use("/days", dayRoutes);
-app.use("/days/:dayId/slots", slotRoutes);
-app.use("/days/:dayId/slots/:slotId/students/:studentId", slotRoutes);
+app.use("/events", eventRoutes);
+app.use("/events/:eventId", eventRoutes);
+// app.use("/days/:dayId/slots", slotRoutes);
+// app.use("/days/:dayId/slots/:slotId/students/:studentId", slotRoutes);
 app.use("/campgrounds/:id/comments", commentRoutes);
 
 app.listen(process.env.PORT, process.env.IP, function(){

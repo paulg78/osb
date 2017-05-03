@@ -5,14 +5,14 @@
         <div style="width: 30%; margin: 25px auto;">      
         <div id="dvImportSegments" class="fileupload ">
             <fieldset>
-                <legend>Upload your CSV File</legend>
+                <legend>Upload your CSV File for event <%= event.name %></legend>
                 <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
             </fieldset>
         </div>
         </div>
     </div>
-    
-   <form action="/days/createSchedule" method="POST">
+ 
+   <form action="/events/<%=event._id%>/createSchedule" method="POST">
         <input type="hidden" id="scheduleId" name="scheduleString">
     <table id="schedule" name="schedule"></table>
     <div class="form-group">
