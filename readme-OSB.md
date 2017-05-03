@@ -1,7 +1,9 @@
 #OSB
 
 TODOS
-Allow student to be added only if there is space left in a slot
+change unscheduled student list to be based on students not on calendar
+(instead of students without a slot; stop using slot in student so we don't 
+have to deal with transactions); use index for that
 fix delete student
 add roles: 
   al:     modify schedule (days and slots); view all students
@@ -15,6 +17,7 @@ student create, read, update
 fill in school automatically as user's school
 added days: list, create, edit
 only show students owned by the user
+Allow student to be added only if there is space left in a slot
 
 
 RESTFUL ROUTES

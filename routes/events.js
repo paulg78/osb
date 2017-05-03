@@ -134,21 +134,21 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function(req, res) {
     //         populate { path: 'slots',  model: 'Slot',
     //             populate { path: 'students' model: 'Student'
     Event.findById(req.params.eventId)
-        .populate({ path: 'days',
-            populate: { path: 'slots',
-                populate: { path: 'students', model: 'Student'
-                }
-            }
-        })
+        // .populate({ path: 'days',
+        //     populate: { path: 'slots',
+        //         populate: { path: 'students', model: 'Student'
+        //         }
+        //     }
+        // })
+        .populate({ path: 'days.slots.students', model: 'Student'})
         .exec(function(err, foundEvent) {
             if (err) {
                 console.log(err);
             }
             else {
-                foundEvent.days.forEach(function(day) {
-                    console.log("day.slots=" + day.slots);
-                });
-
+                // foundEvent.days.forEach(function(day) {
+                //     console.log("day.slots=" + day.slots);
+                // });
                 // console.log("user id=" + req.user._id);
                 User.findById(req.user._id, function(err, userFound) {
                     if (err) {
@@ -191,9 +191,9 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function(req, res) {
 // update student with slot id
 // save the student
 router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function(req, res) {
-    console.log("adding student to slot");
-    console.log("studentId=" + req.params.studentId);
-    console.log("slotId=" + req.params.slotId);
+    // console.log("adding student to slot");
+    // console.log("studentId=" + req.params.studentId);
+    // console.log("slotId=" + req.params.slotId);
     Event.findById(req.params.eventId).exec(function(err, foundEvent) {
         if (err) {
             console.log(err);
