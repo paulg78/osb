@@ -2,23 +2,22 @@
 
      <header class="jumbotron">
          <div class="container">
-             <h1>Days in Schedule</h1>
+             <h1>Days in Event <%= event.name %></h1>
              <p>
                 <a class="btn btn-primary btn-lg" href="/days/new">Add New Day</a>
              </p>
          </div>
      </header>
      
-     <% days.forEach(function(day){ %>
+     <% event.days.forEach(function(day){ %>
         <li>
             <%= day.date %>
             <form style="display: inline" action="/days/<%=day._id%>?_method=DELETE" method="POST">
                 <a href="/days/<%=day._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
-                <a href="/days/<%=day._id%>" class="btn btn-xs btn-info">SHOW</a>
+                <a href="days/<%=day._id%>" class="btn btn-xs btn-info">SCHEDULE</a>
                 <button class="btn btn-xs btn-danger">DELETE</button>
             </form>
         </li>        
        <% }); %>
-
 
 <% include ../partials/footer %>

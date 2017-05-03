@@ -1,7 +1,7 @@
 <% include ../partials/header %>
 <div class="container">
- <span class="hidden" id="dayId"><%= day._id %></span>
   <h1 style="text-align: center">Add Students <%= day.date %></h1>
+  <span class="hidden" id="dayId"><%= day._id %></span>
 <div class="row">
 
 <div class="col-sm-6" style="background-color:pink;">
@@ -13,9 +13,9 @@
         <ul>        
         <% var cnt = 0; %>
         <% slot.students.forEach(function(student){ %>
-           <% if (student.school == school) { %>
+           <!--<% if (student.school == school) { %>-->
             <li><%= student.fname + " " + student.lname %></li>
-            <% } %>
+            <!--<% } %>-->
             <% cnt+=1; %>
         <% }) %>
         </ul>
@@ -48,8 +48,14 @@
  </div>  
  </div>
 <div style="width: 30%; margin: 25px auto;"class="well">
-      <a href="/days">Go Back</a>
-  </div>
+      <a href="events/<%= event._id %>/days">Go Back</a>
+  </div> 
+ 
+ 
+ 
+ 
+ 
  </div>
+ 
  <script src="/scripts/selectStudent.js"></script>
 <% include ../partials/footer %>
