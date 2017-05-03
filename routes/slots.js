@@ -62,7 +62,6 @@ router.post("/",middleware.isLoggedIn,function(req, res){
 // find student by id
 // update student with slot id
 // save the student
-
 router.put("/:slotId/students/:studentId", function(req, res){
     var slotId = req.params.slotId;
     var studentId = req.params.studentId;

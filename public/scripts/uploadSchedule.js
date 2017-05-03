@@ -21,6 +21,7 @@
                 });
             scheduleTable.appendChild(rowNode);
             });
+            $("#scheduleId").val(JSON.stringify(data));
         });
     }
 
