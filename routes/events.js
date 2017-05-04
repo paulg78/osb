@@ -8,11 +8,12 @@ var middleware = require("../middleware");
 //INDEX - show all days
 router.get("/", function(req, res) {
     // Get all days from DB
-    Event.find({}, function(err, allEvents) {
+    Event.find({}, 'name', function(err, allEvents) {
         if (err) {
             console.log(err);
         }
         else {
+            console.log("allEvents=" + allEvents);
             res.render("events/index", {
                 events: allEvents
             });
@@ -105,11 +106,14 @@ router.post("/:eventId/createSchedule", function(req, res) {
 router.get("/:eventId/days", function(req, res) {
     //find the event with provided ID
     // Event.findById(req.params.eventId).populate("slots").exec(function(err, foundEvent) {  // populates slots but not students
-    Event.findById(req.params.eventId).exec(function(err, foundEvent) {
+    Event.findById(req.params.eventId)
+    .select('name days.date days._id')
+    .exec(function(err, foundEvent) {
         if (err) {
             console.log(err);
         }
         else {
+            console.log("foundEvent=" + foundEvent);
             res.render("events/days", {
                 event: foundEvent
             });
@@ -160,7 +164,8 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function(req, res) {
                         Student.find({
                             school: userFound.school,
                             slot: undefined
-                        }, function(err, queryResponse) {
+                        }, 'fname lname grade',
+                        function(err, queryResponse) {
                             if (err) {
                                 console.log(err);
                             }
@@ -170,6 +175,7 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function(req, res) {
                                 // console.log("req.params.dayId=" + req.params.dayId);
                                 // console.log("foundEvent.days=" + foundEvent.days);
                                 // console.log("day=" + getById(foundEvent.days, req.params.dayId));
+                                console.log("queryResponse=" + queryResponse);
                                 res.render("events/daySchedule", {
                                     event: foundEvent,
                                     day: getById(foundEvent.days, req.params.dayId),
