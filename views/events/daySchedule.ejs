@@ -14,7 +14,7 @@
         <% var cnt = 0; %>
         <% slot.students.forEach(function(student){ %>
            <!--<% if (student.school == school) { %>-->
-            <li><%= student.fname + " " + student.lname %></li>
+            <li><%= student.fullName %></li>
             <!--<% } %>-->
             <% cnt+=1; %>
         <% }) %>
@@ -41,7 +41,7 @@
     <h3>Unscheduled Students</h3>
   <ul class="list-group">
       <% students.forEach(function(student) { %>
-        <li class="list-group-item"><%= student.fname + " " + student.lname + ", grade " + student.grade%>
+        <li class="list-group-item" style="height: 30px; padding: 5px 15px;"><%= student.fullName + ", grade " + student.grade%>
         <span name="studentId" class="hidden"><%= student._id %></span></li>
       <% }) %>
   </ul>
