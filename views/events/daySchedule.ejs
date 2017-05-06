@@ -4,23 +4,22 @@
     <span class="hidden" id="dayId"><%= day._id %></span>
     <div class="row">
         <div class="col-sm-10">
-            <% day.slots.forEach(function(slot){ %>
-                <div class="row solidborder">
-                    <div class="col-sm-11">
+            <div class="row" style="display:flex; flex-wrap: wrap;">
+                <% day.slots.forEach(function(slot){ %>
+                    <div class="col-sm-3">
                         <strong><%= slot.time %></strong><span>
                         <% var remaining = slot.max - slot.students.length; %>   
                         <% if (remaining > 0) { %>
                             <%= " (" + remaining + ")" %></span>
                             <% } %>
-                        <% var delim=" : "; %>
+                    <ul class="list-group">
                         <% slot.students.forEach(function(student){ %>
                             <% if (student.school == school) { %>
-                                <%= delim + " " + student.fullName %>
-                                <% delim=","; %>                                    
+                                <li class="list-group-item" style="height: 25px; padding: 2px 10px;" name="schedStud">
+                                    <data value=<%= student._id %>><%= student.fullName %></data></li>
                             <% } %>
                         <% }) %>
-                    </div>
-                    <div class="col-sm-1"> 
+                    </ul>                        
                         <% if (remaining > 0) { %>
                             <form method="POST">
                                 <div class="form-group">
@@ -30,14 +29,14 @@
                             </form>
                         <% } %>
                     </div>
-                </div>
-            <% }) %>
+                <% }) %>
+            </div>
         </div>
         <div class="col-sm-2">
             <h4>Unscheduled:</h4>
             <ul class="list-group">
                 <% students.forEach(function(student) { %>
-                    <li class="list-group-item" style="height: 30px; padding: 5px 15px;"><%= student.fullName + "(" + student.grade + ")"%>
+                    <li class="list-group-item" style="height: 30px; padding: 5px 15px;" name="unschedStud"><%= student.fullName + "(" + student.grade + ")"%>
                     <span name="studentId" class="hidden"><%= student._id %></span></li>
                 <% }) %>
             </ul>
