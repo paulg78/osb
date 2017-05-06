@@ -5,38 +5,36 @@
     <div class="row">
         <div class="col-sm-10">
             <% day.slots.forEach(function(slot){ %>
-                <div class="row">
-
-                    <div class="col-sm-6" style="background-color:grey;">
-                        <h4><%= slot.time %><span class="glyphicon glyphicon-plus"></span></h4>
-                        <ul>        
-                            <% var cnt = 0; %>
-                            <% slot.students.forEach(function(student){ %>
-                                <% if (student.school == school) { %>
-                                    <li><%= student.fullName %></li>
-                                <% } %>
-                                <% cnt+=1; %>
-                            <% }) %>
-                        </ul>
+                <div class="row solidborder">
+                    <div class="col-sm-11">
+                        <strong><%= slot.time %></strong><span>
+                        <% var remaining = slot.max - slot.students.length; %>   
+                        <% if (remaining > 0) { %>
+                            <%= " (" + remaining + ")" %></span>
+                            <% } %>
+                        <% var delim=" : "; %>
+                        <% slot.students.forEach(function(student){ %>
+                            <% if (student.school == school) { %>
+                                <%= delim + " " + student.fullName %>
+                                <% delim=","; %>                                    
+                            <% } %>
+                        <% }) %>
                     </div>
-                    <div class="col-sm-6" style="background-color:green;"> 
-                        <% var slotsLeft = slot.max - cnt; %>
-                        <% if (slotsLeft > 0) { %>
-                            <%= slotsLeft + " appointments available" %>        
+                    <div class="col-sm-1"> 
+                        <% if (remaining > 0) { %>
                             <form method="POST">
                                 <div class="form-group">
                                     <input class="hidden" type="text" name="slotId" value="<%= slot._id %>">
-                                    <button type=submit disabled=disabled name="addStudentBtn">Add student</button>
-                                    <!--<input type="submit" disabled=disabled name="addStudentBtn" value="Add student">-->
+                                    <button type=submit disabled=disabled name="addStudentBtn"><span class="glyphicon glyphicon-plus"></span></button>
                                 </div>
                             </form>
-                            <% } %>
+                        <% } %>
                     </div>
                 </div>
             <% }) %>
         </div>
-        <div class="col-sm-2" style="background-color:yellow;">
-            <h3>Unscheduled Students</h3>
+        <div class="col-sm-2">
+            <h4>Unscheduled:</h4>
             <ul class="list-group">
                 <% students.forEach(function(student) { %>
                     <li class="list-group-item" style="height: 30px; padding: 5px 15px;"><%= student.fullName + "(" + student.grade + ")"%>

@@ -14,3 +14,8 @@ table, th, td {
     border: 1px solid black;
     border-collapse: collapse;
 }
+
+.solidborder {
+    border-style: solid;
+    border-width: 1px;
+}
