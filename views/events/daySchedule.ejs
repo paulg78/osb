@@ -1,61 +1,54 @@
 <% include ../partials/header %>
 <div class="container">
-  <h1 style="text-align: center">Add Students <%= day.date %></h1>
-  <span class="hidden" id="dayId"><%= day._id %></span>
-<div class="row">
+    <h2 style="text-align: center">Add Students <%= day.date %></h2>
+    <span class="hidden" id="dayId"><%= day._id %></span>
+    <div class="row">
+        <div class="col-sm-10">
+            <% day.slots.forEach(function(slot){ %>
+                <div class="row">
 
-<div class="col-sm-6" style="background-color:pink;">
-
-   <% day.slots.forEach(function(slot){ %>
-   <div class="row">
-<div class="col-sm-6" style="background-color:grey;">
-    <h3><%= slot.time %></h3>
-        <ul>        
-        <% var cnt = 0; %>
-        <% slot.students.forEach(function(student){ %>
-           <!--<% if (student.school == school) { %>-->
-            <li><%= student.fullName %></li>
-            <!--<% } %>-->
-            <% cnt+=1; %>
-        <% }) %>
-        </ul>
-        </div>
-        <div class="col-sm-6" style="background-color:green;"> 
-        <% var slotsLeft = slot.max - cnt; %>
-        <% if (slotsLeft > 0) { %>
-            <%= slotsLeft + " appointments available" %>        
-             <form method="POST">
-                <div class="form-group">
-                    <input class="hidden" type="text" name="slotId" value="<%= slot._id %>">
-                    <button type=submit disabled=disabled name="addStudentBtn">Add student</button>
-                    <!--<input type="submit" disabled=disabled name="addStudentBtn" value="Add student">-->
+                    <div class="col-sm-6" style="background-color:grey;">
+                        <h4><%= slot.time %><span class="glyphicon glyphicon-plus"></span></h4>
+                        <ul>        
+                            <% var cnt = 0; %>
+                            <% slot.students.forEach(function(student){ %>
+                                <% if (student.school == school) { %>
+                                    <li><%= student.fullName %></li>
+                                <% } %>
+                                <% cnt+=1; %>
+                            <% }) %>
+                        </ul>
+                    </div>
+                    <div class="col-sm-6" style="background-color:green;"> 
+                        <% var slotsLeft = slot.max - cnt; %>
+                        <% if (slotsLeft > 0) { %>
+                            <%= slotsLeft + " appointments available" %>        
+                            <form method="POST">
+                                <div class="form-group">
+                                    <input class="hidden" type="text" name="slotId" value="<%= slot._id %>">
+                                    <button type=submit disabled=disabled name="addStudentBtn">Add student</button>
+                                    <!--<input type="submit" disabled=disabled name="addStudentBtn" value="Add student">-->
+                                </div>
+                            </form>
+                            <% } %>
+                    </div>
                 </div>
-            </form>
-            <% } %>
+            <% }) %>
         </div>
-  </div>
-  <% }) %>
-
-  </div>
-<div class="col-sm-6" style="background-color:yellow;">
-    <h3>Unscheduled Students</h3>
-  <ul class="list-group">
-      <% students.forEach(function(student) { %>
-        <li class="list-group-item" style="height: 30px; padding: 5px 15px;"><%= student.fullName + ", grade " + student.grade%>
-        <span name="studentId" class="hidden"><%= student._id %></span></li>
-      <% }) %>
-  </ul>
- </div>  
- </div>
-<div style="width: 30%; margin: 25px auto;"class="well">
-      <a href="events/<%= event._id %>/days">Go Back</a>
-  </div> 
+        <div class="col-sm-2" style="background-color:yellow;">
+            <h3>Unscheduled Students</h3>
+            <ul class="list-group">
+                <% students.forEach(function(student) { %>
+                    <li class="list-group-item" style="height: 30px; padding: 5px 15px;"><%= student.fullName + "(" + student.grade + ")"%>
+                    <span name="studentId" class="hidden"><%= student._id %></span></li>
+                <% }) %>
+            </ul>
+        </div>  
+    </div>
+    <div style="width: 30%; margin: 25px auto;"class="well">
+          <a href="/events/<%= event._id %>/days">Go Back</a>
+    </div> 
+</div>
  
- 
- 
- 
- 
- </div>
- 
- <script src="/scripts/selectStudent.js"></script>
+<script src="/scripts/selectStudent.js"></script>
 <% include ../partials/footer %>

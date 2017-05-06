@@ -113,7 +113,7 @@ router.get("/:eventId/days", function(req, res) {
             console.log(err);
         }
         else {
-            console.log("foundEvent=" + foundEvent);
+            // console.log("foundEvent=" + foundEvent);
             res.render("events/days", {
                 event: foundEvent
             });
@@ -175,7 +175,7 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function(req, res) {
                                 // console.log("req.params.dayId=" + req.params.dayId);
                                 // console.log("foundEvent.days=" + foundEvent.days);
                                 // console.log("day=" + getById(foundEvent.days, req.params.dayId));
-                                console.log("queryResponse=" + queryResponse);
+                                // console.log("queryResponse=" + queryResponse);
                                 res.render("events/daySchedule", {
                                     event: foundEvent,
                                     day: getById(foundEvent.days, req.params.dayId),
