@@ -186,18 +186,16 @@ router.post('/resetpw/:token', function(req, res) {
         user.resetPasswordExpires = undefined;
 
         user.save(function(err) {
-          
-          req.logIn(user, function(err) {
-            if (err) { 
+             if (err) {
+                req.flash('failureRedirect', "Error--new password didn't save.");
+                res.redirect('/forgotpw');          
+             }
+             else {
               done(err, user); 
+            req.flash('success', 'Success! Your password has been changed.');
+            res.redirect('/login');                   
               return;
             }
-            req.flash('success', 'Success! Your password has been changed.');
-            res.redirect('/days');          
-         
-          // req.logIn(user, function(err) {
-          //   done(err, user);
-          });
         });
       });
     },
@@ -223,7 +221,7 @@ router.post('/resetpw/:token', function(req, res) {
       // });
     }
   ], function(err) {
-    res.redirect('/');
+    res.redirect('/login');
   });
 });
 
