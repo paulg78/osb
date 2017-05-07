@@ -19,3 +19,13 @@ table, th, td {
     border-style: solid;
     border-width: 1px;
 }
+
+.addRemBtn {
+    color: red;
+    font-size: 1em;
+    /*position: relative;*/
+    /*width: 100px;*/
+    /*height: 100px;*/
+    /*top: 0;*/
+    /*right: 0;*/
+}

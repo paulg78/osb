@@ -1,22 +1,20 @@
 /* global $ */
 
-// Activate selected student on unscheduled list
-// $('.list-group-item').on('click', function() {
+// Activate unscheduled student and enable add buttons
 $("[name='unschedStud']").on('click', function() {
-    $('.active').filter("[name='unschedStud']").removeClass('active');
+    // too confusing and not useful to allow both a sheduled and unscheduled student to be active at same time
+    $('.active').removeClass('active');    
+    // $('.active').filter("[name='unschedStud']").removeClass('active');
     $(this).toggleClass('active');
-    // enable add student buttons
     $("[name='addStudentBtn']").attr("disabled",false);
 });
 
 // Add student to schedule
-// Set form action (URL)
-// $(":input").on('click', function() {
 $("[name='addStudentBtn']").on('click', function() {
     console.log("clicked add student");
     var dayId = $("#dayId").text(); 
-    var slotId= $(this).parent().children("[name='slotId']").val();
-    var studentId= $('.active').children("[name=studentId]").text();
+    var slotId= $(this).parent().parent().parent().find("[name='slotId']").text()
+    var studentId= $('.active').filter("[name='unschedStud']").children("[name=studentId]").text();
     console.log("dayId=" + dayId);
     console.log("slotId=" + slotId);
     console.log("studentId=" + studentId);
@@ -24,24 +22,27 @@ $("[name='addStudentBtn']").on('click', function() {
     $(this)[0].form.action = dayId + "/slots/" + slotId + "/students/" + studentId + "?_method=PUT";
 });
 
-// Show remove button for scheduled student selected
+// Activate scheduled student and show remove button
 $("[name='schedStud']").on('click', function() {
+    // too confusing and not useful to allow both a sheduled and unscheduled student to be active at same time
+    $('.active').removeClass('active');   
     // $('.active').filter("[name='schedStud']").removeClass('active');
-    // $(this).toggleClass('active
+    $(this).toggleClass('active');
+    $(this).parent().parent().find("[name='remStudentBtn']").removeClass('hidden');
     //fix problem of item being clicked more than once (check if button already exists)
-    $(this).parent().children().append('<button type="button" id="removeStudentbtn">remove</button>');
+    // $(this).parent().children().append('<button type="button" id="removeStudentbtn">remove</button>');
     // // enable add student buttons
     // $("[name='addStudentBtn']").attr("disabled",false);
 });
 
 // Remove student from schedule
-$("#removeStudentbtn").on('click', function() {
+$("[name='remStudentBtn']").on('click', function() {
     console.log("clicked remove student");
-    // var dayId = $("#dayId").text(); 
-    // var slotId= $(this).parent().children("[name='slotId']").val();
-    // var studentId= $('.active').children("[name=studentId]").text();
-    // console.log("dayId=" + dayId);
-    // console.log("slotId=" + slotId);
-    // console.log("studentId=" + studentId);
-    // $(this)[0].form.action = dayId + "/slots/" + slotId + "/students/" + studentId + "?_method=PUT";
+    var dayId = $("#dayId").text(); 
+    var slotId= $(this).parent().parent().parent().find("[name='slotId']").text()
+    var studentId= $('.active').filter("[name='schedStud']").children("[name=studentId]").text();
+    console.log("dayId=" + dayId);
+    console.log("slotId=" + slotId);
+    console.log("studentId=" + studentId);
+    $(this)[0].form.action = dayId + "/slots/" + slotId + "/students/" + studentId + "?_method=DELETE";
 });

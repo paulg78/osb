@@ -6,28 +6,32 @@
         <div class="col-sm-10">
             <div class="row" style="display:flex; flex-wrap: wrap;">
                 <% day.slots.forEach(function(slot){ %>
-                    <div class="col-sm-3">
-                        <strong><%= slot.time %></strong><span>
+                    <div class="col-sm-3 solidborder">
+                        <span class="hidden" type="text" name="slotId"><%= slot._id %></span>
+                         <strong><%= slot.time %></strong>
                         <% var remaining = slot.max - slot.students.length; %>   
                         <% if (remaining > 0) { %>
-                            <%= " (" + remaining + ")" %></span>
+                            <%= " (" + remaining + ")  " %>
+                           <form method="POST">
+                                <div class="form-group">
+                                    <button type=submit class="addRemBtn" disabled=disabled name="addStudentBtn">+</button>
+                                </div>
+                            </form>
                             <% } %>
+                          <form method="POST">
+                                <div class="form-group">
+                                    <button type=submit class="hidden addRemBtn" name="remStudentBtn">-</button>
+                                </div>
+                            </form>                    
                     <ul class="list-group">
                         <% slot.students.forEach(function(student){ %>
                             <% if (student.school == school) { %>
-                                <li class="list-group-item" style="height: 25px; padding: 2px 10px;" name="schedStud">
-                                    <data value=<%= student._id %>><%= student.fullName %></data></li>
+                                <li class="list-group-item" style="height: 25px; padding: 2px 10px;" name="schedStud"><%= student.fullName %>
+                                    <span name="studentId" class="hidden"><%= student._id %></span></li>
                             <% } %>
                         <% }) %>
                     </ul>                        
-                        <% if (remaining > 0) { %>
-                            <form method="POST">
-                                <div class="form-group">
-                                    <input class="hidden" type="text" name="slotId" value="<%= slot._id %>">
-                                    <button type=submit disabled=disabled name="addStudentBtn"><span class="glyphicon glyphicon-plus"></span></button>
-                                </div>
-                            </form>
-                        <% } %>
+
                     </div>
                 <% }) %>
             </div>

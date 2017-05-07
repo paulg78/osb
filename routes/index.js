@@ -2,6 +2,7 @@ var express = require("express");
 var router  = express.Router();
 var passport = require("passport");
 var User = require("../models/user");
+var Event = require("../models/event");
 var async = require('async');
 var crypto = require('crypto');
 // var nodemailer = require('nodemailer');
@@ -69,7 +70,22 @@ router.post('/login', function(req, res, next) {
     }
     req.logIn(user, function(err) {
       if (err) return next(err);
-      return res.redirect('/events');
+      
+      // If there is only one event, go right to days for that event
+      Event.find({}, 'name', function(err, allEvents) {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          if (allEvents.length == 1) {
+            res.redirect("events/" + allEvents[0]._id + "/days");
+          }
+          else {
+            return res.redirect('/events');
+          }
+          }
+       });
+
     });
   })(req, res, next);
 });
