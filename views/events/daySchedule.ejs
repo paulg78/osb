@@ -8,20 +8,16 @@
                 <% day.slots.forEach(function(slot){ %>
                     <div class="col-sm-3 solidborder">
                         <span class="hidden" type="text" name="slotId"><%= slot._id %></span>
-                         <strong><%= slot.time %></strong>
+                        <form class="form-inline" method="POST">
+                        <strong><%= slot.time %></strong>
                         <% var remaining = slot.max - slot.students.length; %>   
                         <% if (remaining > 0) { %>
                             <%= " (" + remaining + ")  " %>
-                           <form method="POST">
-                                <div class="form-group">
-                                    <button type=submit class="addRemBtn" disabled=disabled name="addStudentBtn">+</button>
-                                </div>
+                            <button type=submit class="addStudBtn" disabled=disabled name="addStudentBtn">+</button>
                             </form>
                             <% } %>
-                          <form method="POST">
-                                <div class="form-group">
-                                    <button type=submit class="hidden addRemBtn" name="remStudentBtn">-</button>
-                                </div>
+                          <form class="form-inline" method="POST">
+                                    <button type=submit style="display: none;" class="RemStudBtn" name="remStudentBtn">-</button>
                             </form>                    
                     <ul class="list-group">
                         <% slot.students.forEach(function(student){ %>

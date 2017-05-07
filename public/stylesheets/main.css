@@ -18,14 +18,17 @@ table, th, td {
 .solidborder {
     border-style: solid;
     border-width: 1px;
+    /*border-right: none;*/
+    /*border-bottom: none;*/
 }
 
-.addRemBtn {
+.addStudBtn {
     color: red;
     font-size: 1em;
-    /*position: relative;*/
-    /*width: 100px;*/
-    /*height: 100px;*/
-    /*top: 0;*/
-    /*right: 0;*/
+    float: right;
+}
+
+.remStudBtn {
+    color: red;
+    font-size: 1em;
 }
