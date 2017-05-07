@@ -3,16 +3,16 @@ var passportLocalMongoose = require("passport-local-mongoose");
 var bcrypt = require('bcrypt-nodejs');
 
 var UserSchema = new mongoose.Schema({
-    username: {
+    username: {   // email address
         type: String,
         required: true,
         unique: true
     },
-    email: {
-        type: String,
-        required: true,
-        unique: true
-    },
+    // email: {
+    //     type: String,
+    //     required: true,
+    //     unique: true
+    // },
     password: {
         type: String
         // required: true
@@ -47,6 +47,6 @@ UserSchema.methods.comparePassword = function(candidatePassword, cb) {
   });
 };
 
-UserSchema.plugin(passportLocalMongoose)
+UserSchema.plugin(passportLocalMongoose);
 
 module.exports = mongoose.model("User", UserSchema);

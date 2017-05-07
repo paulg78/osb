@@ -17,26 +17,9 @@ router.get("/register", function(req, res){
    res.render("register"); 
 });
 
-//handle sign up logic
-// router.post("/register", function(req, res){
-//     var newUser = new User({username: req.body.username, email: req.body.email, school: req.body.school});
-//     User.register(newUser, req.body.password, function(err, user){
-//         if(err){
-//             console.log(err);
-//             req.flash("error", err.message);
-//             return res.render("register");
-//         }
-//         passport.authenticate("local")(req, res, function(){
-//           req.flash("success", "Successfully Signed Up!" + req.body.username);
-//           res.redirect("/students"); 
-//         });
-//     });
-// });
-
 router.post('/register', function(req, res) {
   var user = new User({
       username: req.body.username,
-      email: req.body.email,
       password: req.body.password,
       school: req.body.school
     });
@@ -114,9 +97,9 @@ router.post('/forgotpw', function(req, res, next) {
       });
     },
     function(token, done) {
-      User.findOne({ email: req.body.email }, function(err, user) {
+      User.findOne({ username: req.body.username }, function(err, user) {
         if (!user) {
-          req.flash('error', 'No account with that email address exists.');
+          req.flash('error', "No account with email address " + req.body.username + " exists.");
           return res.redirect('/forgotpw');
         }
 
@@ -130,7 +113,7 @@ router.post('/forgotpw', function(req, res, next) {
     },
     function(token, user, done) {
       console.log("would send email, if it worked with token=" + token);
-      req.flash('success', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+      req.flash('success', 'An e-mail has been sent to ' + user.username + ' with further instructions.');
       res.redirect('/login');
     //   var smtpTransport = nodemailer.createTransport('SMTP', {
     //     service: 'mailgun',
@@ -140,7 +123,7 @@ router.post('/forgotpw', function(req, res, next) {
     //     }
     //   });
     //   var mailOptions = {
-    //     to: user.email,
+    //     to: user.username,
     //     from: 'paulg7884@gmail.com',
     //     subject: 'Node.js Password Reset',
     //     text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
@@ -149,7 +132,7 @@ router.post('/forgotpw', function(req, res, next) {
     //       'If you did not request this, please ignore this email and your password will remain unchanged.\n'
     //   };
     //   smtpTransport.sendMail(mailOptions, function(err) {
-    //     req.flash('info', 'An e-mail has been sent to ' + user.email + ' with further instructions.');
+    //     req.flash('info', 'An e-mail has been sent to ' + user.username + ' with further instructions.');
     //     done(err, 'done');
     //   });
     }
@@ -209,11 +192,11 @@ router.post('/resetpw/:token', function(req, res) {
       //   }
       // });
       // var mailOptions = {
-      //   to: user.email,
+      //   to: user.username,
       //   from: 'passwordreset@demo.com',
       //   subject: 'Your password has been changed',
       //   text: 'Hello,\n\n' +
-      //     'This is a confirmation that the password for your account ' + user.email + ' has just been changed.\n'
+      //     'This is a confirmation that the password for your account ' + user.username + ' has just been changed.\n'
       // };
       // smtpTransport.sendMail(mailOptions, function(err) {
       //   req.flash('success', 'Success! Your password has been changed.');
