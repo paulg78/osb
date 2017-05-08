@@ -88,8 +88,6 @@ app.use("/students", studentRoutes);
 app.use("/events", eventRoutes);
 app.use("/events/:eventId", eventRoutes);
 app.use("/events/:eventId/days/:dayId", eventRoutes);
-// app.use("/days/:dayId/slots", slotRoutes);
-// app.use("/days/:dayId/slots/:slotId/students/:studentId", slotRoutes);
 app.use("/campgrounds/:id/comments", commentRoutes);
 
 app.listen(process.env.PORT, process.env.IP, function(){

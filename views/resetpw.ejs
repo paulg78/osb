@@ -1,7 +1,7 @@
 <% include ./partials/header %>
 <div class="container">
     <div class="row">
-        <h1 style="text-align: center">Reset Password</h1>
+        <h1 style="text-align: center">Create New Password</h1>
         <h4 style="text-align: center">Please enter new password twice.</h4>
         <div style="width: 30%; margin: 25px auto;">
             <form action="/resetpw/<%=user.resetPasswordToken%>" method="post">
@@ -12,11 +12,10 @@
                     <input class="form-control" type="password" name="confirm" placeholder="confirm password">
                 </div>
                 <div class="form-group">
-                    <button class="btn btn-lg btn-primary btn-block">Update Password</button>
+                    <button class="btn btn-lg btn-primary btn-block">Save new password</button>
                 </div>
             </form>
-            <a href="/days">Go Back</a>
-            <a href="/forgotpw">Reset Password</a>            
+            <a href="/login">Cancel</a>
         </div>
     </div>
 </div>

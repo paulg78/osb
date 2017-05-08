@@ -20,7 +20,7 @@
                 <ul class="nav navbar-nav navbar-right">
                     <% if(!currentUser){ %>
                         <li><a href="/login">Login</a></li>
-                        <li><a href="/register">Sign Up</a></li>
+                        <li><a href="/requestpwreset">Register</a></li>
                     <% } else { %>
                         <li><a href="#">Signed In As <%= currentUser.name %></a></li>
                         <li><a href="/logout">Logout</a></li>
