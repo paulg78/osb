@@ -5,26 +5,13 @@ var middleware = require("../middleware");
 var request = require("request");
 
 //INDEX - show students for school of logged in user
-router.get("/", function(req, res){
-    // Get all students from DB
-    // console.log("req.user.school=" + req.user.school);
-    // console.log("currentUser.school=" + currentUser.school);
-    // console.log("res:");
-    // console.log(res);
-    var userSchool;
-    if (res.locals.currentUser == undefined) {
-        userSchool = "";
-        console.log("*** current user is undefined");
-    }
-    else {
-        userSchool = res.locals.currentUser.school;
-    }
-    
-    Student.find({school: userSchool}, function(err, queryResponse){
+router.get("/", middleware.isLoggedIn, function(req, res){
+
+    Student.find({school: res.locals.currentUser.school}, function(err, queryResponse){
        if(err){
            console.log(err);
        } else {
-          res.render("students/index",{students:queryResponse, school: userSchool});
+          res.render("students/index",{students:queryResponse});
          }
     });
 });

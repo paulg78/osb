@@ -27,7 +27,8 @@ var commentRoutes    = require("./routes/comments"),
     // slotRoutes      = require("./routes/slots"),
     // dayRoutes       = require("./routes/days"),
     eventRoutes       = require("./routes/events"),
-    indexRoutes      = require("./routes/index");
+    indexRoutes      = require("./routes/index"),
+    userRoutes    = require("./routes/users");
     
 mongoose.connect("mongodb://localhost/yelp_camp_v9");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -82,6 +83,7 @@ app.use(function(req, res, next){
 app.use("/", indexRoutes);
 app.use("/resetpw/:token", indexRoutes);
 app.use("/campgrounds", campgroundRoutes);
+app.use("/users", userRoutes);
 app.use("/students", studentRoutes);
 app.use("/events", eventRoutes);
 app.use("/events/:eventId", eventRoutes);

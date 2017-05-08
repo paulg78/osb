@@ -1,0 +1,25 @@
+<% include ../partials/header %> 
+
+     <header>
+         <div class="container">
+             <h1>Users</h1>
+             <p>
+                <a class="btn btn-primary btn-lg" href="/users/new">Add New User</a>
+             </p>
+         </div>
+     </header>
+     <h2>Username name role school</h2>
+     <% users.forEach(function(user){ %>
+        <li>
+            <%= user.username %>
+            <%= user.name %>
+            <%= user.role %>
+            <%= user.school %>
+            <form style="display: inline" action="/users/<%=user._id%>?_method=DELETE" method="POST">
+                <a href="/users/<%=user._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
+                <button class="hidden" class="btn btn-xs btn-danger">DELETE</button>
+            </form>
+        </li>
+    <% }); %>
+
+<% include ../partials/footer %>

@@ -1,0 +1,28 @@
+<% include ../partials/header %>
+    <div class="row">
+        <h1 style="text-align: center">Create a New user</h1>
+        <div style="width: 30%; margin: 25px auto;">
+            <form action="/users" method="POST">
+                <div class="form-group">
+                    <input class="form-control" type="text" name="username" placeholder="email address">
+                    <p>username needs to be email address when we start sending email</p>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="name" placeholder="full name">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="role" placeholder="role">
+                    <p>role values: role_sc, role_al, role_wa</p>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="school" placeholder="school">
+                </div>
+                <div class="form-group">
+                    <button type=submit class="btn btn-lg btn-primary btn-block">Submit!</button>
+                </div>
+            </form>
+            <a href="/users">Go Back</a>
+        </div>
+    </div>
+<% include ../partials/footer %>
+

@@ -8,17 +8,14 @@ var UserSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    // email: {
-    //     type: String,
-    //     required: true,
-    //     unique: true
-    // },
     password: {
         type: String
         // required: true
     },
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    role: String, // values: role_sc, role_al, role_wa
+    name: String,
     school: String
 });
 
