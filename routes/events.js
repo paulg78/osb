@@ -13,7 +13,7 @@ router.get("/", function(req, res) {
             console.log(err);
         }
         else {
-            console.log("allEvents=" + allEvents);
+            // console.log("allEvents=" + allEvents);
             res.render("events/index", {
                 events: allEvents
             });
@@ -236,7 +236,7 @@ router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function(r
             var day = getById(foundEvent.days, req.params.dayId);
             var slot = getById(day.slots, req.params.slotId);
             slot.students.push(req.params.studentId);
-            console.log("slot.students=" + slot.students);
+            // console.log("slot.students=" + slot.students);
             foundEvent.save(function (err) {
                 if (err) {
                     console.log(err);

@@ -9,15 +9,19 @@
          </div>
      </header>
      
+<div class="container dayList">
+    <table>
      <% event.days.forEach(function(day){ %>
-        <li>
-            <%= day.date %>
-            <form style="display: inline" action="/days/<%=day._id%>?_method=DELETE" method="POST">
-                <a href="/days/<%=day._id%>/edit" class="hidden" class="btn btn-xs btn-info">EDIT</a>
-                <a href="days/<%=day._id%>" class="btn btn-xs btn-info">SCHEDULE</a>
-                <button class="hidden" class="btn btn-xs btn-danger">DELETE</button>
+        <tr>
+      <td>     <form style="display: inline" action="/days/<%=day._id%>?_method=DELETE" method="POST">
+               <%= day.date %> </td> 
+        <td>        <a href="/days/<%=day._id%>/edit" class="hidden" class="btn btn-xs btn-info">EDIT</a></td> 
+        <td>        <a href="days/<%=day._id%>" class="btn btn-xs btn-info">SCHEDULE</a></td> 
+        <td>        <button class="hidden" class="btn btn-xs btn-danger">DELETE</button></td> 
             </form>
-        </li>        
+        </tr>
        <% }); %>
+    </table>
+</div>
 
 <% include ../partials/footer %>
