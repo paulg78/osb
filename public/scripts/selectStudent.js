@@ -26,20 +26,18 @@ $("[name='addStudentBtn']").on('click', function() {
 
 // Activate scheduled student and show remove button
 $("[name='schedStud']").on('click', function() {
-    // hide all the unschedule buttons
-    $("[name='remStudentBtn']").hide();
-    // too confusing and not useful to allow both a sheduled and unscheduled student to be active at same time
-    $('.active').removeClass('active');   
-    // $('.active').filter("[name='schedStud']").removeClass('active');
-    $(this).toggleClass('active');
-    $(this).parent().parent().find("[name='remStudentBtn']").show();
-    // disable add student buttons
-    $("[name='addStudentBtn']").attr("disabled",true);   
-    // $(this).parent().parent().find("[name='remStudentBtn']").removeClass('hidden');    
-    //fix problem of item being clicked more than once (check if button already exists)
-    // $(this).parent().children().append('<button type="button" id="removeStudentbtn">remove</button>');
-    // // enable add student buttons
-    // $("[name='addStudentBtn']").attr("disabled",false);
+    var school = $("#school").text();
+    if (school != "") {  // only school counselors can remove students from schedule
+        // hide all the unschedule buttons
+        $("[name='remStudentBtn']").hide();
+        // too confusing and not useful to allow both a sheduled and unscheduled student to be active at same time
+        $('.active').removeClass('active');   
+        // $('.active').filter("[name='schedStud']").removeClass('active');
+        $(this).toggleClass('active');
+        $(this).parent().parent().find("[name='remStudentBtn']").show();
+        // disable add student buttons
+        $("[name='addStudentBtn']").attr("disabled",true);
+    }
 });
 
 // Remove student from schedule
