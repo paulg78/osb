@@ -1,124 +1,10 @@
-#YelpCamp
-
-##Initial Setup
-* Add Landing Page
-* Add Campgrounds Page that lists all campgrounds
-
-Each Campground has:
-   * Name
-   * Image
-
-##Layout and Basic Styling
-* Create our header and footer partials
-* Add in Bootstrap
-
-##Creating New Campgrounds
-* Setup new campground POST route
-* Add in body-parser
-* Setup route to show form
-* Add basic unstyled form
-
-##Style the campgrounds page
-* Add a better header/title
-* Make campgrounds display in a grid
-
-##Style the Navbar and Form
-* Add a navbar to all templates
-* Style the new campground form
-
-##Add Mongoose
-* Install and configure Mongoose
-* Setup campground model
-* Use campground model inside of our routes
-
-##Show Page
-* Review the RESTful routes we've seen so far
-* Add description to our campground model
-* Show db.collection.drop()
-* Add a show route/template
-
-##Refactor Mongoose Code
-* Create a models directory
-* Use module.exports
-* Require everything correctly!
-
-##Add Seeds File
-* Add a seeds.js file
-* Run the seeds file every time the server starts
-
-##Add the Comment model!
-* Make our errors go away!
-* Display comments on campground show page
-
-##Comment New/Create
-* Discuss nested routes
-* Add the comment new and create routes
-* Add the new comment form
-
-##Style Show Page
-* Add sidebar to show page
-* Display comments nicely
-
-##Finish Styling Show Page
-* Add public directory
-* Add custom stylesheet
-
-##Auth Pt. 1 - Add User Model
-* Install all packages needed for auth
-* Define User model 
-
-##Auth Pt. 2 - Register
-* Configure Passport
-* Add register routes
-* Add register template
-
-##Auth Pt. 3 - Login
-* Add login routes
-* Add login template
-
-##Auth Pt. 4 - Logout/Navbar
-* Add logout route
-* Prevent user from adding a comment if not signed in
-* Add links to navbar
-
-##Auth Pt. 5 - Show/Hide Links
-* Show/hide auth links in navbar 
-
-##Refactor The Routes
-* Use Express router to reoragnize all routes
-
-##Users + Comments
-* Associate users and comments
-* Save author's name to a comment automatically
-
-##Users + Campgrounds
-* Prevent an unauthenticated user from creating a campground
-* Save username+id to newly created campground
+#OSB
 
 
 TODOS
-* Add "back" redirect to login
-* Add method-override
-* BOOTSTRAP NAV COLLPASE JS
-* Flash Messages
-* Refactor container div to header
-* Show/hide delete and update buttons
-* style login/register forms
-* Random Background Landing Page
-* Refactor middleware
-* change styling in show template - comment delete/update
-* UPATE/DELETE CAMPGROUND
 
-* BOOTSTRAP NAV COLLPASE JS
-* Flash Messages
-* Refactor container div to header
-* Show/hide delete and update buttons
-* style login/register forms
-* Random Background Landing Page
-* Refactor middleware
-* change styling in show template - comment delete/update
-* UPDATE/DELETE CAMPGROUND
 
+done:
 
 
 
@@ -126,15 +12,37 @@ RESTFUL ROUTES
 
 name      url      verb    desc.
 ===============================================
-INDEX   /dogs      GET   Display a list of all dogs
-NEW     /dogs/new  GET   Displays form to make a new dog
-CREATE  /dogs      POST  Add new dog to DB
-SHOW    /dogs/:id  GET   Shows info about one dog
+INDEX   /days		get 	list days
+NEW     /days/new	get	display create form
+CREATE  /days	post	add new day to db
+EDIT	/days/:id/edit	get	display edit form--with edit day, link to add slot
+UPDATE /days/:id	put	update day in db
+SHOW    /days/:id	get	show info about one a day--with add student (so show probably isn’t the right word)
+Cannot PUT /slots/58fc0b3ebbe6421c18cc457f
 
-INDEX   /campgrounds
-NEW     /campgrounds/new
-CREATE  /campgrounds
-SHOW    /campgrounds/:id
+NEW           days/:id/slots/new              GET	    display slot create form
+CREATE        days/:id/slots                  POST	  add new slot to db
+EDIT	        days/:id/slots/:id/edit	        get     display slot edit form
+Update	      days/:id/slots/:id 	            put	    update slot in db
+Delete	      days/:id/slots/:id	            delete  delete slot from db
+Add student   days/:id/slots/:id/students/:id  	put	  add student to slot in db 
 
-NEW     campgrounds/:id/comments/new    GET
-CREATE  campgrounds/:id/comments      POST
+This way worked but changed this route to the above version.
+Add student	days/:id/slots/:id/scheduleStudent  	put	add student to slot in db 
+(not post since we aren’t creating something new, just updating (:id typically not sent with post because it 
+doesn’t yet exist when creating. Makes sense because it is modifying a slot but can’t use days/:id/slots/:id put 
+since that is used for editing other data about the slot.
+
+started this from web dev bootcamp yelp camp app
+INDEX   /campgrounds	get 	list campgrounds
+NEW     /campgrounds/new	get	display create form
+CREATE  /campgrounds	post	add new to db
+SHOW    /campgrounds/:id	get	more info about a campground (with links to edit campground and add comment)
+EDIT	/campgrounds/:id/edit	get	display edit form
+UPDATE /campgrounds/:id	put	update db
+
+NEW     campgrounds/:id/comments/new    GET	display comment create form
+CREATE  campgrounds/:id/comments      POST	add new comment to db
+EDIT	campgrounds/:id/comments/:id/edit	get	display comment edit form
+Update	   campgrounds/:id/comments/:id 	put	update comment in db
+Delete	   campgrounds/:id/comments/:id	delete	delete comment from db
