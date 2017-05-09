@@ -21,7 +21,7 @@ router.get("/", function(req, res) {
     });
 });
 
-//NEW - show form to create new day
+//NEW - show form to create new event
 // router.get("/new", middleware.isLoggedIn, function(req, res){
 router.get("/new", function(req, res) {
     res.render("events/new");
@@ -120,6 +120,32 @@ router.get("/:eventId/days", function(req, res) {
         }
     });
 });
+
+// Show form to add day to event
+router.get("/:eventId/days/new", function(req, res) {
+    res.render("events/newDay", {
+        eventId: req.params.eventId
+    });
+});
+
+// CREATE - add new event to DB
+router.post("/:eventId/days", function(req, res) {
+    // var newEvent = {
+    //     name: req.body.name
+    // };
+    // // Create a new event and save to DB
+    // Event.create(newEvent, function(err, newlyCreated) {
+    //     if (err) {
+    //         console.log(err);
+    //     }
+    //     else {
+    //         //redirect back to events page
+    //         console.log(newlyCreated);
+    //         res.redirect("/events");
+    //     }
+    // });
+});
+
 
 function getById(arr, id) {
 
