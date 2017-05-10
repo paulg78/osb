@@ -65,93 +65,85 @@ router.get("/:eventId/uploadCsv", function (req, res) {
 
 // update database with days and slots (schedule of fittings)
 router.post("/:eventId/createSchedule", function (req, res) {
-    Event.findById(req.params.eventId).exec(function (err, ev) {
+    console.log("Going over the waterfall !");
+    async.waterfall([
+        findEvent,
+        saveDays,
+        saveEvent,
+    ], function (err, result) {
         if (err) {
-            console.log(err);
+            console.log("Error creating schedule");
+            req.flash("error", "Schedule upload failed: " + err.message);
         }
-        else {
-            var dayId;
-            var scheduleArray = JSON.parse(req.body.scheduleString);
-            var numRows = scheduleArray.length;
-            console.log("numRows=" + numRows);
-            var i = 0;
-            var j;
-            var saveError = null;
-            async.whilst(
-                function () {
-                    return i < numRows;
-                },
-                function (callback) {
-                    console.log("async iteratee called");
-                    console.log("i=" + i);
-                    var day = {
-                        date: scheduleArray[i][0],
-                        slots: []
-                    };
-                    // day.date = scheduleArray[i][0];
-                    // day.slots = [];
-                    for (j = 1; j < scheduleArray[i].length; j++) {
-                        console.log("j=" + j);
-                        var slot = {
-                            time: scheduleArray[i][j],
-                            max: scheduleArray[i + 1],
-                            students: []
-                        };
-                        // slot.time = scheduleArray[i][j];
-                        // slot.max = scheduleArray[i + 1][j];
-                        console.log("created slot; time=" + scheduleArray[i][j] + ", max=" + scheduleArray[i + 1][j]);
-                        // slot.students = [];
-                        day.slots.push(slot);
-                    }
-                    // test code to see if it really stops when saveError gets set; it works!
-                    // if (i == 0) {
-                    //     saveError = "save failed";
-                    // }
-                    // save day and get day ID
-                    Day.create(day, function (err, newDay) {
-                        if (err) {
-                            console.log(err);
-                            saveError = err;
-                        }
-                        else {
-                            console.log("created day=" + newDay.date);
-                            // add day id to event
-                            ev.days.push(newDay._id);
-                        }
-                        i += 2;
-                        console.log("calling callback with i=" + i);
-                        callback(saveError, i);
-                    });
-
-                },
-                function (err, nbrRows) {
-                    if (err) {
-                        console.log("Saving days failed, i=" + i + ":" + err);
-                        req.flash("error", "Upload failed: " + err.message);
-                    }
-                    else {
-                        // save event
-                        console.log("saved " + nbrRows / 2 + " days, nbrRows=" + nbrRows);
-                        ev.save(function (err) {
-                            if (err) {
-                                console.log(err);
-                                req.flash("error", "Upload failed: " + err.message);
-                            }
-                            else {
-                                console.log("Uploaded days for event=" + ev.name);
-                                req.flash("success", "Uploaded days for event=" + ev.name);
-                            }
-                        });
-                    }
-                }
-            );
-
-        }
-
+        res.redirect("/events");
     });
-    res.redirect("/events");
-});
 
+    function findEvent(callback) {
+        console.log("starting findEvent");
+        Event.findById(req.params.eventId).exec(function (err, ev) {
+            callback(err, ev); // calls 2nd function
+        });
+    }
+
+    function saveDays(ev, callback) {
+        console.log("starting saveDays");
+        var scheduleArray = JSON.parse(req.body.scheduleString);
+        var numRows = scheduleArray.length;
+        console.log("numRows=" + numRows);
+        var i = 0;
+        var j;
+        async.whilst(
+            function () {
+                return i < numRows;
+            },
+            function (whilstCallback) {
+                console.log("async iteratee called");
+                console.log("i=" + i);
+                var day = {
+                    date: scheduleArray[i][0],
+                    slots: []
+                };
+                for (j = 1; j < scheduleArray[i].length; j++) {
+                    console.log("j=" + j);
+                    var slot = {
+                        time: scheduleArray[i][j],
+                        max: scheduleArray[i + 1][j],
+                        students: []
+                    };
+                    console.log("created slot; time=" + scheduleArray[i][j] + ", max=" + scheduleArray[i + 1][j]);
+                    day.slots.push(slot);
+                }
+
+                // save day and get day ID
+                Day.create(day, function (err, newDay) {
+                    if (!err) {
+                        console.log("created day=" + newDay.date);
+                        // add day id to event
+                        ev.days.push(newDay._id);
+                    }
+                    i += 2;
+                    console.log("calling callback with i=" + i);
+                    whilstCallback(err);
+                });
+            },
+            function (err) {
+                callback(err, ev);
+            }
+        );
+    }
+
+    function saveEvent(ev, callback) {
+        console.log("starting saveEvent");
+        ev.save(function (err) {
+            if (!err) {
+                console.log("Uploaded days for event=" + ev.name);
+                req.flash("success", "Uploaded days for event=" + ev.name);
+            }
+            callback(err, ev);
+        });
+    }
+
+});
 
 // SHOW - days in an  event
 // router.get("/:eventId/days", middleware.isLoggedIn, function(req, res) {
