@@ -30,8 +30,8 @@ var commentRoutes = require("./routes/comments"),
   indexRoutes = require("./routes/index"),
   userRoutes = require("./routes/users");
 
-// mongoose.connect("mongodb://localhost/osb");
-mongoose.connect("mongodb://osbApp:osbpw@ds137749.mlab.com:37749/osb");
+mongoose.connect("mongodb://localhost/osb");
+// mongoose.connect("mongodb://osbApp:osbpw@ds137749.mlab.com:37749/osb");
 app.use(bodyParser.urlencoded({
   extended: true
 }));

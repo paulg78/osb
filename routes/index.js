@@ -80,12 +80,14 @@ function sendEmail(emailAddress, subject, text) {
 // reset password
 router.post('/requestpwreset', function(req, res, next) {
   async.waterfall([
+
     function(done) {
       crypto.randomBytes(20, function(err, buf) {
         var token = buf.toString('hex');
         done(err, token);
       });
     },
+
     function(token, done) {
       User.findOne({
         username: req.body.username
@@ -103,6 +105,7 @@ router.post('/requestpwreset', function(req, res, next) {
         });
       });
     },
+    
     function(token, user, done) {
       var subject, text;
       if (user.password == undefined) {
