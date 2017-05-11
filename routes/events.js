@@ -307,9 +307,44 @@ router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (
     // console.log("slotId=" + req.params.slotId);
 
     async.waterfall([
+        updateSlot,
+        updateStudent,
+    ], function (err) {
+        if (err) {
+            console.log(err);
+        }
+        res.redirect("back");
+        // res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
+    });
+
+    function updateSlot(callback) {
+        Slot.findByIdAndUpdate(req.params.slotId, {
+            $push: {
+                students: req.params.studentId
+            }
+        }, function (err) {
+            callback(err);
+        });
+    }
+
+    function updateStudent(callback) {
+        Student.findByIdAndUpdate(req.params.studentId, {
+            slot: req.params.slotId
+        }, function (err) {
+            callback(err);
+        });
+    }
+})
+
+// Remove student from slot
+router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (req, res) {
+    console.log("deleting student from slot");
+    console.log("studentId=" + req.params.studentId);
+    console.log("slotId=" + req.params.slotId);
+
+    async.waterfall([
         findSlot,
         updateSlot,
-        findStudent,
         updateStudent,
     ], function (err) {
         if (err) {
@@ -325,95 +360,25 @@ router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (
     }
 
     function updateSlot(slot, callback) {
-        slot.students.push(req.params.studentId);
+        console.log("before=" + slot.students);
+
+        // "clever" use of splice to remove elements
+        // The first parameter defines the (0 relative) position where elements will be deleted.
+        // The second parameter defines how many elements will be removed. 
+        slot.students.splice(getItemIndex(slot.students, req.params.studentId), 1);
+        console.log("after=" + slot.students);
         slot.save(function (err) {
             callback(err);
         });
     }
 
-    function findStudent(callback) {
-        Student.findById(req.params.studentId).exec(function (err, student) {
-            callback(err, student);
-        });
-    }
-
-    function updateStudent(student, callback) {
-        student.slot = req.params.slotId;
-        student.save(function (err) {
+    function updateStudent(callback) {
+        Student.findByIdAndUpdate(req.params.studentId, {
+            slot: undefined
+        }, function (err) {
             callback(err);
         });
     }
-    // Slot.findById(req.params.slotId, function (err, slot) {
-    //     if (err) {
-    //         console.log(err);
-    //     }
-    //     else {
-    //         slot.students.push(req.params.studentId);
-    //         // console.log("slot.students=" + slot.students);
-    //         slot.save(function (err) {
-    //             if (err) {
-    //                 console.log(err);
-    //             }
-    //             else {
-    //                 Student.findById(req.params.studentId).exec(function (err, foundStudent) {
-    //                     if (err) {
-    //                         console.log(err);
-    //                     }
-    //                     else {
-    //                         foundStudent.slot = req.params.slotId;
-    //                         foundStudent.save(function (err) {
-    //                             if (err) {
-    //                                 console.log(err);
-    //                             };
-    //                         });
-    //                     }
-    //                 });
-    //             }
-    //         });
-    //     };
-    // });
-    // res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
-})
-
-// Add student to slot
-router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (req, res) {
-    console.log("deleting student from slot");
-    console.log("studentId=" + req.params.studentId);
-    console.log("slotId=" + req.params.slotId);
-    Event.findById(req.params.eventId).exec(function (err, foundEvent) {
-        if (err) {
-            console.log(err);
-        }
-        else {
-            var day = getById(foundEvent.days, req.params.dayId);
-            var slot = getById(day.slots, req.params.slotId);
-            console.log("before=" + slot.students);
-
-            // "clever" use of splice to remove elements
-            // The first parameter defines the (0 relative) position where elements will be deleted.
-            // The second parameter defines how many elements will be removed. 
-            slot.students.splice(getItemIndex(slot.students, req.params.studentId), 1);
-            console.log("after=" + slot.students);
-
-            foundEvent.save(function (err) {
-                if (err) {
-                    console.log(err);
-                }
-                else {
-                    Student.findById(req.params.studentId).exec(function (err, foundStudent) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        else {
-                            foundStudent.slot = undefined;
-                            foundStudent.save();
-                        }
-                    });
-                }
-            });
-        }
-    });
-    res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
 });
 
 
