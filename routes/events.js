@@ -188,7 +188,11 @@ router.get("/:eventId/days", function (req, res) {
     //find the event with provided ID
     // Event.findById(req.params.eventId).populate("slots").exec(function(err, foundEvent) {  // populates slots but not students
     Event.findById(req.params.eventId)
-        .select('name days.date days._id')
+        .populate({
+            path: 'days',
+            model: 'Day'
+        })
+        // .select('name days.date days._id')  // doesn't work doesn't populate any part of days
         .exec(function (err, foundEvent) {
             if (err) {
                 console.log(err);
@@ -244,31 +248,20 @@ function getItemIndex(arr, item) {
 
 // SCHEDULE - shows info about one day of one event
 router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function (req, res) {
-    //find the event with provided ID
-    // Event.findById(req.params.eventId).populate("slots").exec(function(err, foundEvent) {  // populates slots but not students
-    // Event.findById(req.params.eventId)
-    //     .populate({ path: 'days', model: 'Day',
-    //         populate { path: 'slots',  model: 'Slot',
-    //             populate { path: 'students' model: 'Student'
-    Event.findById(req.params.eventId)
-        // .populate({ path: 'days',
-        //     populate: { path: 'slots',
-        //         populate: { path: 'students', model: 'Student'
-        //         }
-        //     }
-        // })
+    Day.findById(req.params.dayId)
         .populate({
-            path: 'days.slots.students',
-            model: 'Student'
+            path: 'slots',
+            model: 'Slot',
+            populate: {
+                path: 'students',
+                model: 'Student'
+            }
         })
-        .exec(function (err, foundEvent) {
+        .exec(function (err, foundDay) {
             if (err) {
                 console.log(err);
             }
             else {
-                // foundEvent.days.forEach(function(day) {
-                //     console.log("day.slots=" + day.slots);
-                // });
                 // console.log("user id=" + req.user._id);
                 User.findById(req.user._id, function (err, userFound) {
                     if (err) {
@@ -293,8 +286,8 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function (req, res) {
                                     // console.log("day=" + getById(foundEvent.days, req.params.dayId));
                                     // console.log("queryResponse=" + queryResponse);
                                     res.render("events/daySchedule", {
-                                        event: foundEvent,
-                                        day: getById(foundEvent.days, req.params.dayId),
+                                        eventId: req.params.eventId,
+                                        day: foundDay,
                                         students: queryResponse,
                                         school: userFound.school
                                     });
@@ -312,35 +305,75 @@ router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (
     // console.log("adding student to slot");
     // console.log("studentId=" + req.params.studentId);
     // console.log("slotId=" + req.params.slotId);
-    Event.findById(req.params.eventId).exec(function (err, foundEvent) {
+
+    async.waterfall([
+        findSlot,
+        updateSlot,
+        findStudent,
+        updateStudent,
+    ], function (err) {
         if (err) {
             console.log(err);
         }
-        else {
-            var day = getById(foundEvent.days, req.params.dayId);
-            var slot = getById(day.slots, req.params.slotId);
-            slot.students.push(req.params.studentId);
-            // console.log("slot.students=" + slot.students);
-            foundEvent.save(function (err) {
-                if (err) {
-                    console.log(err);
-                }
-                else {
-                    Student.findById(req.params.studentId).exec(function (err, foundStudent) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        else {
-                            foundStudent.slot = req.params.slotId;
-                            foundStudent.save();
-                        }
-                    });
-                }
-            });
-        }
+        res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
     });
-    res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
-});
+
+    function findSlot(callback) {
+        Slot.findById(req.params.slotId, function (err, slot) {
+            callback(err, slot);
+        });
+    }
+
+    function updateSlot(slot, callback) {
+        slot.students.push(req.params.studentId);
+        slot.save(function (err) {
+            callback(err);
+        });
+    }
+
+    function findStudent(callback) {
+        Student.findById(req.params.studentId).exec(function (err, student) {
+            callback(err, student);
+        });
+    }
+
+    function updateStudent(student, callback) {
+        student.slot = req.params.slotId;
+        student.save(function (err) {
+            callback(err);
+        });
+    }
+    // Slot.findById(req.params.slotId, function (err, slot) {
+    //     if (err) {
+    //         console.log(err);
+    //     }
+    //     else {
+    //         slot.students.push(req.params.studentId);
+    //         // console.log("slot.students=" + slot.students);
+    //         slot.save(function (err) {
+    //             if (err) {
+    //                 console.log(err);
+    //             }
+    //             else {
+    //                 Student.findById(req.params.studentId).exec(function (err, foundStudent) {
+    //                     if (err) {
+    //                         console.log(err);
+    //                     }
+    //                     else {
+    //                         foundStudent.slot = req.params.slotId;
+    //                         foundStudent.save(function (err) {
+    //                             if (err) {
+    //                                 console.log(err);
+    //                             };
+    //                         });
+    //                     }
+    //                 });
+    //             }
+    //         });
+    //     };
+    // });
+    // res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
+})
 
 // Add student to slot
 router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (req, res) {

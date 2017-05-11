@@ -25,7 +25,7 @@ var commentRoutes = require("./routes/comments"),
   campgroundRoutes = require("./routes/campgrounds"),
   studentRoutes = require("./routes/students"),
   // slotRoutes      = require("./routes/slots"),
-  // dayRoutes       = require("./routes/days"),
+  dayRoutes = require("./routes/days"),
   eventRoutes = require("./routes/events"),
   indexRoutes = require("./routes/index"),
   userRoutes = require("./routes/users");
@@ -96,6 +96,7 @@ app.use("/campgrounds", campgroundRoutes);
 app.use("/users", userRoutes);
 app.use("/students", studentRoutes);
 app.use("/events", eventRoutes);
+app.use("/days", dayRoutes);
 app.use("/events/:eventId", eventRoutes);
 app.use("/events/:eventId/days/:dayId", eventRoutes);
 app.use("/campgrounds/:id/comments", commentRoutes);
