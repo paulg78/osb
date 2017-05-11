@@ -4,6 +4,7 @@ var Student = require("../models/student");
 var User = require("../models/user");
 var Event = require("../models/event");
 var Day = require("../models/day");
+var Slot = require("../models/slot");
 var middleware = require("../middleware");
 var async = require('async');
 
@@ -65,6 +66,44 @@ router.get("/:eventId/uploadCsv", function (req, res) {
 
 // update database with days and slots (schedule of fittings)
 router.post("/:eventId/createSchedule", function (req, res) {
+    var scheduleArray = JSON.parse(req.body.scheduleString);
+    var numRows = scheduleArray.length;
+
+    function saveSlots(row, day, callbackfunction) {
+        var col = 1;
+        async.whilst(
+            function () {
+                return col < scheduleArray[row].length;
+            },
+
+            function (slotCallback) {
+                console.log("async slot iteratee called");
+
+                console.log("col=" + col);
+                var slot = {
+                    time: scheduleArray[row][col],
+                    max: scheduleArray[row + 1][col],
+                    students: []
+                };
+                // save slot and get slot ID
+                Slot.create(slot, function (err, newSlot) {
+                    if (!err) {
+                        console.log("created slot=" + newSlot.time);
+                        // add slot id to day
+                        day.slots.push(newSlot._id);
+                    }
+                    col++;
+                    console.log("calling slotCallback with col=" + col);
+                    slotCallback(err);
+                    // console.log("created slot; time=" + scheduleArray[row][col] + ", max=" + scheduleArray[row + 1][col]);
+                });
+            },
+            function (err) {
+                callbackfunction(err);
+            }
+        );
+    }
+
     console.log("Going over the waterfall !");
     async.waterfall([
         findEvent,
@@ -87,43 +126,41 @@ router.post("/:eventId/createSchedule", function (req, res) {
 
     function saveDays(ev, callback) {
         console.log("starting saveDays");
-        var scheduleArray = JSON.parse(req.body.scheduleString);
-        var numRows = scheduleArray.length;
         console.log("numRows=" + numRows);
-        var i = 0;
-        var j;
+        var row = 0;
+        var col;
         async.whilst(
             function () {
-                return i < numRows;
+                return row < numRows;
             },
-            function (whilstCallback) {
-                console.log("async iteratee called");
-                console.log("i=" + i);
+            function (dayCallback) {
+                console.log("async day iteratee called");
+                console.log("row=" + row);
                 var day = {
-                    date: scheduleArray[i][0],
+                    date: scheduleArray[row][0],
                     slots: []
                 };
-                for (j = 1; j < scheduleArray[i].length; j++) {
-                    console.log("j=" + j);
-                    var slot = {
-                        time: scheduleArray[i][j],
-                        max: scheduleArray[i + 1][j],
-                        students: []
-                    };
-                    console.log("created slot; time=" + scheduleArray[i][j] + ", max=" + scheduleArray[i + 1][j]);
-                    day.slots.push(slot);
-                }
-
-                // save day and get day ID
-                Day.create(day, function (err, newDay) {
-                    if (!err) {
-                        console.log("created day=" + newDay.date);
-                        // add day id to event
-                        ev.days.push(newDay._id);
-                    }
-                    i += 2;
-                    console.log("calling callback with i=" + i);
-                    whilstCallback(err);
+                saveSlots(row, day, function (err1) {
+                    var err = null;
+                    // save day and get day ID
+                    Day.create(day, function (err2, newDay) {
+                        if (err1) {
+                            err = err1;
+                        }
+                        else {
+                            if (err2) {
+                                err = err2;
+                            }
+                            else {
+                                console.log("created day=" + newDay.date);
+                                // add day id to event
+                                ev.days.push(newDay._id);
+                            }
+                        }
+                        row += 2;
+                        console.log("calling dayCallback with row=" + row);
+                        dayCallback(err);
+                    });
                 });
             },
             function (err) {
