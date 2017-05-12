@@ -2,7 +2,7 @@
     <div class="row">
         <h1 style="text-align: center">Add a day to the Event</h1>
         <div style="width: 30%; margin: 25px auto;">
-            <form action="/days" method="POST">
+            <form action="/events/<%= eventId %>/days" method="POST">
                 <div class="form-group">
                     <input class="form-control" type="text" name="date" value="7/15/2017 (Tuesday)">
                 </div>

@@ -213,24 +213,41 @@ router.get("/:eventId/days/new", function (req, res) {
     });
 });
 
-// CREATE - add new event to DB
+// CREATE - add new day to DB
 router.post("/:eventId/days", function (req, res) {
-    // var newEvent = {
-    //     name: req.body.name
-    // };
-    // // Create a new event and save to DB
-    // Event.create(newEvent, function(err, newlyCreated) {
-    //     if (err) {
-    //         console.log(err);
-    //     }
-    //     else {
-    //         //redirect back to events page
-    //         console.log(newlyCreated);
-    //         res.redirect("/events");
-    //     }
-    // });
-});
+    async.waterfall([
+        createDay,
+        updateEvent,
+    ], function (err) {
+        if (err) {
+            req.flash("error", "Error adding message; see error in console.");
+            console.log("Error adding message: " + err);
+            res.redirect("back");
+        }
+        else {
+            res.redirect("days");
+        }
+    });
 
+    function createDay(callback) {
+        Day.create({
+            date: req.body.date,
+            slots: []
+        }, function (err, day) {
+            callback(err, day);
+        });
+    }
+
+    function updateEvent(day, callback) {
+        Event.findByIdAndUpdate(req.params.eventId, {
+            $push: {
+                days: day._id
+            }
+        }, function (err) {
+            callback(err);
+        });
+    }
+});
 
 function getById(arr, id) {
 
@@ -334,13 +351,13 @@ router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (
             callback(err);
         });
     }
-})
+});
 
 // Remove student from slot
 router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (req, res) {
-    console.log("deleting student from slot");
-    console.log("studentId=" + req.params.studentId);
-    console.log("slotId=" + req.params.slotId);
+    // console.log("deleting student from slot");
+    // console.log("studentId=" + req.params.studentId);
+    // console.log("slotId=" + req.params.slotId);
 
     async.waterfall([
         findSlot,

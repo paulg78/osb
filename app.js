@@ -6,26 +6,26 @@ var express = require("express"),
   // cookieParser = require("cookie-parser"),
   // LocalStrategy = require("passport-local"),
   flash = require("connect-flash"),
-  Campground = require("./models/campground"),
-  Student = require("./models/student"),
-  Comment = require("./models/comment"),
+  // Campground = require("./models/campground"),
+  // Student = require("./models/student"),
+  // Comment = require("./models/comment"),
   User = require("./models/user"),
-  Event = require("./models/event"),
-  session = require("express-session"),
-  seedDB = require("./seeds"),
+  // Event = require("./models/event"),
+  // session = require("express-session"),
+  // seedDB = require("./seeds"),
   methodOverride = require("method-override");
 
 // added for password set/reset features
 var LocalStrategy = require('passport-local').Strategy;
-var async = require('async');
-var crypto = require('crypto');
+// var async = require('async');
+// var crypto = require('crypto');
 
 //requiring routes
 var commentRoutes = require("./routes/comments"),
   campgroundRoutes = require("./routes/campgrounds"),
   studentRoutes = require("./routes/students"),
   // slotRoutes      = require("./routes/slots"),
-  dayRoutes = require("./routes/days"),
+  // dayRoutes = require("./routes/days"),
   eventRoutes = require("./routes/events"),
   indexRoutes = require("./routes/index"),
   userRoutes = require("./routes/users");
@@ -96,7 +96,7 @@ app.use("/campgrounds", campgroundRoutes);
 app.use("/users", userRoutes);
 app.use("/students", studentRoutes);
 app.use("/events", eventRoutes);
-app.use("/days", dayRoutes);
+// app.use("/days", dayRoutes);
 app.use("/events/:eventId", eventRoutes);
 app.use("/events/:eventId/days/:dayId", eventRoutes);
 app.use("/campgrounds/:id/comments", commentRoutes);
