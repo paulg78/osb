@@ -192,7 +192,7 @@ router.get("/:eventId/days", function (req, res) {
             path: 'days',
             model: 'Day'
         })
-        // .select('name days.date days._id')  // doesn't work doesn't populate any part of days
+        // .select('name days.date days._id')  // doesn't work; doesn't populate any part of days
         .exec(function (err, foundEvent) {
             if (err) {
                 console.log(err);
