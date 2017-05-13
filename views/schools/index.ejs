@@ -1,0 +1,25 @@
+<% include ../partials/header %> 
+
+     <header class="jumbotron">
+         <div class="container">
+             <!--<h1><span class="glyphicon glyphicon-tent"></span> Schools</h1>-->
+             <h1>Schools</h1>
+             <p>
+                <a class="btn btn-primary btn-lg" href="/schools/new">Add New School</a>
+             </p>
+         </div>
+     </header>
+     <h2>Name  Quota</h2>
+     <% schools.forEach(function(school){ %>
+        <li>
+            <%= school.name %>
+            <%= school.quota %>
+            <%= school.count %>            
+            <form style="display: inline" action="/schools/<%=school._id%>?_method=DELETE" method="POST">
+                <a href="/schools/<%=school._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
+                <button class="hidden" class="btn btn-xs btn-danger">DELETE</button>
+            </form>
+        </li>
+    <% }); %>
+
+<% include ../partials/footer %>

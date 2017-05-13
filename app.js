@@ -24,6 +24,7 @@ var LocalStrategy = require('passport-local').Strategy;
 var commentRoutes = require("./routes/comments"),
   campgroundRoutes = require("./routes/campgrounds"),
   studentRoutes = require("./routes/students"),
+  schoolRoutes = require("./routes/schools"),
   // slotRoutes      = require("./routes/slots"),
   // dayRoutes = require("./routes/days"),
   eventRoutes = require("./routes/events"),
@@ -95,6 +96,7 @@ app.use("/resetpw/:token", indexRoutes);
 app.use("/campgrounds", campgroundRoutes);
 app.use("/users", userRoutes);
 app.use("/students", studentRoutes);
+app.use("/schools", schoolRoutes);
 app.use("/events", eventRoutes);
 // app.use("/days", dayRoutes);
 app.use("/events/:eventId", eventRoutes);
