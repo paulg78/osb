@@ -3,14 +3,14 @@
      <header>
          <div class="container">
               <h1>Students</h1>
-                <h2>school=<%=qrySchool.name%></h2>
-             <h2><%=qrySchool.name + " -- Quota: " + qrySchool.quota + "  Remaining: " + (qrySchool.quota-students.length)%></h2>
+             <h2><%=qrySchool.name + " -- Quota: " + qrySchool.quota + ",  Remaining: " + (qrySchool.quota-students.length)%></h2>
              <p>
+                <% if (qrySchool.quota-students.length > 0) { %>
                 <a class="btn btn-primary btn-lg" href="/students/new">Add New Student</a>
+                <% } %>
              </p>
          </div>
      </header>
-                     <h2>school=<%=qrySchool.name%></h2>
      <table class="table table-striped">     
          <thead>
              <tr>

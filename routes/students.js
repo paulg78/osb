@@ -8,7 +8,7 @@ var request = require("request");
 //INDEX - show students for school of logged in user
 router.get("/", middleware.isLoggedIn, function (req, res) {
 
-    School.find({
+    School.findOne({
             name: res.locals.currentUser.school
         })
         .exec(function (err, qrySchool) {
