@@ -15,11 +15,17 @@ router.get("/", function (req, res) {
         if (err) {
             console.log(err);
         }
-        else {
-            // console.log("allEvents=" + allEvents);
-            res.render("events/index", {
-                events: allEvents
-            });
+        else { // If there is only one event, go right to days for that event
+            if (allEvents.length == 1) {
+                res.redirect("events/" + allEvents[0]._id + "/days");
+            }
+
+            else {
+                // console.log("allEvents=" + allEvents);
+                res.render("events/index", {
+                    events: allEvents
+                });
+            }
         }
     });
 });
@@ -190,9 +196,9 @@ router.get("/:eventId/days", function (req, res) {
     Event.findById(req.params.eventId)
         .populate({
             path: 'days',
-            model: 'Day'
+            model: 'Day',
+            select: 'date'
         })
-        // .select('name days.date days._id')  // doesn't work; doesn't populate any part of days
         .exec(function (err, foundEvent) {
             if (err) {
                 console.log(err);
@@ -268,52 +274,54 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function (req, res) {
     Day.findById(req.params.dayId)
         .populate({
             path: 'slots',
-            model: 'Slot',
             populate: {
-                path: 'students',
-                model: 'Student'
+                path: 'students'
+                    // select: '_id fname lname grade' // doesn't populate anything                
             }
         })
-        .exec(function (err, foundDay) {
-            if (err) {
-                console.log(err);
-            }
-            else {
-                // console.log("user id=" + req.user._id);
-                User.findById(req.user._id, function (err, userFound) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    else {
-                        // console.log("school=" + userFound.school);
-                        // find the unassigned students
-                        Student.find({
-                                school: userFound.school,
-                                slot: undefined
-                            }, 'fname lname grade',
-                            function (err, queryResponse) {
-                                if (err) {
-                                    console.log(err);
-                                }
-                                else {
-                                    // console.log("students=" + queryResponse);
-                                    // console.log(foundEvent);
-                                    // console.log("req.params.dayId=" + req.params.dayId);
-                                    // console.log("foundEvent.days=" + foundEvent.days);
-                                    // console.log("day=" + getById(foundEvent.days, req.params.dayId));
-                                    // console.log("queryResponse=" + queryResponse);
-                                    res.render("events/daySchedule", {
-                                        eventId: req.params.eventId,
-                                        day: foundDay,
-                                        students: queryResponse,
-                                        school: userFound.school
-                                    });
-                                }
-                            });
-                    }
-                });
-            }
-        });
+
+    // .populate('slots')
+    // .populate('slots.students')
+    .exec(function (err, foundDay) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            // console.log("user id=" + req.user._id);
+            User.findById(req.user._id, function (err, userFound) {
+                if (err) {
+                    console.log(err);
+                }
+                else {
+                    // console.log("school=" + userFound.school);
+                    // find the unassigned students
+                    Student.find({
+                            school: userFound.school,
+                            slot: undefined
+                        }, 'fname lname grade',
+                        function (err, queryResponse) {
+                            if (err) {
+                                console.log(err);
+                            }
+                            else {
+                                // console.log("students=" + queryResponse);
+                                // console.log(foundEvent);
+                                // console.log("req.params.dayId=" + req.params.dayId);
+                                // console.log("foundEvent.days=" + foundEvent.days);
+                                // console.log("day=" + getById(foundEvent.days, req.params.dayId));
+                                // console.log("queryResponse=" + queryResponse);
+                                res.render("events/daySchedule", {
+                                    eventId: req.params.eventId,
+                                    day: foundDay,
+                                    students: queryResponse,
+                                    school: userFound.school
+                                });
+                            }
+                        });
+                }
+            });
+        }
+    });
 });
 
 
@@ -346,6 +354,7 @@ router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (
 
     function updateStudent(callback) {
         Student.findByIdAndUpdate(req.params.studentId, {
+            day: req.params.dayId,
             slot: req.params.slotId
         }, function (err) {
             callback(err);
@@ -391,6 +400,7 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
 
     function updateStudent(callback) {
         Student.findByIdAndUpdate(req.params.studentId, {
+            day: undefined,
             slot: undefined
         }, function (err) {
             callback(err);

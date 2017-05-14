@@ -23,7 +23,7 @@
                     <ul class="list-group">
                         <% slot.students.forEach(function(student){ %>
                             <% if (student.school == school || school == "") { %>
-                                <li class="list-group-item" style="height: 25px; padding: 2px 10px;" name="schedStud"><%= student.fullName %>
+                                <li class="list-group-item" style="height: 25px; padding: 2px 10px;" name="schedStud"><%= student.fullName + "(" + student.grade + ")" %>
                                     <span name="studentId" class="hidden"><%= student._id %></span></li>
                             <% } %>
                         <% }) %>

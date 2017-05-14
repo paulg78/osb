@@ -8,12 +8,12 @@ var crypto = require('crypto');
 // var nodemailer = require('nodemailer');
 
 //root route
-router.get("/", function(req, res) {
+router.get("/", function (req, res) {
   res.render("landing");
 });
 
 //show login form
-router.get("/login", function(req, res) {
+router.get("/login", function (req, res) {
   console.log("back to login");
   res.render("login");
 });
@@ -26,48 +26,45 @@ router.get("/login", function(req, res) {
 //     }), function(req, res){
 //         console.log("do nothing function called");
 // });
-router.post('/login', function(req, res, next) {
-  passport.authenticate('local', function(err, user, info) {
+router.post('/login', function (req, res, next) {
+  passport.authenticate('local', function (err, user, info) {
     if (err) {
       req.flash('error', err.message);
-      return res.redirect('/login');      
+      return res.redirect('/login');
     }
     else if (!user) {
       req.flash('error', 'User Id or password not valid.');
       return res.redirect('/login');
-    }    
- 
-    req.logIn(user, function(err) {
+    }
+
+    req.logIn(user, function (err) {
       if (err) return next(err);
 
-      // If there is only one event, go right to days for that event
-      Event.find({}, 'name', function(err, allEvents) {
-        if (err) {
-          console.log(err);
-        }
-        else {
-          if (allEvents.length == 1) {
-            res.redirect("events/" + allEvents[0]._id + "/days");
-          }
-          else {
-            return res.redirect('/events');
-          }
-        }
-      });
-
+      // Event.find({}, 'name', function(err, allEvents) {
+      //   if (err) {
+      //     console.log(err);
+      //   }
+      //   else {
+      //     if (allEvents.length == 1) {
+      //       res.redirect("events/" + allEvents[0]._id + "/days");
+      //     }
+      //     else {
+      return res.redirect('/events');
+      // }
     });
+    // });
   })(req, res, next);
 });
 
 // logout route
-router.get("/logout", function(req, res) {
+router.get("/logout", function (req, res) {
   req.logout();
   req.flash("success", "LOGGED YOU OUT!");
   res.redirect("/");
 });
 
 // show reset password form
-router.get('/requestpwreset', function(req, res) {
+router.get('/requestpwreset', function (req, res) {
   res.render('requestpwreset', {
     user: req.user
   });
@@ -78,20 +75,20 @@ function sendEmail(emailAddress, subject, text) {
 }
 
 // reset password
-router.post('/requestpwreset', function(req, res, next) {
+router.post('/requestpwreset', function (req, res, next) {
   async.waterfall([
 
-    function(done) {
-      crypto.randomBytes(20, function(err, buf) {
+    function (done) {
+      crypto.randomBytes(20, function (err, buf) {
         var token = buf.toString('hex');
         done(err, token);
       });
     },
 
-    function(token, done) {
+    function (token, done) {
       User.findOne({
         username: req.body.username
-      }, function(err, user) {
+      }, function (err, user) {
         if (!user) {
           req.flash('error', "No account with email address " + req.body.username + " exists.");
           return res.redirect('/requestpwreset');
@@ -100,13 +97,13 @@ router.post('/requestpwreset', function(req, res, next) {
         user.resetPasswordToken = token;
         user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
 
-        user.save(function(err) {
+        user.save(function (err) {
           done(err, token, user);
         });
       });
     },
-    
-    function(token, user, done) {
+
+    function (token, user, done) {
       var subject, text;
       if (user.password == undefined) {
         subject = "Register for OSB";
@@ -114,7 +111,7 @@ router.post('/requestpwreset', function(req, res, next) {
       }
       else {
         subject = "Reset password for OSB";
-        text = "reset token=" + token;        
+        text = "reset token=" + token;
       }
       sendEmail(user.username, subject, text);
       // console.log("would send email, if it worked with token=" + token);
@@ -141,23 +138,23 @@ router.post('/requestpwreset', function(req, res, next) {
       //     done(err, 'done');
       //   });
     }
-  ], function(err) {
+  ], function (err) {
     if (err) return next(err);
     res.redirect('/requestpwreset');
   });
 });
 
 // show password reset form if token valid
-router.get('/resetpw/:token', function(req, res) {
+router.get('/resetpw/:token', function (req, res) {
   User.findOne({
     resetPasswordToken: req.params.token,
     resetPasswordExpires: {
       $gt: Date.now()
     }
-  }, function(err, user) {
+  }, function (err, user) {
     if (err) {
       req.flash('error', err.message);
-      return res.redirect('/requestpwreset');      
+      return res.redirect('/requestpwreset');
     }
     else if (!user) {
       req.flash('error', 'Password reset token is invalid or has expired.');
@@ -171,30 +168,30 @@ router.get('/resetpw/:token', function(req, res) {
 });
 
 // reset password
-router.post('/resetpw/:token', function(req, res) {
+router.post('/resetpw/:token', function (req, res) {
   if (req.body.password != req.body.confirm) {
     req.flash('error', "Password confirmation doesn't match first password entered.");
-    return res.redirect('back');  
+    return res.redirect('back');
   }
   async.waterfall([
-    function(done) {
+    function (done) {
       User.findOne({
         resetPasswordToken: req.params.token
-      }, function(err, user) {
+      }, function (err, user) {
         if (err) {
           req.flash('error', err.message);
-          return res.redirect('back');      
+          return res.redirect('back');
         }
         else if (!user) {
           req.flash('error', 'System error: User not found.');
           return res.redirect('/requestpwreset');
-    }        
+        }
 
         user.password = req.body.password;
         user.resetPasswordToken = undefined;
         user.resetPasswordExpires = undefined;
 
-        user.save(function(err) {
+        user.save(function (err) {
           if (err) {
             req.flash('failureRedirect', "Error--new password didn't save.");
             res.redirect('/requestpwreset');
@@ -208,7 +205,7 @@ router.post('/resetpw/:token', function(req, res) {
         });
       });
     },
-    function(user, done) {
+    function (user, done) {
       sendEmail(user.username, "password changed", "text that works for reset or register");
       // var smtpTransport = nodemailer.createTransport('SMTP', {
       //   service: 'SendGrid',
@@ -229,7 +226,7 @@ router.post('/resetpw/:token', function(req, res) {
       //   done(err);
       // });
     }
-  ], function(err) {
+  ], function (err) {
     res.redirect('/login');
   });
 });

@@ -4,13 +4,13 @@ var School = require("../models/school");
 var Student = require("../models/student");
 var middleware = require("../middleware");
 var request = require("request");
+var async = require('async');
 
 //INDEX - show schools for school of logged in user
 router.get("/", middleware.isLoggedIn, function (req, res) {
-
     function count(school, schoolData) {
         for (var i = 0; i < schoolData.length; i++) {
-            console.log("schoolData[i]._id=" + schoolData[i]._id);
+            // console.log("schoolData[i]._id=" + schoolData[i]._id);
             if (schoolData[i]._id == school) {
                 return schoolData[i].count;
             }
@@ -18,40 +18,71 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
         return "0";
     }
 
-    // problem here -- no page render on error --- may be problem elsewhere too !!!
-    School.find().sort({
-            name: 1
-        })
-        .exec(function (err, schools) {
-            if (err) {
-                console.log(err);
-            }
-            else {
-                Student.aggregate({
-                        $group: {
-                            _id: '$school',
-                            count: {
-                                $sum: 1
-                            }
-                        }
-                    })
-                    .exec(function (err, schoolCounts) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        else {
-                            schools.forEach(function (school) {
-                                console.log("school.name=" + school.name);
-                                school.count = count(school.name, schoolCounts);
-                                console.log("count=" + school.count);
-                            });
-                        }
-                        return res.render("schools/index", {
-                            schools: schools
-                        });
-                    });
-            }
+    async.waterfall([
+        getSchools,
+        getStudentsCountBySchool,
+        getUnschStudentsCountBySchool,
+    ], function (err, schools) {
+        if (err) {
+            console.log(err);
+        }
+        res.render("schools/index", {
+            schools: schools
         });
+    });
+
+    function getSchools(callback) {
+        School.find().sort({
+                name: 1
+            })
+            .exec(function (err, schools) {
+                callback(err, schools);
+            });
+    }
+
+    function getStudentsCountBySchool(schools, callback) {
+        Student.aggregate({
+                $group: {
+                    _id: '$school',
+                    count: {
+                        $sum: 1
+                    }
+                }
+            })
+            .exec(function (err, schoolCounts) {
+                schools.forEach(function (school) {
+                    // console.log("school.name=" + school.name);
+                    school.count = count(school.name, schoolCounts);
+                    // console.log("count=" + school.count);
+                });
+                callback(err, schools);
+            });
+    }
+
+    function getUnschStudentsCountBySchool(schools, callback) {
+        Student.aggregate([{
+                $match: {
+                    slot: {
+                        $exists: true
+                    }
+                }
+            }, {
+                $group: {
+                    _id: '$school',
+                    count: {
+                        $sum: 1
+                    }
+                }
+            }])
+            .exec(function (err, schoolCounts) {
+                schools.forEach(function (school) {
+                    // console.log("school.name=" + school.name);
+                    school.unschedCount = count(school.name, schoolCounts);
+                    // console.log("count=" + school.unschedCount);
+                });
+                callback(err, schools);
+            });
+    }
 });
 
 //CREATE - add new school to DB

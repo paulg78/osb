@@ -1,28 +1,49 @@
 <% include ../partials/header %> 
 
-     <header class="jumbotron">
+     <header>
          <div class="container">
-             <!--<h1><span class="glyphicon glyphicon-tent"></span> Students</h1>-->
-             <h1>Students</h1>
-             <p><%= currentUser.school %></p>
+              <h1>Students</h1>
+                <h2>school=<%=qrySchool.name%></h2>
+             <h2><%=qrySchool.name + " -- Quota: " + qrySchool.quota + "  Remaining: " + (qrySchool.quota-students.length)%></h2>
              <p>
                 <a class="btn btn-primary btn-lg" href="/students/new">Add New Student</a>
              </p>
          </div>
      </header>
-     <h2>First Name  Last Name  Gender  Grade School</h2>
+                     <h2>school=<%=qrySchool.name%></h2>
+     <table class="table table-striped">     
+         <thead>
+             <tr>
+             <th>First Name</th>
+             <th>Last Name</th>
+             <th>Gender</th>
+             <th>Grade</th>
+             <th>Day</th>
+             <th>Time</th>
+             </tr>
+        </thead>     
+    <tbody>
      <% students.forEach(function(student){ %>
-        <li>
-            <%= student.fname %>
-            <%= student.lname %>
-            <%= student.gender %>
-            <%= student.grade %>
-            <%= student.school %>
-            <form style="display: inline" action="/students/<%=student._id%>?_method=DELETE" method="POST">
+        <tr>
+            <td><%= student.fname %></td>
+            <td><%= student.lname %></td>
+            <td><%= student.gender %></td>
+            <td><%= student.grade %></td>
+            <td><% if (student.day != undefined) { %>
+                <%= student.day.date %></td>
+                <% } %>
+            <td><% if (student.slot != undefined) { %>
+                <%= student.slot.time %></td>
+                <% } %>
+            <td>
+             <form style="display: inline" action="/students/<%=student._id%>?_method=DELETE" method="POST">
                 <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
                 <button class="hidden" class="btn btn-xs btn-danger">DELETE</button>
-            </form>
-        </li>
+            </form>                
+            </td>
+        </tr>
     <% }); %>
+        </tbody>
+    </table>    
 
 <% include ../partials/footer %>
