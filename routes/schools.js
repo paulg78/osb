@@ -20,8 +20,8 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
 
     async.waterfall([
         getSchools,
-        getStudentsCountBySchool,
-        getUnschStudentsCountBySchool,
+        getStudentCountBySchool,
+        getUnschStudentCountBySchool,
     ], function (err, schools) {
         if (err) {
             console.log(err);
@@ -40,7 +40,7 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
             });
     }
 
-    function getStudentsCountBySchool(schools, callback) {
+    function getStudentCountBySchool(schools, callback) {
         Student.aggregate({
                 $group: {
                     _id: '$school',
@@ -59,11 +59,11 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
             });
     }
 
-    function getUnschStudentsCountBySchool(schools, callback) {
+    function getUnschStudentCountBySchool(schools, callback) {
         Student.aggregate([{
                 $match: {
                     slot: {
-                        $exists: true
+                        $ne: null
                     }
                 }
             }, {
@@ -124,7 +124,6 @@ router.get("/new", middleware.isLoggedIn, function (req, res) {
 // });
 
 router.get("/:id/edit", function (req, res) {
-    console.log("IN EDIT!");
     //find the school with provided ID
     School.findById(req.params.id, function (err, foundSchool) {
         if (err) {
@@ -142,10 +141,7 @@ router.get("/:id/edit", function (req, res) {
 router.put("/:id", function (req, res) {
     console.log("IN put (update school)!");
     var newData = {
-        fname: req.body.firstName,
-        lname: req.body.lastName,
-        gender: req.body.gender,
-        grade: req.body.grade
+        quota: req.body.quota
     };
 
     School.findByIdAndUpdate(req.params.id, {

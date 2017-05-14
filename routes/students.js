@@ -16,7 +16,6 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
                 console.log(err);
             }
             else {
-                console.log("school=" + qrySchool);
                 Student.find({
                         school: res.locals.currentUser.school
                     })
@@ -35,7 +34,7 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
                             console.log(err);
                         }
                         else {
-                            console.log("school=" + qrySchool);
+                            // console.log("school=" + qrySchool);
                             res.render("students/index", {
                                 students: queryResponse,
                                 qrySchool: qrySchool
@@ -82,8 +81,35 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
 
 //NEW - show form to create new student
 router.get("/new", middleware.isLoggedIn, function (req, res) {
-    res.render("students/new");
+    School.findOne({
+            name: res.locals.currentUser.school
+        })
+        .exec(function (err, school) {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                Student.count({
+                        school: res.locals.currentUser.school
+                    })
+                    .exec(function (err, count) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                            if (count < school.quota) {
+                                res.render("students/new");
+                            }
+                            else {
+                                res.redirect("/students");
+                            }
+                        }
+
+                    });
+            }
+        });
 });
+
 
 // SHOW - shows more info about one student
 // router.get("/:id", function(req, res){
