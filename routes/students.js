@@ -49,66 +49,65 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
 router.post("/", middleware.isLoggedIn, function (req, res) {
     // get data from form and add to students collection
 
-    var userSchool;
-    if (res.locals.currentUser == undefined) {
-        userSchool = "";
-        console.log("*** current user is undefined");
-    }
-    else {
-        userSchool = res.locals.currentUser.school;
-    }
+    // var userSchool;
+    // if (res.locals.currentUser == undefined) {
+    //     userSchool = "";
+    //     console.log("*** current user is undefined");
+    // }
+    // else {
+    //     userSchool = res.locals.currentUser.school;
+    // }
 
-    var newStudent = {
+    var studentData = {
+        // fname: req.sanitize(req.body.firstName),
         fname: req.body.firstName,
         lname: req.body.lastName,
         gender: req.body.gender,
         grade: req.body.grade,
-        school: userSchool
+        school: res.locals.currentUser.school
     }
 
     // Create a new student and save to DB
-    Student.create(newStudent, function (err, newlyCreated) {
+    Student.create(studentData, function (err, newStudent) {
         if (err) {
             console.log(err);
         }
         else {
-            //redirect back to students page
-            // console.log(newlyCreated);
-            res.redirect("/students");
+            res.json(newStudent);
         }
     });
 });
 
-//NEW - show form to create new student
-router.get("/new", middleware.isLoggedIn, function (req, res) {
-    School.findOne({
-            name: res.locals.currentUser.school
-        })
-        .exec(function (err, school) {
-            if (err) {
-                console.log(err);
-            }
-            else {
-                Student.count({
-                        school: res.locals.currentUser.school
-                    })
-                    .exec(function (err, count) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        else {
-                            if (count < school.quota) {
-                                res.render("students/new");
-                            }
-                            else {
-                                res.redirect("/students");
-                            }
-                        }
+// //NEW - show form to create new student
+// router.get("/new", middleware.isLoggedIn, function (req, res) {
+//     School.findOne({
+//             name: res.locals.currentUser.school
+//         })
+//         .exec(function (err, school) {
+//             if (err) {
+//                 console.log(err);
+//             }
+//             else {
+//                 Student.count({
+//                         school: res.locals.currentUser.school
+//                     })
+//                     .exec(function (err, count) {
+//                         if (err) {
+//                             console.log(err);
+//                         }
+//                         else {
+//                             if (count < school.quota) {
+//                                 res.render("students/new");
+//                             }
+//                             else {
+//                                 res.redirect("/students");
+//                             }
+//                         }
 
-                    });
-            }
-        });
-});
+//                     });
+//             }
+//         });
+// });
 
 
 // SHOW - shows more info about one student

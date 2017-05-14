@@ -3,14 +3,31 @@
      <header>
          <div class="container">
               <h1>Students</h1>
-             <h2><%=qrySchool.name + " -- Quota: " + qrySchool.quota + ",  Remaining: " + (qrySchool.quota-students.length)%></h2>
-             <p>
-                <% if (qrySchool.quota-students.length > 0) { %>
-                <a class="btn btn-primary btn-lg" href="/students/new">Add New Student</a>
-                <% } %>
-             </p>
-         </div>
+             <h2><%=qrySchool.name + " -- Quota: " + qrySchool.quota + ",  Remaining: "%><span id='remaining'><%= (qrySchool.quota-students.length) %></h2>
+          </div>
      </header>
+     
+    <% if (qrySchool.quota-students.length > 0) { %>     
+        <div style="width: 100%; margin: 25px auto;">
+            <form action="/students" method="POST" class="form-inline" id=newStudentForm>
+                <h2 style="text-align: center">Create a New Student</h2>                
+                <div class="form-group">
+                    <input class="form-control" type="text" name="firstName" placeholder="first name">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="lastName" placeholder="last name">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="gender" placeholder="gender">
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="grade" placeholder="grade">
+                </div>
+                <div class="form-group">
+                    <button type=submit class="btn btn-lg btn-primary btn-block">Submit!</button>
+                </div>
+            </form>
+    <% } %>     
      <table class="table table-striped">     
          <thead>
              <tr>
@@ -22,7 +39,7 @@
              <th>Time</th>
              </tr>
         </thead>     
-    <tbody>
+    <tbody id='studentList'>
      <% students.forEach(function(student){ %>
         <tr>
             <td><%= student.fname %></td>
@@ -45,5 +62,5 @@
     <% }); %>
         </tbody>
     </table>    
-
+<script src="/scripts/ajax.js"></script>
 <% include ../partials/footer %>
