@@ -13,8 +13,9 @@ $("[name='unschedStud']").on('click', function () {
 
 // Add student to schedule
 $("[name='addStudentBtn']").on('click', function (e) {
-    console.log("clicked add student");
     e.preventDefault();
+    console.log("clicked add student");
+
     var dayId = $("#dayId").text();
     var slotId = $(this).parent().parent().children("[name='slotId']").text();
     var studentId = $('.active').filter("[name='unschedStud']").children("[name=studentId]").text();
@@ -23,9 +24,15 @@ $("[name='addStudentBtn']").on('click', function (e) {
     console.log("studentId=" + studentId);
     // $(this)[0].form.action ="/days/" + dayId + "/slots/" + slotId + "/students/" + studentId + "?_method=PUT";
     // ajax version should add someone to slot; remove them from unscheduled list
-
-
-    $(this)[0].form.action = dayId + "/slots/" + slotId + "/students/" + studentId + "?_method=PUT";
+    // $(this)[0].form.action = dayId + "/slots/" + slotId + "/students/" + studentId + "?_method=PUT";
+    $.ajax({
+        url: dayId + "/slots/" + slotId + "/students/" + studentId,
+        type: 'PUT',
+        success: function () {
+            // move student text to schedule
+            // $('.active').filter("[name='unschedStud']").children("[name=studentText]").text();
+        }
+    });
 });
 
 // Activate scheduled student and show remove button

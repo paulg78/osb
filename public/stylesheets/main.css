@@ -10,18 +10,35 @@
     padding: 9px;
 }
 
+
 /*.daylist {*/
+
+
 /*    border: none;*/
+
+
 /*}*/
+
 
 /*table, th, td {*/
+
+
 /*    border: 1px solid black;*/
+
+
 /*    border-collapse: collapse;*/
+
+
 /*}*/
 
-td {
-    padding: 2px;
-}
+
+/*td {*/
+
+
+/*    padding: 2px;*/
+
+
+/*}*/
 
 .solidborder {
     border-style: solid;
@@ -41,6 +58,18 @@ td {
     font-size: 1em;
 }
 
-.role_sc, .role_al, .role_wa{
-    display:none;
+.role_sc,
+.role_al,
+.role_wa {
+    display: none;
+}
+
+.schedStud {
+    height: 25px;
+    /*padding: 2px 10px;*/
+}
+
+.unschedStud {
+    height: 30px;
+    /*padding: 5px 15px;*/
 }
