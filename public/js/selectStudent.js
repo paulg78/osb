@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
 /* global $ */
 
 // Activate unscheduled student and enable add buttons
-$(".unschedStud").on('click', function () {
+$(".unschedList").on('click', ".unschedStud", function () {
     // too confusing and not useful to allow both a sheduled and unscheduled student to be active at same time
     $('.active').removeClass('active');
     // hide all the unschedule buttons
@@ -47,15 +47,25 @@ $(".addStudBtn").on('click', function (e) {
             // $('.active.unschedStud').children("[name=studentText]").text();
             console.log("updated database and ajax callback executed");
             console.log("result=" + result);
-            toList.append('\n                <li class="list-group-item schedStud">\n                    <span name="studentText">' + fromListItem.children("[name=studentText]").text() + '</span>\n                    <span name="studentId" class="hidden">' + fromListItem.children("[name=studentId]").text() + '<span>\n                </li>\n                ');
-            fromListItem.remove();
+            fromListItem.removeClass('unschedStud active');
+            fromListItem.addClass('schedStud');
+            toList.append(fromListItem);
+            // toList.append(
+            //     `
+            //     <li class="list-group-item schedStud">
+            //         <span name="studentText">${fromListItem.children("[name=studentText]").text()}</span>
+            //         <span name="studentId" class="hidden">${fromListItem.children("[name=studentId]").text()}<span>
+            //     </li>
+            //     `
+            // );
+            // fromListItem.remove();
         }
     });
     console.log("finished ajax call");
 });
 
 // Activate scheduled student and show remove button
-$(".schedStud").on('click', function () {
+$(".schedList").on('click', ".schedStud", function () {
     var school = $("#school").text();
     if (school != "") {
         // only school counselors can remove students from schedule
