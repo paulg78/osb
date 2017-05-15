@@ -388,13 +388,13 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
     }
 
     function updateSlot(slot, callback) {
-        console.log("before=" + slot.students);
+        // console.log("before=" + slot.students);
 
         // "clever" use of splice to remove elements
         // The first parameter defines the (0 relative) position where elements will be deleted.
         // The second parameter defines how many elements will be removed. 
         slot.students.splice(getItemIndex(slot.students, req.params.studentId), 1);
-        console.log("after=" + slot.students);
+        // console.log("after=" + slot.students);
         slot.save(function (err) {
             callback(err);
         });

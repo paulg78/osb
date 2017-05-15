@@ -48,14 +48,18 @@
 }
 
 .addStudBtn {
-    color: red;
+    color: black;
     font-size: 1em;
+    padding: 2px 10px;
     float: right;
 }
 
 .remStudBtn {
     color: red;
     font-size: 1em;
+    padding: 2px 15px;
+    border-width: 1px;
+    border-color: red;
 }
 
 .role_sc,
@@ -65,11 +69,12 @@
 }
 
 .schedStud {
-    height: 25px;
-    /*padding: 2px 10px;*/
+    /*height: 25px;*/
+    padding: 2px 10px;
 }
 
 .unschedStud {
-    height: 30px;
+    /*height: 30px;*/
     /*padding: 5px 15px;*/
+    padding: 5px 10px;
 }

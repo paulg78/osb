@@ -14,16 +14,16 @@
                         <% var remaining = slot.max - slot.students.length; %>   
                         <% if (remaining > 0) { %>
                             <%= " (" + remaining + ")  " %>
-                            <button type=submit class="addStudBtn role_sc" disabled=disabled name="addStudentBtn">+</button>
+                            <button type=submit class="addStudBtn role_sc" disabled=disabled>+</button>
                             </form>
                             <% } %>
                           <form class="form-inline role_sc" method="POST">
-                                    <button type=submit style="display: none;" class="RemStudBtn" name="remStudentBtn">-</button>
+                                    <button type=submit style="display: none;" class="remStudBtn">-</button>
                             </form>                    
                     <ul class="list-group">
                         <% slot.students.forEach(function(student){ %>
                             <% if (student.school == school || school == "") { %>
-                                <li class="list-group-item schedStud" name="schedStud">
+                                <li class="list-group-item schedStud">
                                     <span name="studentText"><%= student.fullName + "(" + student.grade + ")" %></span>
                                     <span name="studentId" class="hidden"><%= student._id %></span>
                                 </li>
@@ -39,7 +39,7 @@
             <h4>Unscheduled:</h4>
             <ul class="list-group">
                 <% students.forEach(function(student) { %>
-                    <li class="list-group-item unschedStud" name="unschedStud">
+                    <li class="list-group-item unschedStud">
                         <span name="studentText"><%= student.fullName + "(" + student.grade + ")"%></span>
                         <span name="studentId" class="hidden"><%= student._id %></span>
                     </li>
