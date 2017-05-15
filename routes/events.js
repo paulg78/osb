@@ -338,6 +338,7 @@ router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (
         if (err) {
             console.log(err);
         }
+        // res.json()
         res.redirect("back");
         // res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
     });
