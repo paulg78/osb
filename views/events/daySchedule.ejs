@@ -37,7 +37,7 @@
         </div>
         <div class="col-sm-2 role_sc">
             <h4>Unscheduled:</h4>
-            <ul class="list-group">
+            <ul class="list-group unschedList">
                 <% students.forEach(function(student) { %>
                     <li class="list-group-item unschedStud">
                         <span name="studentText"><%= student.fullName + "(" + student.grade + ")"%></span>
@@ -52,5 +52,5 @@
     </div> 
 </div>
  
-<script src="/scripts/selectStudent.js"></script>
+<script src="/js/selectStudent.js"></script>
 <% include ../partials/footer %>

@@ -337,11 +337,13 @@ router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (
     ], function (err) {
         if (err) {
             console.log(err);
+            res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
         }
-        console.log("sending json response");
-        res.json();
-        // res.redirect("back");
-        // res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
+        else {
+            console.log("add-sending json response");
+            res.json(""); // doesn't go to success function unless data is sent
+            console.log("add-json response sent");
+        }
     });
 
     function updateSlot(callback) {
@@ -377,8 +379,13 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
     ], function (err) {
         if (err) {
             console.log(err);
+            res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
         }
-        res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
+        else {
+            console.log("del-sending json response");
+            res.json(""); // doesn't go to success function unless data is sent
+            console.log("del-json response sent");
+        }
     });
 
     function findSlot(callback) {
