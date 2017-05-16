@@ -48,7 +48,7 @@ router.post("/", function (req, res) {
         }
         else {
             //redirect back to events page
-            console.log(newlyCreated);
+            // console.log(newlyCreated);
             res.redirect("/events");
         }
     });
@@ -340,9 +340,9 @@ router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (
             res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
         }
         else {
-            console.log("add-sending json response");
+            // console.log("add-sending json response");
             res.json(""); // doesn't go to success function unless data is sent
-            console.log("add-json response sent");
+            // console.log("add-json response sent");
         }
     });
 
@@ -382,9 +382,9 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
             res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
         }
         else {
-            console.log("del-sending json response");
+            // console.log("del-sending json response");
             res.json(""); // doesn't go to success function unless data is sent
-            console.log("del-json response sent");
+            // console.log("del-json response sent");
         }
     });
 
@@ -419,7 +419,7 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
 
 
 router.get("/:dayId/edit", middleware.isLoggedIn, function (req, res) {
-    console.log("IN EDIT!");
+    // console.log("IN EDIT!");
     //find the day with provided ID
     Day.findById(req.params.dayId).populate("slots").exec(function (err, foundDay) {
         if (err) {
@@ -435,7 +435,7 @@ router.get("/:dayId/edit", middleware.isLoggedIn, function (req, res) {
 });
 
 router.put("/:dayId", function (req, res) {
-    console.log("IN day put! looking for id=" + req.params.dayId);
+    // console.log("IN day put! looking for id=" + req.params.dayId);
     Day.findByIdAndUpdate(req.params.dayId, {
         date: req.body.date
     }, function (err, day) {

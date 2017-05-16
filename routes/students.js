@@ -47,16 +47,6 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
 
 //CREATE - add new student to DB
 router.post("/", middleware.isLoggedIn, function (req, res) {
-    // get data from form and add to students collection
-
-    // var userSchool;
-    // if (res.locals.currentUser == undefined) {
-    //     userSchool = "";
-    //     console.log("*** current user is undefined");
-    // }
-    // else {
-    //     userSchool = res.locals.currentUser.school;
-    // }
 
     var studentData = {
         // fname: req.sanitize(req.body.firstName),
@@ -78,52 +68,6 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
     });
 });
 
-// //NEW - show form to create new student
-// router.get("/new", middleware.isLoggedIn, function (req, res) {
-//     School.findOne({
-//             name: res.locals.currentUser.school
-//         })
-//         .exec(function (err, school) {
-//             if (err) {
-//                 console.log(err);
-//             }
-//             else {
-//                 Student.count({
-//                         school: res.locals.currentUser.school
-//                     })
-//                     .exec(function (err, count) {
-//                         if (err) {
-//                             console.log(err);
-//                         }
-//                         else {
-//                             if (count < school.quota) {
-//                                 res.render("students/new");
-//                             }
-//                             else {
-//                                 res.redirect("/students");
-//                             }
-//                         }
-
-//                     });
-//             }
-//         });
-// });
-
-
-// SHOW - shows more info about one student
-// router.get("/:id", function(req, res){
-//     //find the student with provided ID
-//     Student.findById(req.params.id).populate("comments").exec(function(err, foundStudent){
-//         if(err){
-//             console.log(err);
-//         } else {
-//             console.log(foundStudent)
-//             //render show template with that student
-//             res.render("students/show", {student: foundStudent});
-//         }
-//     });
-// });
-
 router.get("/:id/edit", function (req, res) {
     console.log("IN EDIT!");
     //find the student with provided ID
@@ -132,7 +76,6 @@ router.get("/:id/edit", function (req, res) {
             console.log(err);
         }
         else {
-            //render show template with that student
             res.render("students/edit", {
                 student: foundStudent
             });
@@ -158,22 +101,11 @@ router.put("/:id", function (req, res) {
             res.redirect("back");
         }
         else {
-            console.log("Updating student");
+            // console.log("Updating student");
             req.flash("success", "Successfully Updated!");
-            // res.redirect("/students/" + student._id);
             res.redirect("/students");
         }
     });
 });
-
-
-//middleware
-// function isLoggedIn(req, res, next){
-//     if(req.isAuthenticated()){
-//         return next();
-//     }
-//     req.flash("error", "You must be signed in to do that!");
-//     res.redirect("/login");
-// }
 
 module.exports = router;

@@ -11,12 +11,16 @@
                         <span class="hidden" type="text" name="slotId"><%= slot._id %></span>
                         <form class="form-inline" method="POST">
                         <strong><%= slot.time %></strong>
-                        <% var remaining = slot.max - slot.students.length; %>   
+                        <% var remaining = slot.max - slot.students.length; %>
+                        <span> (</span>
+                        <span class="availSlots"><%=remaining%></span>
+                        <span>)</span>
                         <% if (remaining > 0) { %>
-                            <%= " (" + remaining + ")  " %>
                             <button type=submit class="addStudBtn role_sc" disabled=disabled>+</button>
-                            </form>
-                            <% } %>
+                          <%  } else { %>
+                            <button type=submit class="addStudBtn role_sc hidden" disabled=disabled>+</button>
+                           <%  } %>
+                        </form>
                           <form class="form-inline role_sc" method="POST">
                                     <button type=submit style="display: none;" class="remStudBtn">-</button>
                             </form>                    
@@ -52,5 +56,5 @@
     </div> 
 </div>
  
-<script src="/js/selectStudent.js"></script>
+<script src="/scripts/selectStudent.js"></script>
 <% include ../partials/footer %>
