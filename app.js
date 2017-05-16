@@ -31,6 +31,7 @@ var commentRoutes = require("./routes/comments"),
   indexRoutes = require("./routes/index"),
   userRoutes = require("./routes/users");
 
+console.log("process.env.DATABASEURL=" + process.env.DATABASEURL);
 mongoose.connect(process.env.DATABASEURL);
 
 app.use(bodyParser.urlencoded({
