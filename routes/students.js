@@ -68,9 +68,8 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
     });
 });
 
+// Find student and render form
 router.get("/:id/edit", function (req, res) {
-    console.log("IN EDIT!");
-    //find the student with provided ID
     Student.findById(req.params.id, function (err, foundStudent) {
         if (err) {
             console.log(err);
@@ -83,6 +82,7 @@ router.get("/:id/edit", function (req, res) {
     });
 });
 
+// Update student in database
 router.put("/:id", function (req, res) {
     console.log("IN put (update student)!");
     var newData = {

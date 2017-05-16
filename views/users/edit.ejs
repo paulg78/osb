@@ -4,16 +4,18 @@
         <div style="width: 30%; margin: 25px auto;">
             <form action="/users/<%=user._id%>?_method=PUT" method="POST">
                 <div class="form-group">
-                    <input class="form-control" type="text" name="username" value="<%= user.username %>">
+                    User Name (email address): <input class="form-control" type="text" name="username" value="<%= user.username %>">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="name" value="<%= user.name %>">
+                    Full Name: <input class="form-control" type="text" name="name" value="<%= user.name %>">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="role" value="<%= user.role %>">
+                    Role: <input class="form-control" type="text" name="role" value="<%= user.role %>">
+                    <p>role values: role_sc (school counselor), role_al(Assitance League, role_wa (website admin)</p>
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="school" value="<%= user.school %>">
+                    School: <input class="form-control" type="text" name="school" value="<%= user.school %>">
+                    <p>Leave school blank for AL and WA roles.</p>                    
                 </div>
                 <div class="form-group">
                     <button class="btn btn-lg btn-primary btn-block">Submit!</button>
