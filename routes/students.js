@@ -5,8 +5,34 @@ var School = require("../models/school");
 var middleware = require("../middleware");
 var request = require("request");
 
-//INDEX - show students for school of logged in user
+// List students
 router.get("/", middleware.isLoggedIn, function (req, res) {
+
+    Student.find()
+        .populate('day', 'date')
+        .populate('slot', 'time')
+        .sort({
+            fname: 1,
+            lname: 1
+        })
+        .exec(function (err, queryResponse) {
+            if (err) {
+                console.log(err.errmsg);
+                req.flash("error", "System Error: " + err.message);
+                res.redirect("back");
+            }
+            else {
+                // console.log("school=" + qrySchool);
+                res.render("students/index", {
+                    students: queryResponse
+                });
+            }
+        });
+});
+
+
+//  show students for school of logged in user
+router.get("/school", middleware.isLoggedIn, function (req, res) {
 
     School.findOne({
             name: res.locals.currentUser.school
@@ -35,7 +61,7 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
                         }
                         else {
                             // console.log("school=" + qrySchool);
-                            res.render("students/index", {
+                            res.render("students/bySchool", {
                                 students: queryResponse,
                                 qrySchool: qrySchool
                             });
@@ -48,11 +74,18 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
 //CREATE - add new student to DB
 router.post("/", middleware.isLoggedIn, function (req, res) {
 
+    function firstLetterUpCase(str) {
+        if (str) {
+            return str[0].toUpperCase() + str.substring(1, str.length);
+        }
+        return "";
+    }
+
     var studentData = {
         // fname: req.sanitize(req.body.firstName),
-        fname: req.body.firstName,
-        lname: req.body.lastName,
-        gender: req.body.gender,
+        fname: firstLetterUpCase(req.body.firstName),
+        lname: firstLetterUpCase(req.body.lastName),
+        gender: firstLetterUpCase(req.body.gender),
         grade: req.body.grade,
         school: res.locals.currentUser.school
     }
@@ -60,9 +93,18 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
     // Create a new student and save to DB
     Student.create(studentData, function (err, newStudent) {
         if (err) {
-            console.log(err);
+            if (err.name == 'ValidationError') {
+                req.flash("error", "first name, last name, and grade are required fields");
+            }
+            else {
+                req.flash("error", "System error--student not saved");
+            }
+            console.log("create failed: " + err.message);
+            // res.json(err); // need an ajax error response here to get on ajax error path
+            res.status(500).send('Bad Request');
         }
         else {
+            console.log("create succeeded");
             res.json(newStudent);
         }
     });
@@ -103,7 +145,7 @@ router.put("/:id", function (req, res) {
         else {
             // console.log("Updating student");
             req.flash("success", "Successfully Updated!");
-            res.redirect("/students");
+            res.redirect("/students/school");
         }
     });
 });

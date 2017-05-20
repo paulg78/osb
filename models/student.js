@@ -1,10 +1,19 @@
 var mongoose = require("mongoose");
 
 var studentSchema = new mongoose.Schema({
-    fname: String,
-    lname: String,
+    fname: {
+        type: String,
+        required: true
+    },
+    lname: {
+        type: String,
+        required: true
+    },
     gender: String,
-    grade: String,
+    grade: {
+        type: String,
+        required: true
+    },
     school: String,
     day: {
         type: mongoose.Schema.Types.ObjectId,

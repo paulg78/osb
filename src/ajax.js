@@ -2,9 +2,15 @@
 $('#newStudentForm').submit(function (e) {
     e.preventDefault();
     var studentStr = $(this).serialize();
-    $.post('/students', studentStr, function (student) {
-        $('#studentList').append(
-            `
+
+    $.ajax({
+        url: '/students',
+        type: 'POST',
+        data: studentStr,
+        success: function (student) {
+            console.log('Ajax post returned success');
+            $('#studentList').append(
+                `
             <tr>
                 <td>${student.fname}</td>
                 <td>${student.lname}</td>
@@ -20,16 +26,20 @@ $('#newStudentForm').submit(function (e) {
                 </td>
             </tr>            
                 `
-        )
-        var remaining = $('#remaining').text() - 1;
-        $('#remaining').text(remaining);
-        // $('#remaining').text($('#remaining').text() - 1);
-        if (remaining < 1) {
-            $('#newStudentForm').hide();
-        }
-        else {
-            $('#newStudentForm').find('.form-control').val("");
-            $('#newStudentForm').find('.form-control').first().focus();
+            )
+            var remaining = $('#remaining').text() - 1;
+            $('#remaining').text(remaining);
+            // $('#remaining').text($('#remaining').text() - 1);
+            if (remaining < 1) {
+                $('#newStudentForm').hide();
+            }
+            else {
+                $('#newStudentForm').find('.form-control').val("");
+                $('#newStudentForm').find('.form-control').first().focus();
+            }
+        },
+        error: function (err) { // how can I get it to take this path on error?
+            console.log('Ajax post returned error: ' + err);
         }
     })
 })

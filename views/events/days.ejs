@@ -13,11 +13,13 @@
     <table>
      <% event.days.forEach(function(day){ %>
         <tr>
-        <td>     <form style="display: inline" action="/days/<%=day._id%>?_method=DELETE" method="POST">
-               <%= day.date %> </td> 
-        <td>        <a href="/days/<%=day._id%>/edit" class="hidden" class="btn btn-xs btn-info">EDIT</a></td> 
-        <td>        <a href="/events/<%= event._id %>/days/<%=day._id%>" class="btn btn-xs btn-info">SCHEDULE</a></td> 
-        <td>        <button class="hidden" class="btn btn-xs btn-danger">DELETE</button></td> 
+            <form style="display: inline" action="/days/<%=day._id%>?_method=DELETE" method="POST">
+                <td> <%= day.date %> </td> 
+                <td> <a href="/days/<%=day._id%>/edit" class="hidden" class="btn btn-xs btn-info">EDIT</a></td>
+                <td> 
+                    <a href="/events/<%= event._id %>/days/<%=day._id%>/school" class="btn btn-xs btn-info role_sc">SCHEDULE</a>            
+                    <a href="/events/<%= event._id %>/days/<%=day._id%>" class="btn btn-xs btn-info role_al">SCHEDULE</a></td> 
+                <td> <button class="hidden" class="btn btn-xs btn-danger">DELETE</button></td> 
             </form>
         </tr>
        <% }); %>

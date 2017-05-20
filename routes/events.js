@@ -188,7 +188,7 @@ router.post("/:eventId/createSchedule", function (req, res) {
 
 });
 
-// SHOW - days in an  event
+// SHOW - days in an event
 // router.get("/:eventId/days", middleware.isLoggedIn, function(req, res) {
 router.get("/:eventId/days", function (req, res) {
     //find the event with provided ID
@@ -226,8 +226,8 @@ router.post("/:eventId/days", function (req, res) {
         updateEvent,
     ], function (err) {
         if (err) {
-            req.flash("error", "Error adding message; see error in console.");
-            console.log("Error adding message: " + err);
+            req.flash("error", "Error adding day; see error in console.");
+            console.log("Error adding day: " + err);
             res.redirect("back");
         }
         else {
@@ -269,7 +269,50 @@ function getItemIndex(arr, item) {
     }
 }
 
-// SCHEDULE - shows info about one day of one event
+// SCHEDULE By School - shows schedule for one day of an event
+router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, function (req, res) {
+    Day.findById(req.params.dayId)
+        .populate({
+            path: 'slots',
+            populate: {
+                path: 'students'
+                    // select: '_id fname lname grade' // doesn't populate anything                
+            }
+        })
+        .exec(function (err, foundDay) {
+            if (err) {
+                console.log(err);
+            }
+            else {
+                // find the unassigned students
+                Student.find({
+                        school: res.locals.currentUser.school,
+                        slot: undefined
+                    }, 'fname lname grade',
+                    function (err, queryResponse) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        else {
+                            // console.log(foundEvent);
+                            // console.log("req.params.dayId=" + req.params.dayId);
+                            // console.log("foundEvent.days=" + foundEvent.days);
+                            // console.log("day=" + getById(foundEvent.days, req.params.dayId));
+                            // console.log("queryResponse=" + queryResponse);
+                            res.render("events/daySchoolSchedule", {
+                                eventId: req.params.eventId,
+                                day: foundDay,
+                                students: queryResponse,
+                                school: res.locals.currentUser.school
+                            });
+                        }
+                    });
+            }
+        });
+});
+
+
+// SCHEDULE All Students - shows schedule for one day of an event
 router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function (req, res) {
     Day.findById(req.params.dayId)
         .populate({
@@ -279,49 +322,20 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function (req, res) {
                     // select: '_id fname lname grade' // doesn't populate anything                
             }
         })
+        .exec(function (err, foundDay) {
+            if (err) {
+                console.log(err);
+                req.flash("System error:", err.message);
+                res.redirect("back");
+            }
+            else {
+                res.render("events/daySchedule", {
+                    eventId: req.params.eventId,
+                    day: foundDay
+                });
+            }
+        });
 
-    // .populate('slots')
-    // .populate('slots.students')
-    .exec(function (err, foundDay) {
-        if (err) {
-            console.log(err);
-        }
-        else {
-            // console.log("user id=" + req.user._id);
-            User.findById(req.user._id, function (err, userFound) {
-                if (err) {
-                    console.log(err);
-                }
-                else {
-                    // console.log("school=" + userFound.school);
-                    // find the unassigned students
-                    Student.find({
-                            school: userFound.school,
-                            slot: undefined
-                        }, 'fname lname grade',
-                        function (err, queryResponse) {
-                            if (err) {
-                                console.log(err);
-                            }
-                            else {
-                                // console.log("students=" + queryResponse);
-                                // console.log(foundEvent);
-                                // console.log("req.params.dayId=" + req.params.dayId);
-                                // console.log("foundEvent.days=" + foundEvent.days);
-                                // console.log("day=" + getById(foundEvent.days, req.params.dayId));
-                                // console.log("queryResponse=" + queryResponse);
-                                res.render("events/daySchedule", {
-                                    eventId: req.params.eventId,
-                                    day: foundDay,
-                                    students: queryResponse,
-                                    school: userFound.school
-                                });
-                            }
-                        });
-                }
-            });
-        }
-    });
 });
 
 

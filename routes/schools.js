@@ -94,7 +94,15 @@ router.post("/", function (req, res) {
         quota: req.body.quota
     }, function (err, newlyCreated) {
         if (err) {
-            console.log(err);
+            console.log(err.errmsg);
+            if (err.code == 11000) {
+                req.flash("error", req.body.name + " has already been created.");
+            }
+            else {
+                req.flash("error", "Schedule upload failed: " + err.message);
+            }
+            res.redirect("back");
+            // res.redirect("/schools/new");
         }
         else {
             //redirect back to schools page

@@ -13,19 +13,22 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="/login">login</a>
                 <a class="navbar-brand role_al role_wa" href="/users">Users</a>                
-                <a class="navbar-brand" href="/events">Events</a>
-                <a class="navbar-brand role_sc" href="/students">Students</a>
+                <a class="navbar-brand role_sc role_al role_wa" href="/events">Events</a>
+                <% if(currentUser){ %>
+                    <a class="navbar-brand role_sc" href="/students/school">Students</a>
+                <% } %>      
+                <a class="navbar-brand role_al" href="/students">Students</a>        
                 <a class="navbar-brand role_al role_wa" href="/schools">Schools</a>
             </div>
             <div class="collapse navbar-collapse">
                 <ul class="nav navbar-nav navbar-right">
-                    <% if(!currentUser){ %>
-                        <li><a href="/login">Login</a></li>
-                        <li><a href="/requestpwreset">Register</a></li>
-                    <% } else { %>
+                    <% if(currentUser){ %>
                         <li><a href="#">Signed In As <%= currentUser.name %></a></li>
                         <li><a href="/logout">Logout</a></li>
                         <span class="hidden" id="userRole"><%= currentUser.role %></span>
+                    <% } else { %>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/requestpwreset">Register</a></li>                    
                     <% } %>
                 </ul>
             </div>

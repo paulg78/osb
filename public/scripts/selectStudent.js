@@ -15,24 +15,25 @@ $(".unschedList").on('click', ".unschedStud", function () {
 $(".addStudBtn").on('click', function (e) {
     e.preventDefault();
     $(".addStudBtn").attr("disabled", true);
-    // console.log("clicked add student");
+    console.log("clicked add student");
 
+    var eventId = $("#eventId").text();
     var dayId = $("#dayId").text();
     var slotId = $(this).parent().siblings("[name='slotId']").text();
     var studentId = $('.active.unschedStud').children("[name=studentId]").text();
-    // console.log("dayId=" + dayId);
-    // console.log("slotId=" + slotId);
-    // console.log("studentId=" + studentId);
+    console.log("dayId=" + dayId);
+    console.log("slotId=" + slotId);
+    console.log("studentId=" + studentId);
     var fromListItem = $('.active.unschedStud');
     var toList = $(this).parent().siblings(".list-group");
 
     $.ajax({
-        url: dayId + "/slots/" + slotId + "/students/" + studentId,
+        url: "/events/" + eventId + "/days/" + dayId + "/slots/" + slotId + "/students/" + studentId,
         type: 'PUT',
         success: function (result) {
             // move student text and id to schedule
-            // console.log("updated database and ajax callback executed");
-            // console.log("result=" + result);
+            console.log("updated database and ajax callback executed");
+            console.log("result=" + result);
             fromListItem.removeClass('unschedStud active');
             fromListItem.addClass('schedStud');
             toList.append(fromListItem); // no need to remove from fromList since this moves the element
@@ -45,7 +46,7 @@ $(".addStudBtn").on('click', function (e) {
             }
         }
     });
-    // console.log("finished ajax call");
+    console.log("finished ajax call");
 });
 
 // Activate scheduled student and show remove button
@@ -67,24 +68,25 @@ $(".schedList").on('click', ".schedStud", function () {
 // Remove student from schedule
 $(".remStudBtn").on('click', function (e) {
     e.preventDefault();
-    // console.log("clicked remove student");
+    console.log("clicked remove student");
     // hide all unschedule buttons
     $(".remStudBtn").hide();
+    var eventId = $("#eventId").text();
     var dayId = $("#dayId").text();
     var slotId = $(this).parent().siblings("[name='slotId']").text();
     var studentId = $('.active.schedStud').children("[name=studentId]").text();
-    // console.log("dayId=" + dayId);
-    // console.log("slotId=" + slotId);
-    // console.log("studentId=" + studentId);
+    console.log("dayId=" + dayId);
+    console.log("slotId=" + slotId);
+    console.log("studentId=" + studentId);
 
     var fromListItem = $('.active.schedStud');
     var toList = $('.unschedList');
 
     $.ajax({
-        url: dayId + "/slots/" + slotId + "/students/" + studentId,
+        url: "/events/" + eventId + "/days/" + dayId + "/slots/" + slotId + "/students/" + studentId,
         type: 'DELETE',
         success: function (result) {
-            // console.log("updated database and ajax callback executed");
+            console.log("updated database and ajax callback executed");
 
             // increment slots remaining
             var availElem = fromListItem.parent().siblings().children(".availSlots");
@@ -98,5 +100,5 @@ $(".remStudBtn").on('click', function (e) {
             toList.append(fromListItem); // no need to remove from fromList since this moves the element
         }
     });
-    // console.log("finished ajax call");
+    console.log("finished ajax call");
 });
