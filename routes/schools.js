@@ -169,6 +169,50 @@ router.put("/:id", function (req, res) {
     });
 });
 
+// upload schools from CSV file
+router.get("/uploadSchools", middleware.isLoggedIn, function (req, res) {
+    res.render("schools/uploadSchools");
+});
+
+// update database schools
+router.post("createSchools", function (req, res) {
+    var schools = JSON.parse(req.body.schoolsString);
+    var numSchools = schools.length;
+    var row = 0;
+
+    async.whilst(
+        function () {
+            return row < numSchools;
+        },
+        function (schoolCallback) {
+            console.log("async school iteratee called");
+            console.log("row=" + row);
+            var school = {
+                name: schools[row][0],
+                district: schools[row][1],
+                quota: schools[row][1]
+            };
+            // save school and get school ID
+            school.create(school, function (err, newschool) {
+                if (err) {
+                    console.lot("Error--school=" + school.name + ", " + err.message);
+                }
+                else {
+                    console.log("created school=" + school.name);
+                }
+                row++;
+                console.log("calling schoolCallback with row=" + row);
+                schoolCallback(null); // don't stop for errors                
+            });
+        },
+        function (err) {
+            if (err) {
+                console.log("error while creating schools--shouldn't happen since errors are just logged in console.");
+            }
+        }
+    );
+    res.redirect("/schools");
+});
 
 //middleware
 // function isLoggedIn(req, res, next){

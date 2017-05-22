@@ -1,0 +1,31 @@
+<% include ../partials/header %>
+    <div class="row">
+        <h1 style="text-align: center">Upload Schools</h1>
+        <div style="width: 30%; margin: 25px auto;">      
+        <div id="dvImportSegments" class="fileupload ">
+            <fieldset>
+                <legend>Select CSV File</legend>
+                <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
+            </fieldset>
+        </div>
+        </div>
+    </div>
+ 
+   <form action="/schools/createSchools" method="POST">
+        <input type="hidden" id="schoolsId" name="schoolsString">
+    <table id="schools" name="schools"></table>
+    <div class="form-group">
+        <button type=submit class="btn btn-lg btn-primary btn-block">Submit!</button>
+    </div>
+    </form>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.8.3/jquery.csv.min.js"></script>
+    <script src="/scripts/uploadSchools.js"></script>    
+    <script>  
+        $(document).ready(function() {
+        // The event listener for the file upload
+        console.log("setting file upload listener");
+        document.getElementById('txtFileUpload').addEventListener('change', addSubmitForm, false);
+        });
+    </script>
+<% include ../partials/footer %>

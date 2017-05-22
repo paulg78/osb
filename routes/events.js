@@ -62,7 +62,6 @@ router.get("/:eventId/uploadCsv", function (req, res) {
             console.log(err);
         }
         else {
-            //render show template with that day
             res.render("events/uploadCsv", {
                 event: foundEvent
             });
