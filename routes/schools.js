@@ -175,33 +175,33 @@ router.get("/uploadSchools", middleware.isLoggedIn, function (req, res) {
 });
 
 // update database schools
-router.post("createSchools", function (req, res) {
+router.post("/createSchools", function (req, res) {
     var schools = JSON.parse(req.body.schoolsString);
     var numSchools = schools.length;
-    var row = 0;
+    var row = 1; // skip column heading
 
     async.whilst(
         function () {
             return row < numSchools;
         },
         function (schoolCallback) {
-            console.log("async school iteratee called");
-            console.log("row=" + row);
+            // console.log("async school iteratee called");
+            // console.log("row=" + row);
             var school = {
                 name: schools[row][0],
                 district: schools[row][1],
-                quota: schools[row][1]
+                quota: schools[row][2]
             };
             // save school and get school ID
-            school.create(school, function (err, newschool) {
+            School.create(school, function (err, newschool) {
                 if (err) {
-                    console.lot("Error--school=" + school.name + ", " + err.message);
+                    console.log("Error, row=" + row + " school=" + school.name + ", " + err.message);
                 }
                 else {
-                    console.log("created school=" + school.name);
+                    // console.log("created school=" + school.name);
                 }
                 row++;
-                console.log("calling schoolCallback with row=" + row);
+                // console.log("calling schoolCallback with row=" + row);
                 schoolCallback(null); // don't stop for errors                
             });
         },
@@ -209,9 +209,9 @@ router.post("createSchools", function (req, res) {
             if (err) {
                 console.log("error while creating schools--shouldn't happen since errors are just logged in console.");
             }
+            res.redirect("/schools");
         }
     );
-    res.redirect("/schools");
 });
 
 //middleware
