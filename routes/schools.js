@@ -186,7 +186,7 @@ router.post("/createSchools", function (req, res) {
         },
         function (schoolCallback) {
             // console.log("async school iteratee called");
-            // console.log("row=" + row);
+            console.log("row=" + row);
             var school = {
                 name: schools[row][0],
                 district: schools[row][1],
@@ -198,7 +198,7 @@ router.post("/createSchools", function (req, res) {
                     console.log("Error, row=" + row + " school=" + school.name + ", " + err.message);
                 }
                 else {
-                    // console.log("created school=" + school.name);
+                    console.log("created school=" + school.name);
                 }
                 row++;
                 // console.log("calling schoolCallback with row=" + row);

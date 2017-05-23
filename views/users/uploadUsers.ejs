@@ -1,6 +1,6 @@
 <% include ../partials/header %>
     <div class="row">
-        <h1 style="text-align: center">Upload Schools</h1>
+        <h1 style="text-align: center">Upload Users</h1>
         <div style="width: 30%; margin: 25px auto;">      
         <div id="dvImportSegments" class="fileupload ">
             <fieldset>
@@ -11,12 +11,12 @@
         </div>
     </div>
 
-    <form action="/schools/createSchools" method="POST">
+    <form action="/users/createUsers" method="POST">
         <div class="form-group">
-            <input type="hidden" id="csvString" name="schoolsString">
+            <input type="hidden" id="csvString" name="usersString">
             <button type=submit class="btn btn-lg btn-primary hidden">Submit!</button>
         </div>
-        <table id="csvTable" name="schools"></table>
+        <table id="csvTable" name="users"></table>
     </form>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.8.3/jquery.csv.min.js"></script>

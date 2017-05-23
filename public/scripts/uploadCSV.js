@@ -9,24 +9,28 @@ function browserSupportFileUpload() {
     return isCompatible;
 }
 
-function addSubmitForm(event) {
+// This function populates a table with Id=csvTable with data from 
+//      a 2D array imported from a .csv file (for display on the form)
+//  The function also populates an element with Id=csvString with a string 
+//      representation of that same data
+function getData(event) {
     upload(event, function (data) {
-        // code below displays school data on screen
-        // var schoolsTable = document.getElementById("schools");
-        // data.forEach(function (school) {
-        //     var rowNode = document.createElement("tr");
-        //     school.forEach(function (element) {
-        //         var colNode = document.createElement("td");
-        //         colNode.textContent = element;
-        //         rowNode.appendChild(colNode);
-        //     });
-        //     schoolsTable.appendChild(rowNode);
-        // });
-        $("#schoolsId").val(JSON.stringify(data));
+        var csvTable = document.getElementById("csvTable");
+        data.forEach(function (day) {
+            var rowNode = document.createElement("tr");
+            day.forEach(function (element) {
+                var colNode = document.createElement("td");
+                colNode.textContent = element;
+                rowNode.appendChild(colNode);
+            });
+            csvTable.appendChild(rowNode);
+        });
+        $("#csvString").val(JSON.stringify(data));
+        $("button").removeClass("hidden");
     });
 }
 
-// Method that reads and parses the .csv file into a 2D array
+// Method that reads and parses a .csv file into a 2D array
 function upload(evt, callbackfunction) {
     console.log("uploading file");
     if (!browserSupportFileUpload()) {
@@ -43,7 +47,6 @@ function upload(evt, callbackfunction) {
             if (data && data.length > 0) {
                 alert('Imported -' + data.length + '- rows successfully!');
                 callbackfunction(data);
-                // document.getElementById('testp').textContent="added something";
             }
             else {
                 alert('No data to import!');

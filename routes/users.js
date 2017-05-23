@@ -3,6 +3,7 @@ var router = express.Router();
 var User = require("../models/user");
 var middleware = require("../middleware");
 var request = require("request");
+var async = require('async');
 
 //INDEX - show all users
 router.get("/", function (req, res) {
@@ -91,6 +92,64 @@ router.put("/:id", function (req, res) {
             res.redirect("/users");
         }
     });
+});
+
+// upload users from CSV file
+router.get("/uploadUsers", middleware.isLoggedIn, function (req, res) {
+    res.render("users/uploadUsers");
+});
+
+// update database users
+router.post("/createUsers", function (req, res) {
+    function myTrim(x) {
+        return x.replace(/^\s+|\s+$/gm, '');
+    }
+
+    var users = JSON.parse(req.body.usersString);
+    var numUsers = users.length;
+    var row = 1; // skip column heading
+
+    async.whilst(
+        function () {
+            return row < numUsers;
+        },
+        function (userCallback) {
+            // console.log("async user iteratee called");
+            console.log("row=" + row);
+            var user = {
+                username: myTrim(users[row][8]),
+                role: "role_sc",
+                name: myTrim(users[row][7]),
+                school: users[row][0]
+            };
+            if (user.name != undefined && user.name.length > 0 &&
+                user.username != undefined && user.username.length > 0) {
+                user.username = user.username.toLowerCase();
+                User.create(user, function (err, newuser) {
+                    if (err) {
+                        console.log("Error, row=" + row + " user=" + user.name + ", " + err.message);
+                    }
+                    else {
+                        console.log("created user=" + user.name);
+                    }
+                    row++;
+                    // console.log("calling userCallback with row=" + row);
+                    userCallback(null); // don't stop for errors                
+                });
+            }
+            else {
+                console.log("Error, row=" + row + " user=" + user.name + ", missing data ");
+                row++;
+                userCallback(null); // don't stop for errors           
+            }
+        },
+        function (err) {
+            if (err) {
+                console.log("error while creating users--shouldn't happen since errors are just logged in console.");
+            }
+            res.redirect("/users");
+        }
+    );
 });
 
 
