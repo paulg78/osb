@@ -25,7 +25,7 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
     // get data from form and add to users collection
 
     var newUser = {
-        username: req.body.username,
+        username: req.body.username.toLowerCase(),
         name: req.body.name,
         role: req.body.role,
         school: req.body.school
@@ -102,12 +102,19 @@ router.get("/uploadUsers", middleware.isLoggedIn, function (req, res) {
 // update database users
 router.post("/createUsers", function (req, res) {
     function myTrim(x) {
-        return x.replace(/^\s+|\s+$/gm, '');
+        if (x != undefined) {
+            return x.replace(/^\s+|\s+$/gm, '');
+        }
+        else {
+            return undefined;
+        }
     }
 
     var users = JSON.parse(req.body.usersString);
     var numUsers = users.length;
     var row = 1; // skip column heading
+    var sc1col = 7;
+    var col = sc1col;
 
     async.whilst(
         function () {
@@ -115,11 +122,11 @@ router.post("/createUsers", function (req, res) {
         },
         function (userCallback) {
             // console.log("async user iteratee called");
-            console.log("row=" + row);
+            // console.log("row=" + row + ", col=" + col);
             var user = {
-                username: myTrim(users[row][8]),
+                name: myTrim(users[row][col]),
+                username: myTrim(users[row][col + 1]),
                 role: "role_sc",
-                name: myTrim(users[row][7]),
                 school: users[row][0]
             };
             if (user.name != undefined && user.name.length > 0 &&
@@ -127,19 +134,22 @@ router.post("/createUsers", function (req, res) {
                 user.username = user.username.toLowerCase();
                 User.create(user, function (err, newuser) {
                     if (err) {
-                        console.log("Error, row=" + row + " user=" + user.name + ", " + err.message);
+                        console.log("row=" + row + ", Error, user=" + user.name + ", " + err.message);
                     }
                     else {
-                        console.log("created user=" + user.name);
+                        console.log("row=" + row + ", created user=" + user.name);
                     }
-                    row++;
+                    col += 2; // move to next counselor
                     // console.log("calling userCallback with row=" + row);
                     userCallback(null); // don't stop for errors                
                 });
             }
             else {
-                console.log("Error, row=" + row + " user=" + user.name + ", missing data ");
+                if (col == sc1col) {
+                    console.log("row=" + row + " missing data, user=" + user.name + ", username=" + user.username);
+                }
                 row++;
+                col = sc1col;
                 userCallback(null); // don't stop for errors           
             }
         },

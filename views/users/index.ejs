@@ -8,18 +8,30 @@
              </p>
          </div>
      </header>
-     <h2>Username name role school</h2>
-     <% users.forEach(function(user){ %>
-        <li>
-            <%= user.username %>
-            <%= user.name %>
-            <%= user.role %>
-            <%= user.school %>
-            <form style="display: inline" action="/users/<%=user._id%>?_method=DELETE" method="POST">
-                <a href="/users/<%=user._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
-                <button class="hidden" class="btn btn-xs btn-danger">DELETE</button>
-            </form>
-        </li>
-    <% }); %>
-
+    <table class="table table-striped">
+        <thead>
+             <tr>
+             <th>Username</th>
+             <th>Name</th>
+             <th>Role</th>
+             <th>School</th>         
+             </tr>
+        </thead>
+        <tbody>     
+            <% users.forEach(function(user){ %>
+                <tr>
+                    <td><%= user.username %></td>
+                    <td><%= user.name %></td>
+                    <td><%= user.role %></td>
+                    <td><%= user.school %></td>
+                    <td>
+                        <form style="display: inline" action="/users/<%=user._id%>?_method=DELETE" method="POST">
+                            <a href="/users/<%=user._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
+                            <button class="hidden" class="btn btn-xs btn-danger">DELETE</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
 <% include ../partials/footer %>

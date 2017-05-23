@@ -12,6 +12,7 @@
          <thead>
              <tr>
              <th>Name</th>
+             <th>District</th>             
              <th>Quota</th>
              <th>Students Available</th>
              <th>Students Unscheduled</th>         
@@ -21,6 +22,7 @@
          <% schools.forEach(function(school){ %>
             <tr>
                 <td><%= school.name %></td>
+                <td><%= school.district %></td>                
                 <td><%= school.quota %></td>
                 <td><%= school.quota - school.count %></td>
                 <td><%= school.quota - school.unschedCount %></td>
