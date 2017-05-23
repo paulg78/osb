@@ -40,19 +40,8 @@ router.post('/login', function (req, res, next) {
     req.logIn(user, function (err) {
       if (err) return next(err);
 
-      // Event.find({}, 'name', function(err, allEvents) {
-      //   if (err) {
-      //     console.log(err);
-      //   }
-      //   else {
-      //     if (allEvents.length == 1) {
-      //       res.redirect("events/" + allEvents[0]._id + "/days");
-      //     }
-      //     else {
       return res.redirect('/events');
-      // }
     });
-    // });
   })(req, res, next);
 });
 
@@ -87,7 +76,7 @@ router.post('/requestpwreset', function (req, res, next) {
 
     function (token, done) {
       User.findOne({
-        username: req.body.username
+        username: req.body.username.toLowerCase()
       }, function (err, user) {
         if (!user) {
           req.flash('error', "No account with email address " + req.body.username + " exists.");
@@ -116,7 +105,7 @@ router.post('/requestpwreset', function (req, res, next) {
       sendEmail(user.username, subject, text);
       // console.log("would send email, if it worked with token=" + token);
       req.flash('success', 'An e-mail has been sent to ' + user.username + ' with further instructions.');
-      res.redirect('/login');
+
       //   var smtpTransport = nodemailer.createTransport('SMTP', {
       //     service: 'mailgun',
       //     auth: {
@@ -137,10 +126,17 @@ router.post('/requestpwreset', function (req, res, next) {
       //     req.flash('info', 'An e-mail has been sent to ' + user.username + ' with further instructions.');
       //     done(err, 'done');
       //   });
+      done(null); // indicates no error ... pass err object from sendmail
     }
   ], function (err) {
-    if (err) return next(err);
-    res.redirect('/requestpwreset');
+    if (err) {
+      req.flash('error', 'error: ' + err.message);
+      console.log('error: ' + err.message);
+      res.redirect('/requestpwreset');
+    }
+    else {
+      res.redirect('/login');
+    }
   });
 });
 
