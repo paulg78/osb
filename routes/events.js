@@ -119,7 +119,7 @@ router.post("/:eventId/createSchedule", function (req, res) {
             console.log("Error creating schedule");
             req.flash("error", "Schedule upload failed: " + err.message);
         }
-        res.redirect("/events");
+        res.render("/events");
     });
 
     function findEvent(callback) {

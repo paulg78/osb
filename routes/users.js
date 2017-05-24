@@ -8,7 +8,9 @@ var async = require('async');
 //INDEX - show all users
 router.get("/", function (req, res) {
     // Get all users from DB
-    User.find({}, function (err, allUsers) {
+    User.find().sort({
+        name: 1
+    }).exec(function (err, allUsers) {
         if (err) {
             console.log(err);
         }

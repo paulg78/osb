@@ -16,11 +16,11 @@ function browserSupportFileUpload() {
 function getData(event) {
     upload(event, function (data) {
         var csvTable = document.getElementById("csvTable");
-        data.forEach(function (day) {
+        data.forEach(function (row) {
             var rowNode = document.createElement("tr");
-            day.forEach(function (element) {
+            row.forEach(function (col) {
                 var colNode = document.createElement("td");
-                colNode.textContent = element;
+                colNode.textContent = col;
                 rowNode.appendChild(colNode);
             });
             csvTable.appendChild(rowNode);
