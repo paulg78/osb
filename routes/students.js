@@ -8,6 +8,10 @@ var request = require("request");
 // List students
 router.get("/", middleware.isLoggedIn, function (req, res) {
 
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("/students/school");
+    }
+
     Student.find()
         .populate('day', 'date')
         .populate('slot', 'time')

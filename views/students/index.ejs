@@ -1,12 +1,13 @@
 <% include ../partials/header %> 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.10/css/theme.bootstrap_3.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.10/js/jquery.tablesorter.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.10/js/jquery.tablesorter.widgets.min.js"></script>
 
      <header>
-         <div class="container">
-              <h1>Students</h1>
-         </div>
+        <h1>Students</h1>
      </header>
      
-     <table class="table table-striped">     
+     <table id="studentTable" class="table table-striped tablesorter">     
          <thead>
              <tr>
              <th>First Name</th>
@@ -33,5 +34,17 @@
         </tr>
     <% }); %>
         </tbody>
-    </table>    
+    </table>
+    
+<script>
+$(function(){
+  $("#studentTable").tablesorter(
+      { theme: 'bootstrap',
+        headerTemplate : '{content} {icon}',
+        widgets : [ "uitheme" ]
+      });
+});
+</script>    
+    
+    
 <% include ../partials/footer %>
