@@ -188,8 +188,7 @@ router.post("/:eventId/createSchedule", function (req, res) {
 });
 
 // SHOW - days in an event
-// router.get("/:eventId/days", middleware.isLoggedIn, function(req, res) {
-router.get("/:eventId/days", function (req, res) {
+router.get("/:eventId/days", middleware.isLoggedIn, function (req, res) {
     //find the event with provided ID
     // Event.findById(req.params.eventId).populate("slots").exec(function(err, foundEvent) {  // populates slots but not students
     Event.findById(req.params.eventId)
@@ -209,49 +208,6 @@ router.get("/:eventId/days", function (req, res) {
                 });
             }
         });
-});
-
-// Show form to add day to event
-router.get("/:eventId/days/new", function (req, res) {
-    res.render("events/newDay", {
-        eventId: req.params.eventId
-    });
-});
-
-// CREATE - add new day to DB
-router.post("/:eventId/days", function (req, res) {
-    async.waterfall([
-        createDay,
-        updateEvent,
-    ], function (err) {
-        if (err) {
-            req.flash("error", "Error adding day; see error in console.");
-            console.log("Error adding day: " + err);
-            res.redirect("back");
-        }
-        else {
-            res.redirect("days");
-        }
-    });
-
-    function createDay(callback) {
-        Day.create({
-            date: req.body.date,
-            slots: []
-        }, function (err, day) {
-            callback(err, day);
-        });
-    }
-
-    function updateEvent(day, callback) {
-        Event.findByIdAndUpdate(req.params.eventId, {
-            $push: {
-                days: day._id
-            }
-        }, function (err) {
-            callback(err);
-        });
-    }
 });
 
 function getById(arr, id) {

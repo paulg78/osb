@@ -6,7 +6,7 @@ var request = require("request");
 var async = require('async');
 
 //INDEX - show all users
-router.get("/", function (req, res) {
+router.get("/", middleware.isLoggedIn, function (req, res) {
     // Get all users from DB
     User.find().sort({
         name: 1
@@ -163,15 +163,5 @@ router.post("/createUsers", function (req, res) {
         }
     );
 });
-
-
-//middleware
-// function isLoggedIn(req, res, next){
-//     if(req.isAuthenticated()){
-//         return next();
-//     }
-//     req.flash("error", "You must be signed in to do that!");
-//     res.redirect("/login");
-// }
 
 module.exports = router;
