@@ -5,77 +5,78 @@ var School = require("../models/school");
 var middleware = require("../middleware");
 var request = require("request");
 
-// List all students
-router.get("/", middleware.isLoggedIn, function (req, res, next) {
-
-    if (res.locals.currentUser.role == 'role_sc') {
-        // console.log("skipping to next students handler");
-        next('route');
-    }
-    else {
-        console.log("after next");
-        Student.find()
-            .populate('day', 'date')
-            .populate('slot', 'time')
-            .sort({
-                fname: 1,
-                lname: 1
+// List Students (all or by school)
+router.get("/", middleware.isLoggedIn,
+    function (req, res, next) {
+        if (res.locals.currentUser.role == 'role_sc') {
+            // console.log("skipping to next students handler");
+            next();
+        }
+        else { // list all students
+            // console.log("after next");
+            Student.find()
+                .populate('day', 'date')
+                .populate('slot', 'time')
+                .sort({
+                    fname: 1,
+                    lname: 1
+                })
+                .exec(function (err, queryResponse) {
+                    if (err) {
+                        console.log(err.errmsg);
+                        req.flash("error", "System Error: " + err.message);
+                        res.redirect("back");
+                    }
+                    else {
+                        // console.log("school=" + qrySchool);
+                        res.render("students/index", {
+                            students: queryResponse
+                        });
+                    }
+                });
+        }
+    },
+    function (req, res) { //  List students for school counselor
+        School.findOne({
+                name: res.locals.currentUser.school
             })
-            .exec(function (err, queryResponse) {
+            .exec(function (err, qrySchool) {
                 if (err) {
                     console.log(err.errmsg);
                     req.flash("error", "System Error: " + err.message);
                     res.redirect("back");
                 }
                 else {
-                    // console.log("school=" + qrySchool);
-                    res.render("students/index", {
-                        students: queryResponse
-                    });
+                    // console.log("in list students for a school");
+                    Student.find({
+                            school: res.locals.currentUser.school
+                        })
+                        .populate('day', 'date')
+                        .populate('slot', 'time')
+                        // Alternate syntax that also works:
+                        // .populate({
+                        //     path: 'day',
+                        //     select: 'date'
+                        // }).populate({
+                        //     path: 'slot',
+                        //     select: 'time'
+                        // })
+                        .exec(function (err, queryResponse) {
+                            if (err) {
+                                console.log(err);
+                            }
+                            else {
+                                // console.log("school=" + qrySchool);
+                                res.render("students/bySchool", {
+                                    students: queryResponse,
+                                    qrySchool: qrySchool
+                                });
+                            }
+                        });
                 }
             });
     }
-});
-
-//  List students for school of logged in user (counselor)
-router.get("/", middleware.isLoggedIn, function (req, res) {
-
-    School.findOne({
-            name: res.locals.currentUser.school
-        })
-        .exec(function (err, qrySchool) {
-            if (err) {
-                console.log(err);
-            }
-            else {
-                Student.find({
-                        school: res.locals.currentUser.school
-                    })
-                    .populate('day', 'date')
-                    .populate('slot', 'time')
-                    // Alternate syntax that also works:
-                    // .populate({
-                    //     path: 'day',
-                    //     select: 'date'
-                    // }).populate({
-                    //     path: 'slot',
-                    //     select: 'time'
-                    // })
-                    .exec(function (err, queryResponse) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        else {
-                            // console.log("school=" + qrySchool);
-                            res.render("students/bySchool", {
-                                students: queryResponse,
-                                qrySchool: qrySchool
-                            });
-                        }
-                    });
-            }
-        });
-});
+);
 
 //CREATE - add new student to DB
 router.post("/", middleware.isLoggedIn, function (req, res) {
