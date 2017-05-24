@@ -55,14 +55,14 @@ router.post("/", function (req, res) {
 });
 
 // upload days and slots (schedule of fittings)
-// router.get("/uploadCsv", middleware.isLoggedIn, function(req, res){
-router.get("/:eventId/uploadCsv", function (req, res) {
+// router.get("/uploadSchedule", middleware.isLoggedIn, function(req, res){
+router.get("/:eventId/uploadSchedule", function (req, res) {
     Event.findById(req.params.eventId).exec(function (err, foundEvent) {
         if (err) {
             console.log(err);
         }
         else {
-            res.render("events/uploadCsv", {
+            res.render("events/uploadSchedule", {
                 event: foundEvent
             });
         }
