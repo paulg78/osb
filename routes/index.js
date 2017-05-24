@@ -14,7 +14,7 @@ router.get("/", function (req, res) {
 
 //show login form
 router.get("/login", function (req, res) {
-  console.log("back to login");
+  // console.log("back to login");
   res.render("login");
 });
 
@@ -48,7 +48,7 @@ router.post('/login', function (req, res, next) {
 // logout route
 router.get("/logout", function (req, res) {
   req.logout();
-  req.flash("success", "LOGGED YOU OUT!");
+  // req.flash("success", "LOGGED YOU OUT!");
   res.redirect("/");
 });
 

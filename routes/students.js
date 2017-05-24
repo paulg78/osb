@@ -5,38 +5,40 @@ var School = require("../models/school");
 var middleware = require("../middleware");
 var request = require("request");
 
-// List students
-router.get("/", middleware.isLoggedIn, function (req, res) {
+// List all students
+router.get("/", middleware.isLoggedIn, function (req, res, next) {
 
     if (res.locals.currentUser.role == 'role_sc') {
-        return res.redirect("/students/school");
+        // console.log("skipping to next students handler");
+        next('route');
     }
-
-    Student.find()
-        .populate('day', 'date')
-        .populate('slot', 'time')
-        .sort({
-            fname: 1,
-            lname: 1
-        })
-        .exec(function (err, queryResponse) {
-            if (err) {
-                console.log(err.errmsg);
-                req.flash("error", "System Error: " + err.message);
-                res.redirect("back");
-            }
-            else {
-                // console.log("school=" + qrySchool);
-                res.render("students/index", {
-                    students: queryResponse
-                });
-            }
-        });
+    else {
+        console.log("after next");
+        Student.find()
+            .populate('day', 'date')
+            .populate('slot', 'time')
+            .sort({
+                fname: 1,
+                lname: 1
+            })
+            .exec(function (err, queryResponse) {
+                if (err) {
+                    console.log(err.errmsg);
+                    req.flash("error", "System Error: " + err.message);
+                    res.redirect("back");
+                }
+                else {
+                    // console.log("school=" + qrySchool);
+                    res.render("students/index", {
+                        students: queryResponse
+                    });
+                }
+            });
+    }
 });
 
-
-//  show students for school of logged in user
-router.get("/school", middleware.isLoggedIn, function (req, res) {
+//  List students for school of logged in user (counselor)
+router.get("/", middleware.isLoggedIn, function (req, res) {
 
     School.findOne({
             name: res.locals.currentUser.school
@@ -130,7 +132,6 @@ router.get("/:id/edit", function (req, res) {
 
 // Update student in database
 router.put("/:id", function (req, res) {
-    console.log("IN put (update student)!");
     var newData = {
         fname: req.body.firstName,
         lname: req.body.lastName,
@@ -149,7 +150,7 @@ router.put("/:id", function (req, res) {
         else {
             // console.log("Updating student");
             req.flash("success", "Successfully Updated!");
-            res.redirect("/students/school");
+            res.redirect("/students");
         }
     });
 });
