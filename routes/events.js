@@ -220,18 +220,12 @@ router.get("/:eventId/days", middleware.isLoggedIn, function (req, res) {
         });
 });
 
-function getById(arr, id) {
-
-    for (var i = 0, iLen = arr.length; i < iLen; i++) {
-        if (arr[i]._id == id) return arr[i];
-    }
-}
-
+// Returns index of item in array arr if present; otherwise returns null
 function getItemIndex(arr, item) {
-
     for (var i = 0, iLen = arr.length; i < iLen; i++) {
         if (arr[i] == item) return i;
     }
+    return null;
 }
 
 // SCHEDULE By School - shows schedule for one day of an event
@@ -259,10 +253,6 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, function (req,
                             console.log(err);
                         }
                         else {
-                            // console.log(foundEvent);
-                            // console.log("req.params.dayId=" + req.params.dayId);
-                            // console.log("foundEvent.days=" + foundEvent.days);
-                            // console.log("day=" + getById(foundEvent.days, req.params.dayId));
                             // console.log("queryResponse=" + queryResponse);
                             res.render("events/daySchoolSchedule", {
                                 eventId: req.params.eventId,
@@ -282,28 +272,55 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function (req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
-    Day.findById(req.params.dayId)
-        .populate({
-            path: 'slots',
-            populate: {
-                path: 'students'
-                    // select: '_id fname lname grade' // doesn't populate anything                
-            }
-        })
-        .exec(function (err, foundDay) {
-            if (err) {
-                console.log(err);
-                req.flash("System error:", err.message);
-                res.redirect("back");
-            }
-            else {
-                res.render("events/daySchedule", {
-                    eventId: req.params.eventId,
-                    day: foundDay
-                });
-            }
-        });
 
+    // Find event to populate previous and next days    
+    Event.findById(req.params.eventId).exec(function (err, foundEvent) {
+        if (err) {
+            console.log(err);
+            req.flash("System error:", err.message);
+            return res.redirect("back");
+        }
+        else {
+            var prevDayId,
+                nextDayId,
+                i;
+
+            // console.log("foundEvent.days=" + foundEvent.days);
+            i = getItemIndex(foundEvent.days, req.params.dayId);
+            if (i != null) {
+                // console.log("foundEvent.days[i]=" + foundEvent.days[i]);
+                if (i > 0) {
+                    prevDayId = foundEvent.days[i - 1];
+                }
+                if (i < foundEvent.days.length - 1) {
+                    nextDayId = foundEvent.days[i + 1];
+                }
+            }
+            Day.findById(req.params.dayId)
+                .populate({
+                    path: 'slots',
+                    populate: {
+                        path: 'students'
+                            // select: '_id fname lname grade' // doesn't populate anything                
+                    }
+                })
+                .exec(function (err, foundDay) {
+                    if (err) {
+                        console.log(err);
+                        req.flash("System error:", err.message);
+                        return res.redirect("back");
+                    }
+                    else {
+                        res.render("events/daySchedule", {
+                            eventId: req.params.eventId,
+                            day: foundDay,
+                            prevDayId: prevDayId,
+                            nextDayId: nextDayId
+                        });
+                    }
+                });
+        }
+    });
 });
 
 

@@ -26,8 +26,10 @@
             </div>
         </div>
     </div>
-    <div style="width: 20%; margin: 25px auto;"class="well">
-          <a href="/events/<%= eventId %>/days">Go back to day list</a>
+    <div style="width: 19%; margin: 10px auto;" class="well">
+        <a class="btn btn-info" href="/events/<%= eventId %>/days/<%= prevDayId %>"><span class="glyphicon glyphicon-chevron-left"></span></a>
+        <a class="btn btn-info" href="/events/<%= eventId %>/days">List days</a>
+        <a class="btn btn-info" href="/events/<%= eventId %>/days/<%= nextDayId %>"><span class="glyphicon glyphicon-chevron-right"></a>
     </div> 
 </div>
  
