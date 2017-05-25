@@ -53,10 +53,18 @@
         </div>  
     </div>
     <div style="width: 19%; margin: 10px auto;" class="well">
-        <a class="btn btn-info" href="/events/<%= eventId %>/days/<%= prevDayId %>"><span class="glyphicon glyphicon-chevron-left"></span></a>
+        <% if (prevDayId) { %>
+            <a class="btn btn-info" href="/events/<%= eventId %>/days/<%= prevDayId %>/school"><span class="glyphicon glyphicon-chevron-left"></span></a>
+        <%  } else { %>
+            <a class="btn btn-info" href="/events/<%= eventId %>/days"><span class="glyphicon glyphicon-chevron-left"></span></a>
+        <%  } %>
         <a class="btn btn-info" href="/events/<%= eventId %>/days">List days</a>
-        <a class="btn btn-info" href="/events/<%= eventId %>/days/<%= nextDayId %>"><span class="glyphicon glyphicon-chevron-right"></a>
-    </div> 
+        <% if (nextDayId) { %>
+            <a class="btn btn-info" href="/events/<%= eventId %>/days/<%= nextDayId %>/school"><span class="glyphicon glyphicon-chevron-right"></span></a>
+        <%  } else { %>
+            <a class="btn btn-info" href="/events/<%= eventId %>/days"><span class="glyphicon glyphicon-chevron-right"></span></a>
+        <%  } %>        
+     </div> 
 </div>
  
 <script src="/scripts/selectStudent.js"></script>

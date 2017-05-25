@@ -228,65 +228,16 @@ function getItemIndex(arr, item) {
     return null;
 }
 
-// SCHEDULE By School - shows schedule for one day of an event
-router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, function (req, res) {
-    Day.findById(req.params.dayId)
-        .populate({
-            path: 'slots',
-            populate: {
-                path: 'students'
-                    // select: '_id fname lname grade' // doesn't populate anything                
-            }
-        })
-        .exec(function (err, foundDay) {
-            if (err) {
-                console.log(err);
-            }
-            else {
-                // find the unassigned students
-                Student.find({
-                        school: res.locals.currentUser.school,
-                        slot: undefined
-                    }, 'fname lname grade',
-                    function (err, queryResponse) {
-                        if (err) {
-                            console.log(err);
-                        }
-                        else {
-                            // console.log("queryResponse=" + queryResponse);
-                            res.render("events/daySchoolSchedule", {
-                                eventId: req.params.eventId,
-                                day: foundDay,
-                                students: queryResponse,
-                                school: res.locals.currentUser.school
-                            });
-                        }
-                    });
-            }
-        });
-});
-
-
-// SCHEDULE All Students - shows schedule for one day of an event
-router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function (req, res) {
-    if (res.locals.currentUser.role == 'role_sc') {
-        return res.redirect("back");
-    }
-
-    // Find event to populate previous and next days    
-    Event.findById(req.params.eventId).exec(function (err, foundEvent) {
-        if (err) {
-            console.log(err);
-            req.flash("System error:", err.message);
-            return res.redirect("back");
-        }
-        else {
-            var prevDayId,
-                nextDayId,
-                i;
-
+// Calls back passing previous and next day ids, if any
+function prevNextDays(eventId, dayId, callbackfunction) {
+    // Find event to populate previous and next days
+    var prevDayId,
+        nextDayId,
+        i;
+    Event.findById(eventId).exec(function (err, foundEvent) {
+        if (!err) {
             // console.log("foundEvent.days=" + foundEvent.days);
-            i = getItemIndex(foundEvent.days, req.params.dayId);
+            i = getItemIndex(foundEvent.days, dayId);
             if (i != null) {
                 // console.log("foundEvent.days[i]=" + foundEvent.days[i]);
                 if (i > 0) {
@@ -296,6 +247,75 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function (req, res) {
                     nextDayId = foundEvent.days[i + 1];
                 }
             }
+        }
+        callbackfunction(prevDayId, nextDayId, err);
+    });
+}
+
+// SCHEDULE By School - shows schedule for one day of an event
+router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, function (req, res) {
+
+    prevNextDays(req.params.eventId, req.params.dayId, function (prevDayId, nextDayId, err) {
+        if (err) {
+            console.log(err);
+            req.flash("System error:", err.message);
+            return res.redirect("back");
+        }
+        else {
+            Day.findById(req.params.dayId)
+                .populate({
+                    path: 'slots',
+                    populate: {
+                        path: 'students'
+                            // select: '_id fname lname grade' // doesn't populate anything                
+                    }
+                })
+                .exec(function (err, foundDay) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    else {
+                        // find the unassigned students
+                        Student.find({
+                                school: res.locals.currentUser.school,
+                                slot: undefined
+                            }, 'fname lname grade',
+                            function (err, queryResponse) {
+                                if (err) {
+                                    console.log(err);
+                                }
+                                else {
+                                    // console.log("queryResponse=" + queryResponse);
+                                    res.render("events/daySchoolSchedule", {
+                                        eventId: req.params.eventId,
+                                        day: foundDay,
+                                        students: queryResponse,
+                                        school: res.locals.currentUser.school,
+                                        prevDayId: prevDayId,
+                                        nextDayId: nextDayId
+                                    });
+                                }
+                            });
+                    }
+                });
+        }
+    });
+});
+
+
+// SCHEDULE All Students - shows schedule for one day of an event
+router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("back");
+    }
+
+    prevNextDays(req.params.eventId, req.params.dayId, function (prevDayId, nextDayId, err) {
+        if (err) {
+            console.log(err);
+            req.flash("System error:", err.message);
+            return res.redirect("back");
+        }
+        else {
             Day.findById(req.params.dayId)
                 .populate({
                     path: 'slots',
