@@ -6,11 +6,7 @@ var express = require("express"),
   // cookieParser = require("cookie-parser"),
   // LocalStrategy = require("passport-local"),
   flash = require("connect-flash"),
-  // Campground = require("./models/campground"),
-  // Student = require("./models/student"),
-  // Comment = require("./models/comment"),
   User = require("./models/user"),
-  // Event = require("./models/event"),
   // session = require("express-session"),
   // seedDB = require("./seeds"),
   methodOverride = require("method-override");
@@ -21,12 +17,9 @@ var LocalStrategy = require('passport-local').Strategy;
 // var crypto = require('crypto');
 
 //requiring routes
-var commentRoutes = require("./routes/comments"),
-  campgroundRoutes = require("./routes/campgrounds"),
+var
   studentRoutes = require("./routes/students"),
   schoolRoutes = require("./routes/schools"),
-  // slotRoutes      = require("./routes/slots"),
-  // dayRoutes = require("./routes/days"),
   eventRoutes = require("./routes/events"),
   indexRoutes = require("./routes/index"),
   userRoutes = require("./routes/users");
@@ -94,15 +87,12 @@ app.use(function (req, res, next) {
 
 app.use("/", indexRoutes);
 app.use("/resetpw/:token", indexRoutes);
-app.use("/campgrounds", campgroundRoutes);
 app.use("/users", userRoutes);
 app.use("/students", studentRoutes);
 app.use("/schools", schoolRoutes);
 app.use("/events", eventRoutes);
-// app.use("/days", dayRoutes);
 app.use("/events/:eventId", eventRoutes);
 app.use("/events/:eventId/days/:dayId", eventRoutes);
-app.use("/campgrounds/:id/comments", commentRoutes);
 
 app.listen(process.env.PORT, process.env.IP, function () {
   console.log("Server running on port " + process.env.PORT + ", IP " + process.env.IP);

@@ -129,20 +129,6 @@ router.get("/new", function (req, res) {
     res.render("schools/new");
 });
 
-// SHOW - shows more info about one school
-// router.get("/:id", function(req, res){
-//     //find the school with provided ID
-//     School.findById(req.params.id).populate("comments").exec(function(err, foundSchool){
-//         if(err){
-//             console.log(err);
-//         } else {
-//             console.log(foundSchool)
-//             //render show template with that school
-//             res.render("schools/show", {school: foundSchool});
-//         }
-//     });
-// });
-
 router.get("/:id/edit", function (req, res) {
     //find the school with provided ID
     School.findById(req.params.id, function (err, foundSchool) {
