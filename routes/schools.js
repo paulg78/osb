@@ -6,8 +6,20 @@ var middleware = require("../middleware");
 var request = require("request");
 var async = require('async');
 
+// All school routes start here; blocks school actions by role_sc
+router.use(middleware.isLoggedIn, function (req, res, next) {
+    // console.log("went to all user routes");
+    if (res.locals.currentUser.role == 'role_sc') {
+        res.redirect("back");
+    }
+    else {
+        // console.log("going to next user route");
+        next('route');
+    }
+});
+
 //INDEX - show schools for school of logged in user
-router.get("/", middleware.isLoggedIn, function (req, res) {
+router.get("/", function (req, res) {
     function count(school, schoolData) {
         for (var i = 0; i < schoolData.length; i++) {
             // console.log("schoolData[i]._id=" + schoolData[i]._id);
@@ -113,7 +125,7 @@ router.post("/", function (req, res) {
 });
 
 //NEW - show form to create new school
-router.get("/new", middleware.isLoggedIn, function (req, res) {
+router.get("/new", function (req, res) {
     res.render("schools/new");
 });
 
@@ -170,7 +182,7 @@ router.put("/:id", function (req, res) {
 });
 
 // upload schools from CSV file
-router.get("/uploadSchools", middleware.isLoggedIn, function (req, res) {
+router.get("/uploadSchools", function (req, res) {
     res.render("schools/uploadSchools");
 });
 
@@ -213,14 +225,5 @@ router.post("/createSchools", function (req, res) {
         }
     );
 });
-
-//middleware
-// function isLoggedIn(req, res, next){
-//     if(req.isAuthenticated()){
-//         return next();
-//     }
-//     req.flash("error", "You must be signed in to do that!");
-//     res.redirect("/login");
-// }
 
 module.exports = router;

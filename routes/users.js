@@ -5,9 +5,21 @@ var middleware = require("../middleware");
 var request = require("request");
 var async = require('async');
 
+// All user routes start here; blocks user actions by role_sc
+router.use(middleware.isLoggedIn, function (req, res, next) {
+    // console.log("went to all user routes");
+    if (res.locals.currentUser.role == 'role_sc') {
+        res.redirect("back");
+    }
+    else {
+        // console.log("going to next user route");
+        next('route');
+    }
+});
+
 //INDEX - show all users
-router.get("/", middleware.isLoggedIn, function (req, res) {
-    // Get all users from DB
+router.get("/", function (req, res) {
+
     User.find().sort({
         name: 1
     }).exec(function (err, allUsers) {
@@ -23,7 +35,7 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
 });
 
 //CREATE - add new user to DB
-router.post("/", middleware.isLoggedIn, function (req, res) {
+router.post("/", function (req, res) {
     // get data from form and add to users collection
 
     var newUser = {
@@ -50,7 +62,11 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
 });
 
 //NEW - show form to create new user
-router.get("/new", middleware.isLoggedIn, function (req, res) {
+router.get("/new", function (req, res) {
+    // if (res.locals.currentUser.role == 'role_sc') {
+    //     return res.redirect("back");
+    // }
+
     res.render("users/new");
 });
 
@@ -97,7 +113,7 @@ router.put("/:id", function (req, res) {
 });
 
 // upload users from CSV file
-router.get("/uploadUsers", middleware.isLoggedIn, function (req, res) {
+router.get("/uploadUsers", function (req, res) {
     res.render("users/uploadUsers");
 });
 

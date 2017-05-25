@@ -31,13 +31,18 @@ router.get("/", function (req, res) {
 });
 
 //NEW - show form to create new event
-// router.get("/new", middleware.isLoggedIn, function(req, res){
-router.get("/new", function (req, res) {
+router.get("/new", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("back");
+    }
     res.render("events/new");
 });
 
 // CREATE - add new event to DB
-router.post("/", function (req, res) {
+router.post("/", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("back");
+    }
     var newEvent = {
         name: req.body.name
     };
@@ -55,8 +60,10 @@ router.post("/", function (req, res) {
 });
 
 // upload days and slots (schedule of fittings)
-// router.get("/uploadSchedule", middleware.isLoggedIn, function(req, res){
-router.get("/:eventId/uploadSchedule", function (req, res) {
+router.get("/:eventId/uploadSchedule", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("back");
+    }
     Event.findById(req.params.eventId).exec(function (err, foundEvent) {
         if (err) {
             console.log(err);
@@ -70,7 +77,10 @@ router.get("/:eventId/uploadSchedule", function (req, res) {
 });
 
 // update database with days and slots (schedule of fittings)
-router.post("/:eventId/createSchedule", function (req, res) {
+router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("back");
+    }
     var scheduleArray = JSON.parse(req.body.scheduleString);
     var numRows = scheduleArray.length;
 
@@ -269,6 +279,9 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, function (req,
 
 // SCHEDULE All Students - shows schedule for one day of an event
 router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("back");
+    }
     Day.findById(req.params.dayId)
         .populate({
             path: 'slots',
@@ -388,6 +401,9 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
 
 
 router.get("/:dayId/edit", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("back");
+    }
     // console.log("IN EDIT!");
     //find the day with provided ID
     Day.findById(req.params.dayId).populate("slots").exec(function (err, foundDay) {
@@ -404,6 +420,9 @@ router.get("/:dayId/edit", middleware.isLoggedIn, function (req, res) {
 });
 
 router.put("/:dayId", function (req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("back");
+    }
     // console.log("IN day put! looking for id=" + req.params.dayId);
     Day.findByIdAndUpdate(req.params.dayId, {
         date: req.body.date
