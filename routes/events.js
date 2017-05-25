@@ -228,8 +228,8 @@ function getItemIndex(arr, item) {
     return null;
 }
 
-// Calls back passing previous and next day ids, if any
-function prevNextDays(eventId, dayId, callbackfunction) {
+// Calls callbackfunction passing previous and next day ids, if any
+function getPrevNextIds(eventId, dayId, callbackfunction) {
     // Find event to populate previous and next days
     var prevDayId,
         nextDayId,
@@ -255,7 +255,7 @@ function prevNextDays(eventId, dayId, callbackfunction) {
 // SCHEDULE By School - shows schedule for one day of an event
 router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, function (req, res) {
 
-    prevNextDays(req.params.eventId, req.params.dayId, function (prevDayId, nextDayId, err) {
+    getPrevNextIds(req.params.eventId, req.params.dayId, function (prevDayId, nextDayId, err) {
         if (err) {
             console.log(err);
             req.flash("System error:", err.message);
@@ -309,7 +309,7 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, function (req, res) {
         return res.redirect("back");
     }
 
-    prevNextDays(req.params.eventId, req.params.dayId, function (prevDayId, nextDayId, err) {
+    getPrevNextIds(req.params.eventId, req.params.dayId, function (prevDayId, nextDayId, err) {
         if (err) {
             console.log(err);
             req.flash("System error:", err.message);
