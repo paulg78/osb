@@ -2,7 +2,7 @@
 <div class="container">
     <span class="hidden" id="eventId"><%= eventId %></span>
     <span class="hidden" id="dayId"><%= day._id %></span>
-    <span class="hidden" id="school"><%= school %></span>
+    <span class="hidden" id="school"><%= currentUser.school %></span>
     <div class="row">
         <div class="col-sm-10">
             <h2 style="text-align: center">Fitting Schedule <%= day.date %></h2>
@@ -27,7 +27,7 @@
                             </form>                    
                     <ul class="list-group schedList">
                         <% slot.students.forEach(function(student){ %>
-                            <% if (student.school == school || school == "") { %>
+                            <% if (student.school == currentUser.school) { %>
                                 <li class="list-group-item schedStud">
                                     <span name="studentText"><%= student.fullName + "(" + student.grade + ")" %></span>
                                     <span name="studentId" class="hidden"><%= student._id %></span>
@@ -35,10 +35,22 @@
                             <% } %>
                         <% }) %>
                     </ul>                        
-
                     </div>
                 <% }) %>
             </div>
+            <div style="width: 25%; margin: 10px auto;" class="well">
+                <% var url = "/events/" + eventId + "/days"; %>
+                <% if (prevDayId) { %>
+                <%     url = url + "/" + prevDayId + "/school" %>
+                <%     } %>  
+                 <a class="btn btn-info" href= <%= url %> ><span class="glyphicon glyphicon-chevron-left"></span></a>
+                 <a class="btn btn-info" href="/events/<%= eventId %>/days">List days</a>  
+                <% url = "/events/" + eventId + "/days"; %>
+                <% if (nextDayId) { %>
+                <%     url = url + "/" + nextDayId + "/school" %>
+                <%     } %>  
+                <a class="btn btn-info" href= <%= url %> ><span class="glyphicon glyphicon-chevron-right"></span></a>            
+            </div>             
         </div>
         <div class="col-sm-2 role_sc">
             <h4>Unscheduled:</h4>
@@ -52,19 +64,6 @@
             </ul>
         </div>  
     </div>
-    <div style="width: 19%; margin: 10px auto;" class="well">
-        <% if (prevDayId) { %>
-            <a class="btn btn-info" href="/events/<%= eventId %>/days/<%= prevDayId %>/school"><span class="glyphicon glyphicon-chevron-left"></span></a>
-        <%  } else { %>
-            <a class="btn btn-info" href="/events/<%= eventId %>/days"><span class="glyphicon glyphicon-chevron-left"></span></a>
-        <%  } %>
-        <a class="btn btn-info" href="/events/<%= eventId %>/days">List days</a>
-        <% if (nextDayId) { %>
-            <a class="btn btn-info" href="/events/<%= eventId %>/days/<%= nextDayId %>/school"><span class="glyphicon glyphicon-chevron-right"></span></a>
-        <%  } else { %>
-            <a class="btn btn-info" href="/events/<%= eventId %>/days"><span class="glyphicon glyphicon-chevron-right"></span></a>
-        <%  } %>        
-     </div> 
 </div>
  
 <script src="/scripts/selectStudent.js"></script>
