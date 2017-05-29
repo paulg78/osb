@@ -17,6 +17,7 @@
     "ejs": "^2.3.4",
     "express": "^4.13.3",
     "express-session": "^1.15.2",
+    "mailgun-js": "^0.11.2",
     "method-override": "^2.3.5",
     "mongoose": "^4.9.6",
     "passport": "^0.3.2",

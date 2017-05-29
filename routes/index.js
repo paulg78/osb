@@ -5,7 +5,8 @@ var User = require("../models/user");
 var Event = require("../models/event");
 var async = require('async');
 var crypto = require('crypto');
-// var nodemailer = require('nodemailer');
+var Mailgun = require('mailgun-js');
+
 
 //root route
 router.get("/", function (req, res) {
@@ -59,85 +60,80 @@ router.get('/requestpwreset', function (req, res) {
   });
 });
 
-function sendEmail(emailAddress, subject, text) {
-  console.log("emailing " + emailAddress + " text: " + text);
+function sendEmail(emailAddress, subject, text, callBack) {
+  console.log("emailing " + emailAddress + ", subject" + subject + ", text: " + text);
+  var mailgun = new Mailgun({
+    apiKey: process.env.APIKEY,
+    domain: 'test.coloradospringsbridge.com'
+  });
+
+  var data = {
+    from: 'admin@coloradospringsbridge.com',
+    to: emailAddress,
+    subject: subject,
+    text: text
+  };
+
+  mailgun.messages().send(data, function (err, body) {
+    callBack(err);
+  });
 }
 
 // reset password
 router.post('/requestpwreset', function (req, res, next) {
   async.waterfall([
 
-    function (done) {
-      crypto.randomBytes(20, function (err, buf) {
-        var token = buf.toString('hex');
-        done(err, token);
-      });
-    },
-
-    function (token, done) {
-      User.findOne({
-        username: req.body.username.toLowerCase()
-      }, function (err, user) {
-        if (!user) {
-          req.flash('error', "No account with email address " + req.body.username + " exists.");
-          return res.redirect('/requestpwreset');
-        }
-
-        user.resetPasswordToken = token;
-        user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
-
-        user.save(function (err) {
-          done(err, token, user);
+      function (done) {
+        crypto.randomBytes(20, function (err, buf) {
+          var token = buf.toString('hex');
+          done(err, token);
         });
-      });
-    },
+      },
 
-    function (token, user, done) {
-      var subject, text;
-      if (user.password == undefined) {
-        subject = "Register for OSB";
-        text = "register token=" + token;
+      function (token, done) {
+        User.findOne({
+          username: req.body.username.toLowerCase()
+        }, function (err, user) {
+          if (!user) {
+            req.flash('error', "No account with email address " + req.body.username + " exists.");
+            return res.redirect('/requestpwreset');
+          }
+
+          user.resetPasswordToken = token;
+          user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+
+          user.save(function (err) {
+            done(err, token, user);
+          });
+        });
+      },
+
+      function (token, user, done) {
+        var subject, text;
+        if (user.password == undefined) {
+          subject = "Register for OSB";
+        }
+        else {
+          subject = "Reset password for OSB";
+        }
+        text = req.get('host') + '/resetpw/' + token;
+        sendEmail(user.username, subject, text, function (err) {
+          console.log("resetString=" + text);
+          done(err);
+        });
+      }
+    ],
+    function (err) {
+      if (err) {
+        req.flash('error', 'email error: ' + err.message);
+        console.log('error: ' + err.message);
+        res.redirect('/requestpwreset');
       }
       else {
-        subject = "Reset password for OSB";
-        text = "reset token=" + token;
+        req.flash('success', 'An e-mail has been sent to ' + req.body.username + ' with further instructions.');
+        res.redirect('/login');
       }
-      sendEmail(user.username, subject, text);
-      // console.log("would send email, if it worked with token=" + token);
-      req.flash('success', 'An e-mail has been sent to ' + user.username + ' with further instructions.');
-
-      //   var smtpTransport = nodemailer.createTransport('SMTP', {
-      //     service: 'mailgun',
-      //     auth: {
-      //       user: 'postmaster@sandbox5842e29e3bda404180f96b4f068180e3.mailgun.org',
-      //       pass: '76c848986564bac79fe7b264fdd1b933'
-      //     }
-      //   });
-      //   var mailOptions = {
-      //     to: user.username,
-      //     from: 'paulg7884@gmail.com',
-      //     subject: 'Node.js Password Reset',
-      //     text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-      //       'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-      //       'http://' + req.headers.host + '/reset/' + token + '\n\n' +
-      //       'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-      //   };
-      //   smtpTransport.sendMail(mailOptions, function(err) {
-      //     req.flash('info', 'An e-mail has been sent to ' + user.username + ' with further instructions.');
-      //     done(err, 'done');
-      //   });
-      done(null); // indicates no error ... pass err object from sendmail
-    }
-  ], function (err) {
-    if (err) {
-      req.flash('error', 'error: ' + err.message);
-      console.log('error: ' + err.message);
-      res.redirect('/requestpwreset');
-    }
-    else {
-      res.redirect('/login');
-    }
-  });
+    });
 });
 
 // show password reset form if token valid
@@ -169,61 +165,45 @@ router.post('/resetpw/:token', function (req, res) {
     req.flash('error', "Password confirmation doesn't match first password entered.");
     return res.redirect('back');
   }
-  async.waterfall([
-    function (done) {
-      User.findOne({
-        resetPasswordToken: req.params.token
-      }, function (err, user) {
-        if (err) {
-          req.flash('error', err.message);
-          return res.redirect('back');
-        }
-        else if (!user) {
-          req.flash('error', 'System error: User not found.');
-          return res.redirect('/requestpwreset');
-        }
-
-        user.password = req.body.password;
-        user.resetPasswordToken = undefined;
-        user.resetPasswordExpires = undefined;
-
-        user.save(function (err) {
-          if (err) {
-            req.flash('failureRedirect', "Error--new password didn't save.");
-            res.redirect('/requestpwreset');
-          }
-          else {
-            done(err, user);
-            req.flash('success', 'Success! Your new password has been saved.');
-            res.redirect('/login');
-            return;
-          }
-        });
-      });
-    },
-    function (user, done) {
-      sendEmail(user.username, "password changed", "text that works for reset or register");
-      // var smtpTransport = nodemailer.createTransport('SMTP', {
-      //   service: 'SendGrid',
-      //   auth: {
-      //     user: '!!! YOUR SENDGRID USERNAME !!!',
-      //     pass: '!!! YOUR SENDGRID PASSWORD !!!'
-      //   }
-      // });
-      // var mailOptions = {
-      //   to: user.username,
-      //   from: 'passwordreset@demo.com',
-      //   subject: 'Your password has been changed',
-      //   text: 'Hello,\n\n' +
-      //     'This is a confirmation that the password for your account ' + user.username + ' has just been changed.\n'
-      // };
-      // smtpTransport.sendMail(mailOptions, function(err) {
-      //   req.flash('success', 'Success! Your password has been changed.');
-      //   done(err);
-      // });
+  User.findOne({
+    resetPasswordToken: req.params.token
+  }, function (err, user) {
+    if (err) {
+      req.flash('error', err.message);
+      return res.redirect('back');
     }
-  ], function (err) {
-    res.redirect('/login');
+    if (!user) {
+      req.flash('error', 'System error: User not found.');
+      return res.redirect('/requestpwreset');
+    }
+
+    var isRegistering = user.password == undefined;
+    user.password = req.body.password;
+    user.resetPasswordToken = null;
+    user.resetPasswordExpires = null;
+
+    user.save(function (err) {
+      if (err) {
+        req.flash('failureRedirect', "Error--new password didn't save.");
+        return res.redirect('/requestpwreset');
+      }
+      req.flash('success', 'Success! Your new password has been saved.');
+      var subject, text;
+      if (isRegistering) {
+        subject = "Successfully Registered for OSB";
+      }
+      else {
+        subject = "Successfully Reset password for OSB";
+      }
+      text = "You did it!";
+      sendEmail(user.username, subject, text, function (err) {
+        if (err) {
+          console.log('Error sending email.');
+        }
+      });
+      // no need to wait on the email callback
+      res.redirect('/login');
+    });
   });
 });
 
