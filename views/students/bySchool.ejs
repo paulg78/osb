@@ -13,7 +13,7 @@
     <% if (qrySchool.quota-students.length > 0) { %>     
         <div style="width: 100%; margin: 25px auto;">
             <form action="/students" method="POST" class="form-inline" id=newStudentForm>
-                <h3>Add Student</h3>
+                <h3>Add Student          <span id="addMsg"></span></h3>
                 <div class="form-group">
                     <input class="form-control" type="text" name="firstName" placeholder="first name">
                 </div>

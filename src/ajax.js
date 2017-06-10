@@ -27,9 +27,11 @@ $('#newStudentForm').submit(function (e) {
             </tr>            
                 `
             )
+            $('#addMsg').removeClass('failMsg successMsg');
+            $('#addMsg').addClass('successMsg');
+            $('#addMsg').text(student.fname + " " + student.lname + " added.");
             var remaining = $('#remaining').text() - 1;
             $('#remaining').text(remaining);
-            // $('#remaining').text($('#remaining').text() - 1);
             if (remaining < 1) {
                 $('#newStudentForm').hide();
             }
@@ -38,8 +40,11 @@ $('#newStudentForm').submit(function (e) {
                 $('#newStudentForm').find('.form-control').first().focus();
             }
         },
-        error: function (err) { // how can I get it to take this path on error?
-            console.log('Ajax post returned error: ' + err);
+        error: function (err) {
+            console.log('Ajax post returned error: ' + err.responseText);
+            $('#addMsg').removeClass('failMsg successMsg');
+            $('#addMsg').addClass('failMsg');
+            $('#addMsg').text(err.responseText);
         }
     })
 })

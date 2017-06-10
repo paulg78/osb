@@ -78,43 +78,59 @@ router.get("/", middleware.isLoggedIn,
     }
 );
 
+function firstLetterUpCase(val) {
+    if (val == null) {
+        return "";
+    }
+    var str = val.toString().trim();
+    if (str.length > 0) {
+        var s = str[0].toUpperCase() + str.substring(1, str.length);
+        console.log("s=" + s);
+        return s;
+    }
+    return str;
+}
+
+// formats student attributes; returns error message or empty string if no errors
+function studentValid(student) {
+    student.fname = firstLetterUpCase(student.fname);
+    student.lname = firstLetterUpCase(student.lname);
+    student.gender = firstLetterUpCase(student.gender);
+    student.grade = student.grade.toString().trim();
+    if (student.fname == "" || student.lname == "" || student.grade == "") {
+        return "first name, last name, and grade are required fields";
+    }
+    return "";
+}
+
 //CREATE - add new student to DB
 router.post("/", middleware.isLoggedIn, function (req, res) {
 
-    function firstLetterUpCase(str) {
-        if (str) {
-            return str[0].toUpperCase() + str.substring(1, str.length);
-        }
-        return "";
-    }
-
     var studentData = {
-        // fname: req.sanitize(req.body.firstName),
-        fname: firstLetterUpCase(req.body.firstName),
-        lname: firstLetterUpCase(req.body.lastName),
-        gender: firstLetterUpCase(req.body.gender),
+        fname: req.body.firstName,
+        lname: req.body.lastName,
+        gender: req.body.gender,
         grade: req.body.grade,
         school: res.locals.currentUser.school
     }
 
-    // Create a new student and save to DB
-    Student.create(studentData, function (err, newStudent) {
-        if (err) {
-            if (err.name == 'ValidationError') {
-                req.flash("error", "first name, last name, and grade are required fields");
+    var result = studentValid(studentData);
+    console.log("studentData.fname=" + studentData.fname);
+    if (result == "") {
+        Student.create(studentData, function (err, newStudent) {
+            if (err) {
+                console.log("create failed: " + err.message);
+                res.status(500).send(err.message);
             }
             else {
-                req.flash("error", "System error--student not saved");
+                console.log("create succeeded");
+                res.json(newStudent);
             }
-            console.log("create failed: " + err.message);
-            // res.json(err); // need an ajax error response here to get on ajax error path
-            res.status(500).send('Bad Request');
-        }
-        else {
-            console.log("create succeeded");
-            res.json(newStudent);
-        }
-    });
+        });
+    }
+    else {
+        res.status(500).send(result);
+    }
 });
 
 // Find student and render form

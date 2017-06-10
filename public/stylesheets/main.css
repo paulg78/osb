@@ -68,6 +68,20 @@
     display: none;
 }
 
+.failMsg {
+    color: #a94442;
+    background-color: #f2dede;
+    border-color: #ebccd1;
+    font-size: .75em;
+}
+
+.successMsg {
+    color: #3c763d;
+    background-color: #dff0d8;
+    border-color: #d6e9c6;
+    font-size: .75em;
+}
+
 .schedStud {
     /*height: 25px;*/
     padding: 2px 10px;
