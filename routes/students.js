@@ -85,7 +85,6 @@ function firstLetterUpCase(val) {
     var str = val.toString().trim();
     if (str.length > 0) {
         var s = str[0].toUpperCase() + str.substring(1, str.length);
-        console.log("s=" + s);
         return s;
     }
     return str;
@@ -100,6 +99,13 @@ function studentValid(student) {
     if (student.fname == "" || student.lname == "" || student.grade == "") {
         return "first name, last name, and grade are required fields";
     }
+    var len = student.grade.length;
+    if ((len == 1 && (student.grade < "1" || student.grade > "9")) ||
+        (len == 2 && (student.grade < "10" || student.grade > "12")) ||
+        (len < 1) || (len > 2)
+    ) {
+        return "grade must be a number from 1 to 12";
+    }
     return "";
 }
 
@@ -112,10 +118,9 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
         gender: req.body.gender,
         grade: req.body.grade,
         school: res.locals.currentUser.school
-    }
+    };
 
     var result = studentValid(studentData);
-    console.log("studentData.fname=" + studentData.fname);
     if (result == "") {
         Student.create(studentData, function (err, newStudent) {
             if (err) {
@@ -123,7 +128,6 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
                 res.status(500).send(err.message);
             }
             else {
-                console.log("create succeeded");
                 res.json(newStudent);
             }
         });
@@ -156,20 +160,28 @@ router.put("/:id", function (req, res) {
         grade: req.body.grade
     };
 
-    Student.findByIdAndUpdate(req.params.id, {
-        $set: newData
-    }, function (err, student) {
-        if (err) {
-            console.log("edit error");
-            req.flash("error", err.message);
-            res.redirect("back");
-        }
-        else {
-            // console.log("Updating student");
-            req.flash("success", "Successfully Updated!");
-            res.redirect("/students");
-        }
-    });
+    var result = studentValid(newData);
+    if (result == "") {
+        Student.findByIdAndUpdate(req.params.id, {
+            $set: newData
+        }, function (err, student) {
+            if (err) {
+                console.log("edit database error");
+                req.flash("error", err.message);
+                res.redirect("back");
+            }
+            else {
+                // console.log("Updating student");
+                req.flash("success", "Successfully Updated!");
+                res.redirect("/students");
+            }
+        });
+    }
+    else {
+        console.log("edit validation error");
+        req.flash("error", result);
+        res.redirect("back");
+    }
 });
 
 module.exports = router;
