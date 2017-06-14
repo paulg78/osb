@@ -1,6 +1,6 @@
     body {
         background: url("schoolKids.jpg");
-        background-size: contain;
+        background-size: cover;
         background-position: center center;
         background-repeat: no-repeat;
     }
@@ -13,18 +13,14 @@
     }
     
     h1 {
-        font-weight: 700;
+        font-weight: 500;
         font-size: 4em;
     }
     
     .content {
-        padding-top: 30%;
         text-align: center;
-    }
-    
-    hr {
-        width: 400px;
-        border-top: 1px solid #f8f8f8;
-        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+        position: absolute;
+        top: 85%;
+        left: 35%;
     }
     
