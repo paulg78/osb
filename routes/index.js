@@ -74,9 +74,9 @@ function sendEmail(emailAddress, subject, text, callBack) {
     text: text
   };
 
-  mailgun.messages().send(data, function (err, body) {
-    callBack(err);
-  });
+  // mailgun.messages().send(data, function (err, body) {
+  //   callBack(err);
+  // });
 }
 
 // reset password
@@ -111,12 +111,12 @@ router.post('/requestpwreset', function (req, res, next) {
       function (token, user, done) {
         var subject, text;
         if (user.password == undefined) {
-          subject = "Register for OSB";
+          subject = "Register for Assistance League Operation School Bell";
         }
         else {
-          subject = "Reset password for OSB";
+          subject = "Reset password for Assistance League Operation School Bell";
         }
-        text = req.get('host') + '/resetpw/' + token;
+        text = req.protocol + "://" + req.get('host') + '/resetpw/' + token;
         sendEmail(user.username, subject, text, function (err) {
           console.log("resetString=" + text);
           done(err);
