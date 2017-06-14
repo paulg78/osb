@@ -19,14 +19,6 @@ router.get("/login", function (req, res) {
   res.render("login");
 });
 
-//handling login logic
-// router.post("/login", passport.authenticate("local", 
-//     {
-//         successRedirect: "/days",
-//         failureRedirect: "/login"
-//     }), function(req, res){
-//         console.log("do nothing function called");
-// });
 router.post('/login', function (req, res, next) {
   passport.authenticate('local', function (err, user, info) {
     if (err) {
@@ -61,7 +53,7 @@ router.get('/requestpwreset', function (req, res) {
 });
 
 function sendEmail(emailAddress, subject, text, callBack) {
-  console.log("emailing " + emailAddress + ", subject" + subject + ", text: " + text);
+  console.log("emailing " + emailAddress + ", subject: " + subject + ", text: " + text);
   var mailgun = new Mailgun({
     apiKey: process.env.APIKEY,
     domain: 'test.coloradospringsbridge.com'
@@ -74,9 +66,9 @@ function sendEmail(emailAddress, subject, text, callBack) {
     text: text
   };
 
-  // mailgun.messages().send(data, function (err, body) {
-  //   callBack(err);
-  // });
+  mailgun.messages().send(data, function (err, body) {
+    callBack(err);
+  });
 }
 
 // reset password
@@ -110,13 +102,17 @@ router.post('/requestpwreset', function (req, res, next) {
 
       function (token, user, done) {
         var subject, text;
+        var link = req.protocol + "://" + req.get('host') + '/resetpw/' + token;
         if (user.password == undefined) {
           subject = "Register for Assistance League Operation School Bell";
+          text = "To register, create a password after clicking on the following link\n" +
+            "or pasting it into a browser:\n\n" + link + "\n";
         }
         else {
           subject = "Reset password for Assistance League Operation School Bell";
+          text = "To reset your password, create a new password after clicking on the\n" +
+            "following link or pasting it into a browser\n\n" + link + "\n";
         }
-        text = req.protocol + "://" + req.get('host') + '/resetpw/' + token;
         sendEmail(user.username, subject, text, function (err) {
           console.log("resetString=" + text);
           done(err);
@@ -190,12 +186,12 @@ router.post('/resetpw/:token', function (req, res) {
       req.flash('success', 'Success! Your new password has been saved.');
       var subject, text;
       if (isRegistering) {
-        subject = "Successfully Registered for OSB";
+        subject = "Successfully Registered for Operation School Bell";
       }
       else {
-        subject = "Successfully Reset password for OSB";
+        subject = "Successfully Reset password for Operation School Bell";
       }
-      text = "You did it!";
+      text = "You may now login with your new password!";
       sendEmail(user.username, subject, text, function (err) {
         if (err) {
           console.log('Error sending email.');

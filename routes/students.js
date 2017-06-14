@@ -44,36 +44,39 @@ router.get("/", middleware.isLoggedIn,
                 if (err) {
                     console.log(err.errmsg);
                     req.flash("error", "System Error: " + err.message);
-                    res.redirect("back");
+                    return res.redirect("back");
                 }
-                else {
-                    // console.log("in list students for a school");
-                    Student.find({
-                            school: res.locals.currentUser.school
-                        })
-                        .populate('day', 'date')
-                        .populate('slot', 'time')
-                        // Alternate syntax that also works:
-                        // .populate({
-                        //     path: 'day',
-                        //     select: 'date'
-                        // }).populate({
-                        //     path: 'slot',
-                        //     select: 'time'
-                        // })
-                        .exec(function (err, queryResponse) {
-                            if (err) {
-                                console.log(err);
-                            }
-                            else {
-                                // console.log("school=" + qrySchool);
-                                res.render("students/bySchool", {
-                                    students: queryResponse,
-                                    qrySchool: qrySchool
-                                });
-                            }
+                if (qrySchool == null) {
+                    console.log("School missing from database: " + res.locals.currentUser.school);
+                    req.flash("error", "School missing from database: " + res.locals.currentUser.school);
+                    return res.redirect("back");
+                }
+                // console.log("in list students for a school");
+                Student.find({
+                        school: res.locals.currentUser.school
+                    })
+                    .populate('day', 'date')
+                    .populate('slot', 'time')
+                    // Alternate syntax that also works:
+                    // .populate({
+                    //     path: 'day',
+                    //     select: 'date'
+                    // }).populate({
+                    //     path: 'slot',
+                    //     select: 'time'
+                    // })
+                    .exec(function (err, queryResponse) {
+                        if (err) {
+                            console.log(err);
+                            req.flash("error", "System Error: " + err.message);
+                            return res.redirect("back");
+                        }
+                        // console.log("school=" + qrySchool);
+                        res.render("students/bySchool", {
+                            students: queryResponse,
+                            qrySchool: qrySchool
                         });
-                }
+                    });
             });
     }
 );
