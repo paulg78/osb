@@ -502,7 +502,7 @@ router.get("/genSched", middleware.isLoggedIn, function (req, res) {
                 return studNbr < students.length && slotNbr < slots.length;
             },
             function (callback) {
-                console.log("iteratee called for studNbr=" + studNbr + ", slotNbr=" + slotNbr);
+                // console.log("iteratee called for studNbr=" + studNbr + ", slotNbr=" + slotNbr);
                 // find next available slot
                 while (slots[slotNbr].students.length >= slots[slotNbr].max &&
                     slotNbr < slots.length) {
@@ -514,7 +514,7 @@ router.get("/genSched", middleware.isLoggedIn, function (req, res) {
                     students: slots[slotNbr].students
                 }, function (err) {
                     if (!err) {
-                        console.log("updated slot=" + slots[slotNbr]._id);
+                        // console.log("updated slot=" + slots[slotNbr]._id);
                         // find day containing slot
                         Day.findOne({
                                 slots: {
@@ -525,14 +525,14 @@ router.get("/genSched", middleware.isLoggedIn, function (req, res) {
                             },
                             function (err, day) {
                                 if (!err) {
-                                    console.log("found day=" + day.date + ", id=" + day._id);
+                                    // console.log("found day=" + day.date + ", id=" + day._id);
                                     // update student
                                     Student.findByIdAndUpdate(students[studNbr]._id, {
                                         day: day._id,
                                         slot: slots[slotNbr]._id
                                     }, function (err) {
                                         studNbr++;
-                                        console.log("Callback with studNbr=" + studNbr + ", slotNbr=" + slotNbr);
+                                        // console.log("Callback with studNbr=" + studNbr + ", slotNbr=" + slotNbr);
                                         callback(err);
                                     });
                                 }
