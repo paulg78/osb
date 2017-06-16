@@ -3,7 +3,8 @@ var router = express.Router();
 var Student = require("../models/student");
 var School = require("../models/school");
 var middleware = require("../middleware");
-var request = require("request");
+// var request = require("request");
+var async = require('async');
 
 // List Students (all or by school)
 router.get("/", middleware.isLoggedIn,
@@ -120,7 +121,9 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
         lname: req.body.lastName,
         gender: req.body.gender,
         grade: req.body.grade,
-        school: res.locals.currentUser.school
+        school: res.locals.currentUser.school,
+        day: null,
+        slot: null
     };
 
     var result = studentValid(studentData);
@@ -185,6 +188,84 @@ router.put("/:id", function (req, res) {
         req.flash("error", result);
         res.redirect("back");
     }
+});
+
+// generate students for capacity testing
+router.get("/genStuds", function (req, res) {
+    if (res.locals.currentUser.role != 'role_wa') {
+        return res.redirect("back");
+    }
+    School.find(function (err, schools) {
+        if (err) {
+            console.log("error finding schools");
+            req.flash("error", err.msg);
+            return res.redirect("back");
+        }
+
+        var schoolNbr = 0;
+        async.whilst(
+            function () {
+                return schoolNbr < schools.length;
+            },
+            function (schoolCallback) {
+                //console.log("school iteratee called for schoolNbr=" + schoolNbr);
+                Student.find({
+                        school: schools[schoolNbr].name
+                    })
+                    .count(function (err, nbrStuds) {
+                        if (err) {
+                            console.log("Error finding students!");
+                            nbrStuds = 0;
+                        }
+
+                        var studNbr = nbrStuds;
+                        async.whilst(
+                            function () {
+                                return studNbr < schools[schoolNbr].quota;
+                            },
+                            function (studentCallback) {
+                                //console.log("student iteratee called for studNbr=" + studNbr);
+                                var student = {
+                                    fname: "Fname" + studNbr,
+                                    lname: "Lname" + schoolNbr,
+                                    gender: "G",
+                                    grade: "1",
+                                    school: schools[schoolNbr].name,
+                                    day: null,
+                                    slot: null
+                                };
+                                // save student
+                                Student.create(student, function (err) {
+                                    if (err) {
+                                        console.log("Error, studNbr=" + studNbr + " student=" + student.lname + " ," + student.fname + ", " + err.message);
+                                    }
+                                    else {
+                                        //console.log("created student=" + student.lname + " ," + student.fname);
+                                    }
+                                    studNbr++;
+                                    //console.log("calling studentCallback with studNbr=" + studNbr);
+                                    studentCallback(null); // don't stop for errors                
+                                });
+                            },
+                            function (err) {
+                                if (err) {
+                                    console.log("error while creating students for school=" + schools[schoolNbr].name);
+                                }
+                                schoolNbr++;
+                                //console.log("calling schoolCallback with schoolNbr=" + schoolNbr);
+                                schoolCallback(err);
+                            }
+                        );
+                    });
+            },
+            function (err) {
+                if (err) {
+                    console.log("error after creating students for school=" + schools[schoolNbr].name);
+                }
+                schoolNbr++;
+            });
+    });
+    res.redirect("/events");
 });
 
 module.exports = router;

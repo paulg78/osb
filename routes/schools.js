@@ -3,7 +3,7 @@ var router = express.Router();
 var School = require("../models/school");
 var Student = require("../models/student");
 var middleware = require("../middleware");
-var request = require("request");
+// var request = require("request");
 var async = require('async');
 
 // All school routes start here; blocks school actions by role_sc
@@ -18,7 +18,7 @@ router.use(middleware.isLoggedIn, function (req, res, next) {
     }
 });
 
-//INDEX - show schools for school of logged in user
+//INDEX - list schools
 router.get("/", function (req, res) {
     function count(school, schoolData) {
         for (var i = 0; i < schoolData.length; i++) {

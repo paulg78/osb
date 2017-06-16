@@ -1,7 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var Student = require("../models/student");
-var User = require("../models/user");
+//var User = require("../models/user");
 var Event = require("../models/event");
 var Day = require("../models/day");
 var Slot = require("../models/slot");
@@ -409,8 +409,8 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
 
     function updateStudent(callback) {
         Student.findByIdAndUpdate(req.params.studentId, {
-            day: undefined,
-            slot: undefined
+            day: null,
+            slot: null
         }, function (err) {
             callback(err);
         });
@@ -422,7 +422,6 @@ router.get("/:dayId/edit", middleware.isLoggedIn, function (req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
-    // console.log("IN EDIT!");
     //find the day with provided ID
     Day.findById(req.params.dayId).populate("slots").exec(function (err, foundDay) {
         if (err) {
@@ -454,6 +453,100 @@ router.put("/:dayId", function (req, res) {
             res.redirect("/days");
         }
     });
+});
+
+router.get("/genSched", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role != 'role_wa') {
+        return res.redirect("back");
+    }
+
+    // find all students who aren't scheduled
+    // find all slots
+    // for each student
+    //   find an empty slot (one where nbr scheduled < max)
+    //      schedule a student
+    // until all students are scheduled or out of slots
+    async.waterfall([
+        findUnschedStuds,
+        findSlots,
+        scheduleStudents,
+    ], function (err) {
+        if (err) {
+            console.log(err);
+        }
+        res.redirect("back");
+    });
+
+    function findUnschedStuds(callback) {
+        Student.find({
+                slot: null
+            })
+            .exec(function (err, students) {
+                callback(err, students);
+            });
+    }
+
+    function findSlots(students, callback) {
+        Slot.find()
+            .exec(function (err, slots) {
+                callback(err, students, slots);
+            });
+    }
+
+    function scheduleStudents(students, slots, callback) {
+        var studNbr = 0;
+        var slotNbr = 0;
+
+        async.whilst(
+            function () {
+                return studNbr < students.length && slotNbr < slots.length;
+            },
+            function (callback) {
+                console.log("iteratee called for studNbr=" + studNbr + ", slotNbr=" + slotNbr);
+                // find next available slot
+                while (slots[slotNbr].students.length >= slots[slotNbr].max &&
+                    slotNbr < slots.length) {
+                    slotNbr++;
+                }
+                // assign student to slot
+                slots[slotNbr].students.push(students[studNbr]._id);
+                Slot.findByIdAndUpdate(slots[slotNbr]._id, {
+                    students: slots[slotNbr].students
+                }, function (err) {
+                    if (!err) {
+                        console.log("updated slot=" + slots[slotNbr]._id);
+                        // find day containing slot
+                        Day.findOne({
+                                slots: {
+                                    $elemMatch: {
+                                        $eq: slots[slotNbr]._id
+                                    }
+                                }
+                            },
+                            function (err, day) {
+                                if (!err) {
+                                    console.log("found day=" + day.date + ", id=" + day._id);
+                                    // update student
+                                    Student.findByIdAndUpdate(students[studNbr]._id, {
+                                        day: day._id,
+                                        slot: slots[slotNbr]._id
+                                    }, function (err) {
+                                        studNbr++;
+                                        console.log("Callback with studNbr=" + studNbr + ", slotNbr=" + slotNbr);
+                                        callback(err);
+                                    });
+                                }
+                            }
+                        );
+                    }
+                });
+            },
+            function (err) {
+                callback(err);
+            }
+        );
+    }
+
 });
 
 module.exports = router
