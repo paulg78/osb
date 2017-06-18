@@ -1,6 +1,6 @@
     body {
         background: url("schoolKids.jpg");
-        background-size: cover;
+        background-size: contain;
         background-position: center center;
         background-repeat: no-repeat;
     }

@@ -25,15 +25,15 @@
             <td><%= student.lname %></td>
             <td><%= student.school %></td>
             <td><%= student.grade %></td>
-            <td><% if (student.day != undefined) { %>
+            <td><% if (student.day != null) { %>
                 <%= student.day.date %></td>
                 <% } %>
-            <td><% if (student.slot != undefined) { %>
+            <td><% if (student.slot != null) { %>
                 <%= student.slot.time %></td>
                 <% } %>
         </tr>
     <% }); %>
-        </tbody>
+    </tbody>
     </table>
     
 <script>

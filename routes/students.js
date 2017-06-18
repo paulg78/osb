@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 var Student = require("../models/student");
 var School = require("../models/school");
+var Slot = require("../models/slot");
 var middleware = require("../middleware");
 // var request = require("request");
 var async = require('async');
@@ -189,6 +190,58 @@ router.put("/:id", function (req, res) {
         res.redirect("back");
     }
 });
+
+// Returns index of item in array arr if present; otherwise returns null
+function getItemIndex(arr, item) {
+    for (var i = 0, iLen = arr.length; i < iLen; i++) {
+        if (arr[i] == item) return i;
+    }
+    return null;
+}
+
+// Delete student
+router.delete("/:studentId", middleware.isLoggedIn, function (req, res) {
+    // console.log("student to delete=" + req.params.studentId);
+    Student.findOneAndRemove({
+        _id: req.params.studentId
+    }, function (err, student) {
+        if (err) {
+            console.log("Error deleting student: " + err.message);
+            req.flash("error", err.message);
+            return res.redirect("back");
+        }
+        if (student.slot != null) {
+            Slot.findById(student.slot, function (err, slot) {
+                if (err) {
+                    console.log("Error finding slot: " + err.message);
+                    req.flash("error", err.message);
+                    return res.redirect("back");
+                }
+                var delIndex = getItemIndex(slot.students, req.params.studentId);
+                // console.log("delIndex=" + delIndex);
+                if (delIndex == null) {
+                    var err = "Error: student not found in slot";
+                    console.log(err);
+                    req.flash("error", err);
+                    return res.redirect("back");
+                }
+                // console.log("slot.students before: " + slot.students);
+                slot.students.splice(delIndex, 1);
+                // console.log("slot.students after: " + slot.students);
+                slot.save(function (err) {
+                    if (err) {
+                        console.log("Error saving updated slot: " + err.message);
+                        req.flash("error", err.message);
+                        return res.redirect("back");
+                    }
+                });
+            });
+        }
+        req.flash("success", "Deleted " + student.fullName);
+        res.redirect("back");
+    });
+});
+
 
 // generate students for capacity testing
 router.get("/genStuds", function (req, res) {

@@ -145,7 +145,6 @@ router.get("/:id/edit", function (req, res) {
 });
 
 router.put("/:id", function (req, res) {
-    console.log("IN put (update school)!");
     var newData = {
         quota: req.body.quota
     };
@@ -159,7 +158,6 @@ router.put("/:id", function (req, res) {
             res.redirect("back");
         }
         else {
-            console.log("Updating school");
             req.flash("success", "Successfully Updated!");
             // res.redirect("/schools/" + school._id);
             res.redirect("/schools");

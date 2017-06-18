@@ -7,11 +7,11 @@
             <div class="row" style="display:flex; flex-wrap: wrap;">
                 <% day.slots.forEach(function(slot){ %>
                     <div class="col-sm-3 solidborder">
-                        <strong><%= slot.time %></strong>
+                        <span class="slot-time"><%= slot.time %></span>
                         <% var remaining = slot.max - slot.students.length; %>
-                        <span>(</span>
+                        <span class="availDelim">(</span>
                         <span class="availSlots"><%=remaining%></span>
-                        <span>)</span>
+                        <span class="availDelim">)</span>
                     <ul class="list-group schedList">
                         <% slot.students.forEach(function(student){ %>
                                 <li class="list-group-item schedStud">

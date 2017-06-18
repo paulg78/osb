@@ -21,7 +21,7 @@ $('#newStudentForm').submit(function (e) {
                 <td>
                  <form style="display: inline" action="/students/${student._id}?_method=DELETE" method="POST">
                     <a href="/students/${student._id}/edit" class="btn btn-xs btn-info">EDIT</a>
-                    <button class="hidden" class="btn btn-xs btn-danger">DELETE</button>
+                    <button class="btn btn-xs btn-danger">DELETE</button>
                 </form>                
                 </td>
             </tr>            

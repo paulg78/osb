@@ -274,7 +274,7 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
                 // find the unassigned students
                 Student.find({
                         school: res.locals.currentUser.school,
-                        slot: undefined
+                        slot: null
                     }, 'fname lname grade',
                     function (err, queryResponse) {
                         if (err) {
@@ -399,12 +399,21 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
 
         // "clever" use of splice to remove elements
         // The first parameter defines the (0 relative) position where elements will be deleted.
-        // The second parameter defines how many elements will be removed. 
-        slot.students.splice(getItemIndex(slot.students, req.params.studentId), 1);
-        // console.log("after=" + slot.students);
-        slot.save(function (err) {
+        // The second parameter defines how many elements will be removed.
+        var delIndex = getItemIndex(slot.students, req.params.studentId);
+        // console.log("delIndex=" + delIndex);
+        if (delIndex == null) {
+            var err = "Error: student not found in slot";
+            console.log(err);
             callback(err);
-        });
+        }
+        else {
+            slot.students.splice(delIndex, 1);
+            // console.log("after=" + slot.students);
+            slot.save(function (err) {
+                callback(err);
+            });
+        }
     }
 
     function updateStudent(callback) {
