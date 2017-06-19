@@ -300,7 +300,6 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, getPrevNextIds, funct
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
-
     Day.findById(req.params.dayId)
         .populate({
             path: 'slots',
@@ -556,6 +555,86 @@ router.get("/genSched", middleware.isLoggedIn, function (req, res) {
         );
     }
 
+});
+
+
+// find and delete invalid student IDs in slots
+router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
+    console.log("Starting fixslots.")
+    var nbrMissing = 0;
+    Slot.find(function (err, slots) {
+        if (err) {
+            console.log("error finding slots: " + err.msg);
+            return res.redirect("back");
+        }
+        var slotNbr = 0;
+        // loop thru slots
+        async.whilst(
+            function () {
+                return slotNbr < slots.length;
+            },
+            function (slotCallback) {
+                // console.log("Slot iteratee executed for slot=" + slots[slotNbr]._id);
+                // loop thru students
+                var studNbr = 0;
+                async.whilst(
+                    function () {
+                        return studNbr < slots[slotNbr].students.length;
+                    },
+                    function (studentCallback) {
+                        // console.log("iteratee called for studNbr=" + studNbr + ", slotNbr=" + slotNbr);
+                        Student.findById(slots[slotNbr].students[studNbr], function (err, student) {
+                            if (err) {
+                                studentCallback(err);
+                            }
+                            else {
+                                if (student == undefined) {
+                                    nbrMissing++;
+                                    console.log("slot=" + slots[slotNbr]._id + ", missing student=" + slots[slotNbr].students[studNbr]);
+                                    Slot.findById(slots[slotNbr]._id, function (err, slot) {
+                                        if (err) {
+                                            studentCallback(err);
+                                        }
+                                        else {
+                                            // console.log("students before=" + slot.students);
+                                            slot.students.splice(studNbr, 1);
+                                            // console.log("students after=" + slot.students);
+                                              slot.save(function (err) {
+                                                  if (!err) {
+                                                      console.log("missing student deleted from slot")
+                                                      studNbr++;
+                                                  }
+                                                  studentCallback(err);
+                                              });
+                                        }
+                                    })
+                                }
+                                else {
+                                    // console.log("found student=" + student.fullName);
+                                    studNbr++;
+                                    studentCallback(err);
+                                }
+                            }
+                        })
+                    },
+                    function (err) {
+                        if (err) {
+                            console.log("error in student loop: " + err.msg);
+                        }
+                        slotNbr++;
+                        slotCallback(err);
+                    }
+                );
+            },
+            function (err) {
+                if (err) {
+                    console.log("error in slot loop: " + err.msg);
+                }
+                console.log("Ending fixslots. Nbr missing students in slots=" + nbrMissing);
+                res.redirect("back");
+            }
+        );
+    });
 });
 
 module.exports = router
