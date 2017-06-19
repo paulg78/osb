@@ -223,7 +223,9 @@ router.get("/:eventId/days", middleware.isLoggedIn, function (req, res) {
 
 // Returns index of item in array arr if present; otherwise returns null
 function getItemIndex(arr, item) {
+    // console.log("item=" + item + ",len=" + item.length);
     for (var i = 0, iLen = arr.length; i < iLen; i++) {
+        // console.log("arr[i]=" + arr[i] + ",len=" + arr[i].length);
         if (arr[i] == item) return i;
     }
     return null;
@@ -396,9 +398,6 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
     function updateSlot(slot, callback) {
         // console.log("before=" + slot.students);
 
-        // "clever" use of splice to remove elements
-        // The first parameter defines the (0 relative) position where elements will be deleted.
-        // The second parameter defines how many elements will be removed.
         var delIndex = getItemIndex(slot.students, req.params.studentId);
         // console.log("delIndex=" + delIndex);
         if (delIndex == null) {
@@ -407,6 +406,9 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
             callback(err);
         }
         else {
+            // "clever" use of splice to remove elements
+            // The first parameter defines the (0 relative) position where elements will be deleted.
+            // The second parameter defines how many elements will be removed.
             slot.students.splice(delIndex, 1);
             // console.log("after=" + slot.students);
             slot.save(function (err) {
@@ -557,9 +559,11 @@ router.get("/genSched", middleware.isLoggedIn, function (req, res) {
 
 });
 
-
-// find and delete invalid student IDs in slots
+// in slots, find and delete student IDs that don't point to any student
 router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role != 'role_wa') {
+        return res.redirect("back");
+    }
     console.log("Starting fixslots.")
     var nbrMissing = 0;
     Slot.find(function (err, slots) {
@@ -599,13 +603,13 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
                                             // console.log("students before=" + slot.students);
                                             slot.students.splice(studNbr, 1);
                                             // console.log("students after=" + slot.students);
-                                              slot.save(function (err) {
-                                                  if (!err) {
-                                                      console.log("missing student deleted from slot")
-                                                      studNbr++;
-                                                  }
-                                                  studentCallback(err);
-                                              });
+                                            slot.save(function (err) {
+                                                if (!err) {
+                                                    console.log("missing student deleted from slot")
+                                                    studNbr++;
+                                                }
+                                                studentCallback(err);
+                                            });
                                         }
                                     })
                                 }
@@ -635,6 +639,72 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
             }
         );
     });
+});
+
+// Find students who have a slot id but the slot doesn't point to the student
+// i.e. looks like they are on the schedule but they aren't
+router.get("/fixStudents", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role != 'role_wa') {
+        return res.redirect("back");
+    }
+    console.log("Starting fixStudents.")
+    var nbrMissing = 0;
+
+    Student.find({
+            slot: {
+                $ne: null
+            }
+        })
+        .exec(function (err, students) {
+            if (err) {
+                console.log("error finding students: " + err.msg);
+                return res.redirect("back");
+            }
+            var studNbr = 0;
+            // loop thru students
+            async.whilst(
+                function () {
+                    return studNbr < students.length;
+                },
+                function (callback) {
+                    // console.log("student iteratee executed for student id=" + students[studNbr]._id);
+                    Slot.findById(students[studNbr].slot, function (err, slot) {
+                        if (err) {
+                            callback(err);
+                        }
+                        else {
+                            var studIndex = getItemIndex(slot.students, students[studNbr]._id.toString());
+                            // doesn't work to look up object id (_id) without toString
+                            // console.log("slot.students=" + slot.students);
+                            // console.log("studIndex=" + studIndex);
+                            if (studIndex == null) {
+                                console.log("student=" + students[studNbr]._id + " not found in slot=" + slot._id);
+                                nbrMissing++;
+                                // delete schedule data from student
+                                Student.findByIdAndUpdate(students[studNbr]._id, {
+                                    day: null,
+                                    slot: null
+                                }, function (err) {
+                                    studNbr++;
+                                    callback(err);
+                                })
+                            }
+                            else {
+                                studNbr++;
+                                callback(err);
+                            }
+                        }
+                    });
+                },
+                function (err) {
+                    if (err) {
+                        console.log("fixStudents: error in student loop: " + err.msg);
+                    }
+                    console.log("Ending fixStudents. Nbr 'scheduled' students missing from slots=" + nbrMissing);
+                    res.redirect("back");
+                }
+            );
+        });
 });
 
 module.exports = router
