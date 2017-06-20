@@ -21,7 +21,7 @@ $('#newStudentForm').submit(function (e) {
                 <td>
                  <form style="display: inline" action="/students/${student._id}?_method=DELETE" method="POST">
                     <a href="/students/${student._id}/edit" class="btn btn-xs btn-info">EDIT</a>
-                    <button class="btn btn-xs btn-danger">DELETE</button>
+                    <button class="delStudBtn btn btn-xs btn-danger">DELETE</button>
                 </form>                
                 </td>
             </tr>            
@@ -47,4 +47,12 @@ $('#newStudentForm').submit(function (e) {
             $('#addMsg').text(err.responseText);
         }
     })
+})
+
+$(".delStudBtn").on('click', function (e) {
+    // if (confirm("Ready to delete " + student.fullName + ". Click cancel or OK.") == true
+    var trs = $(this).parent().parent().parent().children();
+    if (confirm("Ready to delete " + trs[0].innerText + " " + trs[1].innerText + ".  Click Cancel or OK.") != true) {
+        e.preventDefault();
+    }
 })
