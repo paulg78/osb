@@ -46,15 +46,13 @@ router.post("/", function (req, res) {
     };
 
     // Create a new user and save to DB
-    User.create(newUser, function (err, newlyCreated) {
+    User.create(newUser, function (err) {
         if (err) {
             console.log(err);
             req.flash("error", err.message);
             res.redirect("back");
         }
         else {
-            //redirect back to users page
-            // console.log(newlyCreated);
             req.flash("success", "New user created");
             res.redirect("/users");
         }
@@ -109,6 +107,22 @@ router.put("/:id", function (req, res) {
             // res.redirect("/users/" + user._id);
             res.redirect("/users");
         }
+    });
+});
+
+// Delete user
+router.delete("/:userId", middleware.isLoggedIn, function (req, res) {
+    // console.log("user to delete=" + req.params.userId);
+    User.findOneAndRemove({
+        _id: req.params.userId
+    }, function (err, user) {
+        if (err) {
+            console.log("Error deleting user: " + err.message);
+            req.flash("error", err.message);
+            return res.redirect("back");
+        }
+        req.flash("success", "Deleted " + user.name);
+        res.redirect("back");
     });
 });
 

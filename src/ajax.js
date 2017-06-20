@@ -46,13 +46,13 @@ $('#newStudentForm').submit(function (e) {
             $('#addMsg').addClass('failMsg');
             $('#addMsg').text(err.responseText);
         }
-    })
-})
+    });
+});
 
 $(".delStudBtn").on('click', function (e) {
     // if (confirm("Ready to delete " + student.fullName + ". Click cancel or OK.") == true
-    var trs = $(this).parent().parent().parent().children();
-    if (confirm("Ready to delete " + trs[0].innerText + " " + trs[1].innerText + ".  Click Cancel or OK.") != true) {
+    var tds = $(this).parent().parent().siblings();
+    if (confirm("Ready to delete " + tds[0].innerText + " " + tds[1].innerText + ".  Click Cancel or OK.") != true) {
         e.preventDefault();
     }
-})
+});
