@@ -92,26 +92,31 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
             },
 
             function (slotCallback) {
-                console.log("async slot iteratee called");
-
+                // console.log("async slot iteratee called");
                 console.log("col=" + col);
                 var slot = {
                     time: scheduleArray[row][col],
                     max: scheduleArray[row + 1][col],
                     students: []
                 };
-                // save slot and get slot ID
-                Slot.create(slot, function (err, newSlot) {
-                    if (!err) {
-                        console.log("created slot=" + newSlot.time);
-                        // add slot id to day
-                        day.slots.push(newSlot._id);
-                    }
+                // since scheduleArray is 2D, some columns will be blank if slots per day varies
+                if (slot.time == "") {
                     col++;
-                    console.log("calling slotCallback with col=" + col);
-                    slotCallback(err);
-                    // console.log("created slot; time=" + scheduleArray[row][col] + ", max=" + scheduleArray[row + 1][col]);
-                });
+                    slotCallback(null);
+                }
+                else {
+                    // save slot and get slot ID
+                    Slot.create(slot, function (err, newSlot) {
+                        if (!err) {
+                            console.log("created slot=" + newSlot.time);
+                            // add slot id to day
+                            day.slots.push(newSlot._id);
+                        }
+                        col++;
+                        // console.log("calling slotCallback with col=" + col);
+                        slotCallback(err);
+                    });
+                }
             },
             function (err) {
                 callbackfunction(err);
@@ -129,7 +134,7 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
             console.log("Error creating schedule");
             req.flash("error", "Schedule upload failed: " + err.message);
         }
-        res.render("/events");
+        res.redirect("/events");
     });
 
     function findEvent(callback) {
@@ -673,12 +678,15 @@ router.get("/fixStudents", middleware.isLoggedIn, function (req, res) {
                             callback(err);
                         }
                         else {
-                            var studIndex = getItemIndex(slot.students, students[studNbr]._id.toString());
+                            var studIndex = null;
+                            if (slot != null) {
+                                studIndex = getItemIndex(slot.students, students[studNbr]._id.toString());
+                            }
                             // doesn't work to look up object id (_id) without toString
                             // console.log("slot.students=" + slot.students);
                             // console.log("studIndex=" + studIndex);
                             if (studIndex == null) {
-                                console.log("student=" + students[studNbr]._id + " not found in slot=" + slot._id);
+                                console.log("student=" + students[studNbr]._id + " not found in slot=" + students[studNbr].slot);
                                 nbrMissing++;
                                 // delete schedule data from student
                                 Student.findByIdAndUpdate(students[studNbr]._id, {
