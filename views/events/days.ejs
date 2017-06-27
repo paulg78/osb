@@ -1,25 +1,23 @@
 <% include ../partials/header %> 
 
-     <header>
-         <div class="container">
-             <h1>Days in Event <%= event.name %></h1>
-         </div>
-     </header>
-     
-<div class="container dayList">
-    <table>
-     <% event.days.forEach(function(day){ %>
-        <tr>
-            <form style="display: inline" action="/days/<%=day._id%>?_method=DELETE" method="POST">
-                <td> <%= day.date %> </td> 
-                <td> <a href="/days/<%=day._id%>/edit" class="hidden" class="btn btn-xs btn-info">EDIT</a></td>
-                <td> 
-                    <a href="/events/<%= event._id %>/days/<%=day._id%>/school" class="btn btn-xs btn-info role_sc">SCHEDULE</a>            
-                    <a href="/events/<%= event._id %>/days/<%=day._id%>" class="btn btn-xs btn-info role_al role_wa">SCHEDULE</a></td> 
-                <td> <button class="hidden" class="btn btn-xs btn-danger">DELETE</button></td> 
-            </form>
-        </tr>
-       <% }); %>
+<h1>Days in Event <%= event.name %></h1>
+
+<div class="container">
+  <table class="dayList">
+        <tbody>
+            <% event.days.forEach(function(day){ %>
+                <tr>
+                    <td class="dayList"> <%= day.date %> &nbsp;</td>
+                    <td>
+                        <% if(currentUser.role == "role_sc"){ %>
+                            <a href="/events/<%= event._id %>/days/<%=day._id%>/school" class="btn btn-xs btn-info role_sc">Schedule</a>
+                        <% } else { %>
+                            <a href="/events/<%= event._id %>/days/<%=day._id%>" class="btn btn-xs btn-info role_al role_wa">Schedule</a>
+                        <% } %>
+                    </td>
+                </tr>
+            <% }); %>
+       </tbody>
     </table>
 </div>
 

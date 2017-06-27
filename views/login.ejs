@@ -2,20 +2,22 @@
 <div class="container">
     <div class="row">
         <h1 style="text-align: center">Login</h1>
-        <h4 style="text-align: center">Your user name is the email address you provided to the Assistance League</h4>        
+        <h4 style="text-align: center">Your Username is the email address provided to the Assistance League.</h4>
         <div style="width: 30%; margin: 25px auto;">
             <form action="/login" method="post">
                 <div class="form-group">
+                    <h4>Username:</h4>
                     <input class="form-control" type="text" name="username" placeholder="email address">
                 </div>
                 <div class="form-group">
+                    <h4>Password:</h4>
                     <input class="form-control" type="password" name="password" placeholder="password">
                 </div>
                 <div class="form-group">
                     <button class="btn btn-lg btn-primary btn-block">Login</button>
                 </div>
             </form>
-            <a href="/requestpwreset">   Go to Reset Password</a>            
+            <a href="/requestpwreset">Go to Register or Reset Password</a>
         </div>
     </div>
 </div>

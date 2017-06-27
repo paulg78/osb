@@ -5,9 +5,8 @@
 
      <header>
          <div class="container">
-             <h1>Students</h1>
-             <h2><%=qrySchool.name + " -- Quota: " + qrySchool.quota + ",  Remaining: "%><span id='remaining'><%= (qrySchool.quota-students.length) %></h2>
-          </div>
+             <h2><%=qrySchool.name + " -- Allotment: " + qrySchool.quota + ",  Remaining: "%><span id='remaining'><%= (qrySchool.quota-students.length) %></h2>
+         </div>
      </header>
      
     <% if (qrySchool.quota-students.length > 0) { %>     
@@ -15,19 +14,19 @@
             <form action="/students" method="POST" class="form-inline" id=newStudentForm>
                 <h3>Add Student          <span id="addMsg"></span></h3>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="firstName" placeholder="first name">
+                    <input class="form-control" type="text" name="firstName" placeholder="first name*">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="lastName" placeholder="last name">
+                    <input class="form-control" type="text" name="lastName" placeholder="last name*">
                 </div>
                 <div class="form-group">
                     <input class="form-control" type="text" name="gender" placeholder="gender">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="grade" placeholder="grade">
+                    <input class="form-control" type="text" name="grade" placeholder="grade (1-12)*">
                 </div>
                 <div class="form-group">
-                    <button type=submit class="btn btn-md btn-primary btn-block">Submit!</button>
+                    <button type=submit class="btn btn-md btn-primary btn-block">Save</button>
                 </div>
             </form>
             <p></p>

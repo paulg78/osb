@@ -38,7 +38,8 @@
                     </div>
                 <% }) %>
             </div>
-            <div style="width: 25%; margin: 10px auto;" class="well">
+            <div class="col-sm-12" style="margin: 10px auto;">
+                <div class="text-center">
                 <% var url = "/events/" + eventId + "/days"; %>
                 <% if (prevDayId) { %>
                 <%     url = url + "/" + prevDayId + "/school" %>
@@ -50,7 +51,8 @@
                 <%     url = url + "/" + nextDayId + "/school" %>
                 <%     } %>  
                 <a class="btn btn-info" href= <%= url %> ><span class="glyphicon glyphicon-chevron-right"></span></a>            
-            </div>             
+                </div>
+            </div>
         </div>
         <div class="col-sm-2 role_sc">
             <h4>Unscheduled:</h4>

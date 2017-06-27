@@ -1,15 +1,15 @@
 <% include ./partials/header %>
 <div class="container">
     <div class="row">
-        <h1 style="text-align: center">Create New Password</h1>
-        <h4 style="text-align: center">Please enter the email address for your account.</h4>
-        <div style="width: 30%; margin: 25px auto;">
+        <h1 style="text-align: center">Create Password</h1>
+        <h4 style="text-align: center">Please enter the email address provided to the Assistance League for your account.</h4>
+        <div style="width: 50%; margin: 25px auto;">
             <form action="/requestpwreset" method="post">
                 <div class="form-group">
                     <input class="form-control" type="text" name="username" placeholder="email">
                 </div>         
                 <div class="form-group">
-                    <button class="btn btn-lg btn-primary btn-block">Send email for account verification</button>
+                    <button class="btn btn-lg btn-primary btn-block">Send me link to create password.</button>
                 </div>
             </form>
             <a href="/login">Cancel</a>
