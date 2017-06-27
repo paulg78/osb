@@ -1,0 +1,78 @@
+<% include ./partials/header %>
+<h2>Menu Options</h2>
+<h3 style="padding-left: 30px;">Before Login (Top Right)</h3>
+<p style="padding-left: 60px;"><strong>Login</strong> -- Goes to the Login Page.</p>
+<p style="padding-left: 60px;"><strong>Register or reset password</strong> -- Goes to the Create Password Page.</p>
+<h3 style="padding-left: 30px;">After Login (Top Left and Right)</h3>
+<p style="padding-left: 60px;"><strong>Days</strong> -- Goes to the Days in Event Page.</p>
+<p style="padding-left: 60px;"><strong>Students</strong> -- Goes to the Students Page.</p>
+<p style="padding-left: 60px;"><strong>Logout</strong> -- Goes to the Operation School Bell Initial Page.</p>
+<h2>Create Password Page</h2>
+<p style="padding-left: 30px;">Enter your email address and press enter/return or click&nbsp;
+    <button class="btn btn-xs btn-primary">Send me link to create password.</button>
+    . The application will send you an email with a link you can use to create a password or change your password (if you have already registered). If you
+    do not receive an email, check your junk or spam folder to see if the email was blocked from your inbox.</p>
+<h2>Days in Event Page</h2>
+<p style="padding-left: 30px;">Lists the days scheduled for Operation School Bell.</p>
+<p>
+    <button style="margin-left: 30px;" class="btn btn-xs btn-primary">Schedule</button>
+     &nbsp;-- goes to Fitting Schedule Page for a specific day.
+</p>
+
+<h2>Fitting Schedule Page</h2>
+<p style="padding-left: 30px;">The number in parenthesis after each time indicates how many openings are still available at that time. A time with remaining openings will have a green box with a plus sign for adding students to the schedule. The number in parenthesis after each student
+    name indicates grade level.</p>
+<h3 style="padding-left: 30px;">Add Student to Schedule</h3>
+<ol style="margin: 0px 40px;">
+    <li>Click on an unscheduled student on the right.</li>
+    <li>Click on
+        <button style="background-color: green; font-weight: bold; font-size: 1.25em;">+</button>
+    to add student to a fitting time.</li>
+</ol>
+<h3 style="padding-left: 30px;">Remove Student from Schedule</h3>
+<ol start="1" style="margin: 0px 40px;">
+    <li>Click on a student in a fitting time.</li>
+    <li>Click on
+    <button style="color: red; font-weight: bold; font-size: 1.25em; border-width: 1px; border-color: red;">-</button>
+    to remove student from the schedule. Student will be moved to the end of the unscheduled list.</li>
+</ol>
+<p></p>
+<p></p>
+<p>
+    <button style="margin-left: 30px;" class="btn btn-xs btn-info">
+        <span class="glyphicon glyphicon-chevron-left"></span>
+    </button>&nbsp;-- Go to previous day
+</p>
+<p>
+    <button style="margin-left: 30px;" class="btn btn-xs btn-info">List days</button>
+    &nbsp;-- Goes back to day list
+</p>
+<p>
+    <button style="margin-left: 30px;" class="btn btn-xs btn-info">
+        <span class="glyphicon glyphicon-chevron-right"></span>
+    </button>&nbsp;-- Go to next day
+</p>
+
+<h2>Students Page</h2>
+<p style="padding-left: 30px;">The heading shows the number of fittings allocated to your school and the number of additional students you can enter within your allotment.</p>
+<h3 style="padding-left: 30px;">Add Student to Roster</h3>
+<ol start="1" style="margin: 0px 40px;">
+    <li>Fill in data; first name, last name, and grade (1-12) are required.</li>
+    <li>Press enter/return or click Save to add student to the database. The new student is added to the end of the list.</li>
+</ol>
+<p></p>
+<p>
+    <button style="margin-left: 30px;" class="btn btn-xs btn-primary">Edit</button>
+     &nbsp;-- goes to the Edit Student Page.
+</p>
+<p>
+    <button style="margin-left: 30px;" class="btn btn-xs btn-danger">Delete</button>
+     &nbsp;-- presents confirmation dialog box and deletes student if confirmed.
+</p>
+<p style="padding-left: 30px;"><strong>Sort --&nbsp;</strong>Click column heading to sort; each click toggles between ascending and descending order. To sort on multiple columns, click a column and then shift click on another column.</p>
+<h2>Edit Student Page</h2>
+<p>Make changes and press enter/return or click&nbsp;
+    <button class="btn btn-xs btn-primary">Save</button>
+     &nbsp;to update student in the database.
+</p>
+<% include ./partials/footer %>

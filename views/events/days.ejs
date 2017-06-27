@@ -1,4 +1,4 @@
-<% include ../partials/header %> 
+<% include ../partials/header %>
 
 <h1>Days in Event <%= event.name %></h1>
 
@@ -10,9 +10,9 @@
                     <td class="dayList"> <%= day.date %> &nbsp;</td>
                     <td>
                         <% if(currentUser.role == "role_sc"){ %>
-                            <a href="/events/<%= event._id %>/days/<%=day._id%>/school" class="btn btn-xs btn-info role_sc">Schedule</a>
+                            <a href="/events/<%= event._id %>/days/<%=day._id%>/school" class="btn btn-xs btn-primary role_sc">Schedule</a>
                         <% } else { %>
-                            <a href="/events/<%= event._id %>/days/<%=day._id%>" class="btn btn-xs btn-info role_al role_wa">Schedule</a>
+                            <a href="/events/<%= event._id %>/days/<%=day._id%>" class="btn btn-xs btn-primary role_al role_wa">Schedule</a>
                         <% } %>
                     </td>
                 </tr>

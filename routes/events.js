@@ -270,7 +270,7 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
             path: 'slots',
             populate: {
                 path: 'students'
-                    // select: '_id fname lname grade' // doesn't populate anything                
+                    // select: '_id fname lname grade' // doesn't populate anything
             }
         })
         .exec(function (err, foundDay) {
@@ -312,7 +312,7 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, getPrevNextIds, funct
             path: 'slots',
             populate: {
                 path: 'students'
-                    // select: '_id fname lname grade' // doesn't populate anything                
+                    // select: '_id fname lname grade' // doesn't populate anything
             }
         })
         .exec(function (err, foundDay) {
@@ -430,44 +430,6 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
             callback(err);
         });
     }
-});
-
-
-router.get("/:dayId/edit", middleware.isLoggedIn, function (req, res) {
-    if (res.locals.currentUser.role == 'role_sc') {
-        return res.redirect("back");
-    }
-    //find the day with provided ID
-    Day.findById(req.params.dayId).populate("slots").exec(function (err, foundDay) {
-        if (err) {
-            console.log(err);
-        }
-        else {
-            //render show template with that day
-            res.render("days/edit", {
-                day: foundDay
-            });
-        }
-    });
-});
-
-router.put("/:dayId", function (req, res) {
-    if (res.locals.currentUser.role == 'role_sc') {
-        return res.redirect("back");
-    }
-    // console.log("IN day put! looking for id=" + req.params.dayId);
-    Day.findByIdAndUpdate(req.params.dayId, {
-        date: req.body.date
-    }, function (err, day) {
-        if (err) {
-            req.flash("error", err.message);
-            res.redirect("back");
-        }
-        else {
-            req.flash("success", "Successfully Updated!");
-            res.redirect("/days");
-        }
-    });
 });
 
 router.get("/genSched", middleware.isLoggedIn, function (req, res) {

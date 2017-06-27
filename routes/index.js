@@ -19,6 +19,11 @@ router.get("/login", function (req, res) {
   res.render("login");
 });
 
+//show help
+router.get("/help", function (req, res) {
+  res.render("help");
+});
+
 router.post('/login', function (req, res, next) {
   passport.authenticate('local', function (err, user, info) {
     if (err) {
