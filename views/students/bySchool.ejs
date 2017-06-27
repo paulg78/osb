@@ -1,4 +1,4 @@
-<% include ../partials/header %> 
+<% include ../partials/header %>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.10/css/theme.bootstrap_3.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.10/js/jquery.tablesorter.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.10/js/jquery.tablesorter.widgets.min.js"></script>
@@ -8,8 +8,8 @@
              <h2><%=qrySchool.name + " -- Allotment: " + qrySchool.quota + ",  Remaining: "%><span id='remaining'><%= (qrySchool.quota-students.length) %></h2>
          </div>
      </header>
-     
-    <% if (qrySchool.quota-students.length > 0) { %>     
+
+    <% if (qrySchool.quota-students.length > 0) { %>
         <div style="width: 100%; margin: 25px auto;">
             <form action="/students" method="POST" class="form-inline" id=newStudentForm>
                 <h3>Add Student          <span id="addMsg"></span></h3>
@@ -30,8 +30,8 @@
                 </div>
             </form>
             <p></p>
-    <% } %>     
-     <table id="studentTable" class="table table-striped tablesorter">     
+    <% } %>
+     <table id="studentTable" class="table table-striped tablesorter">
          <thead>
              <tr>
              <th>First Name</th>
@@ -41,7 +41,7 @@
              <th>Day</th>
              <th>Time</th>
              </tr>
-        </thead>     
+        </thead>
     <tbody id='studentList'>
      <% students.forEach(function(student){ %>
         <tr>
@@ -57,14 +57,14 @@
                 <% } %>
             <td>
              <form style="display: inline" action="/students/<%=student._id%>?_method=DELETE" method="POST">
-                <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
-                <button class="delStudBtn btn btn-xs btn-danger">DELETE</button>
-            </form>                
+                <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-info">Edit</a>
+                <button class="delStudBtn btn btn-xs btn-danger">Delete</button>
+            </form>
             </td>
         </tr>
     <% }); %>
         </tbody>
-    </table>    
+    </table>
 <script src="/js/ajax.js"></script>
 
 <script>
