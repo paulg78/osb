@@ -175,36 +175,66 @@ router.post("/createSchools", function (req, res) {
     var schools = JSON.parse(req.body.schoolsString);
     var numSchools = schools.length;
     var row = 1; // skip column heading
-
+    console.log("starting school upload");
     async.whilst(
         function () {
             return row < numSchools;
         },
         function (schoolCallback) {
-            // console.log("async school iteratee called");
-            console.log("row=" + row);
+            // console.log("iteratee called, row=" + row);
             var school = {
                 name: schools[row][0],
                 district: schools[row][1],
                 quota: schools[row][2]
             };
-            // save school and get school ID
-            School.create(school, function (err, newschool) {
+            School.findOne({
+                name: school.name
+            }, function (err, schoolFound) {
                 if (err) {
-                    console.log("Error, row=" + row + " school=" + school.name + ", " + err.message);
+                    console.log("Error finding school=" + school.name + ", " + err.message);
+                    schoolCallback(err);
                 }
                 else {
-                    console.log("created school=" + school.name);
+                    if (schoolFound == undefined) {
+                        School.create(school, function (err) {
+                            if (err) {
+                                console.log("Error creating school, row=" + row + " school=" + school.name + ", " + err.message);
+                            }
+                            else {
+                                console.log("created school=" + school.name);
+                            }
+                            row++;
+                            schoolCallback(err);
+                        });
+                    }
+                    else { // update quota/district if changed
+                        if (school.district != schoolFound.district || school.quota != schoolFound.quota) {
+                            schoolFound.district = school.district;
+                            schoolFound.quota = school.quota;
+                            schoolFound.save(function (err) {
+                                if (err) {
+                                    console.log("Error updating school, row=" + row + " school=" + school.name + ", " + err.message);
+                                }
+                                else {
+                                    console.log("Updated school=" + school.name);
+                                }
+                                row++;
+                                schoolCallback(err);
+                            });
+                        }
+                        else {
+                            row++;
+                            schoolCallback(null); // no error
+                        }
+                    }
                 }
-                row++;
-                // console.log("calling schoolCallback with row=" + row);
-                schoolCallback(null); // don't stop for errors                
             });
         },
         function (err) {
             if (err) {
-                console.log("error while creating schools--shouldn't happen since errors are just logged in console.");
+                console.log("error while uploading schools");
             }
+            console.log("school upload complete");
             res.redirect("/schools");
         }
     );
