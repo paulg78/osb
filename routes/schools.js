@@ -233,6 +233,10 @@ router.post("/createSchools", function (req, res) {
         function (err) {
             if (err) {
                 console.log("error while uploading schools");
+                req.flash("error", "error while uploading schools");
+            }
+            else {
+                req.flash("success", "Schools updated!");
             }
             console.log("school upload complete");
             res.redirect("/schools");

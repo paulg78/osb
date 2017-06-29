@@ -14,7 +14,6 @@ $('#newStudentForm').submit(function (e) {
             <tr>
                 <td>${student.fname}</td>
                 <td>${student.lname}</td>
-                <td>${student.gender}</td>
                 <td>${student.grade}</td>
                 <td></td>
                 <td></td>
@@ -22,9 +21,9 @@ $('#newStudentForm').submit(function (e) {
                  <form style="display: inline" action="/students/${student._id}?_method=DELETE" method="POST">
                     <a href="/students/${student._id}/edit" class="btn btn-xs btn-info">EDIT</a>
                     <button class="delStudBtn btn btn-xs btn-danger">DELETE</button>
-                </form>                
+                </form>
                 </td>
-            </tr>            
+            </tr>
                 `
             )
             $('#addMsg').removeClass('failMsg successMsg');

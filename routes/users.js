@@ -61,16 +61,11 @@ router.post("/", function (req, res) {
 
 //NEW - show form to create new user
 router.get("/new", function (req, res) {
-    // if (res.locals.currentUser.role == 'role_sc') {
-    //     return res.redirect("back");
-    // }
-
     res.render("users/new");
 });
 
 // Find user and render new user form
 router.get("/:id/edit", function (req, res) {
-    //find the user with provided ID
     User.findById(req.params.id, function (err, foundUser) {
         if (err) {
             console.log(err);
@@ -145,7 +140,7 @@ router.post("/createUsers", function (req, res) {
     var users = JSON.parse(req.body.usersString);
     var numUsers = users.length;
     var row = 1; // skip column heading
-    var sc1col = 7;
+    var sc1col = 7; // column of first school counselor
     var col = sc1col;
 
     async.whilst(
@@ -164,16 +159,22 @@ router.post("/createUsers", function (req, res) {
             if (user.name != undefined && user.name.length > 0 &&
                 user.username != undefined && user.username.length > 0) {
                 user.username = user.username.toLowerCase();
-                User.create(user, function (err, newuser) {
+                User.create(user, function (err) {
                     if (err) {
-                        console.log("row=" + row + ", Error, user=" + user.name + ", " + err.message);
+                        if (err.message.indexOf("E11000") < 0) {
+                            console.log("row=" + row + ", Error, user=" + user.name + ", " + err.message);
+                        }
+                        else { // duplicate key error
+                            console.log("row=" + row + ", " + user.username + " already in DB");
+                        }
+
                     }
                     else {
                         console.log("row=" + row + ", created user=" + user.name);
                     }
                     col += 2; // move to next counselor
                     // console.log("calling userCallback with row=" + row);
-                    userCallback(null); // don't stop for errors                
+                    userCallback(null); // don't stop for errors
                 });
             }
             else {
@@ -182,13 +183,18 @@ router.post("/createUsers", function (req, res) {
                 }
                 row++;
                 col = sc1col;
-                userCallback(null); // don't stop for errors           
+                userCallback(null); // don't stop for errors
             }
         },
         function (err) {
             if (err) {
                 console.log("error while creating users--shouldn't happen since errors are just logged in console.");
+                req.flash("error", "error while uploading users");
             }
+            else {
+                req.flash("success", "Users uploaded!");
+            }
+            console.log("User upload complete");
             res.redirect("/users");
         }
     );

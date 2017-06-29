@@ -99,7 +99,6 @@ function firstLetterUpCase(val) {
 function studentValid(student) {
     student.fname = firstLetterUpCase(student.fname);
     student.lname = firstLetterUpCase(student.lname);
-    student.gender = firstLetterUpCase(student.gender);
     student.grade = student.grade.toString().trim();
     if (student.fname == "" || student.lname == "" || student.grade == "") {
         return "first name, last name, and grade are required fields";
@@ -120,7 +119,6 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
     var studentData = {
         fname: req.body.firstName,
         lname: req.body.lastName,
-        gender: req.body.gender,
         grade: req.body.grade,
         school: res.locals.currentUser.school,
         day: null,
@@ -163,7 +161,6 @@ router.put("/:id", function (req, res) {
     var newData = {
         fname: req.body.firstName,
         lname: req.body.lastName,
-        gender: req.body.gender,
         grade: req.body.grade
     };
 
@@ -281,7 +278,6 @@ router.get("/genStuds", function (req, res) {
                                 var student = {
                                     fname: "Fname" + studNbr,
                                     lname: "Lname" + schoolNbr,
-                                    gender: "G",
                                     grade: "1",
                                     school: schools[schoolNbr].name,
                                     day: null,
@@ -297,7 +293,7 @@ router.get("/genStuds", function (req, res) {
                                     }
                                     studNbr++;
                                     //console.log("calling studentCallback with studNbr=" + studNbr);
-                                    studentCallback(null); // don't stop for errors                
+                                    studentCallback(null); // don't stop for errors
                                 });
                             },
                             function (err) {

@@ -20,9 +20,6 @@
                     <input class="form-control" type="text" name="lastName" placeholder="last name*">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="gender" placeholder="gender">
-                </div>
-                <div class="form-group">
                     <input class="form-control" type="text" name="grade" placeholder="grade (1-12)*">
                 </div>
                 <div class="form-group">
@@ -36,7 +33,6 @@
              <tr>
              <th>First Name</th>
              <th>Last Name</th>
-             <th>Gender</th>
              <th>Grade</th>
              <th>Day</th>
              <th>Time</th>
@@ -47,7 +43,6 @@
         <tr>
             <td><%= student.fname %></td>
             <td><%= student.lname %></td>
-            <td><%= student.gender %></td>
             <td><%= student.grade %></td>
             <td><% if (student.day != null) { %>
                 <%= student.day.date %></td>

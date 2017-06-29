@@ -7,7 +7,6 @@ var studentSchema = new mongoose.Schema({
     lname: {
         type: String
     },
-    gender: String,
     grade: {
         type: String
     },
