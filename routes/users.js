@@ -142,6 +142,7 @@ router.post("/createUsers", function (req, res) {
     var row = 1; // skip column heading
     var sc1col = 7; // column of first school counselor
     var col = sc1col;
+    console.log("Starting User upload");
 
     async.whilst(
         function () {
@@ -162,15 +163,15 @@ router.post("/createUsers", function (req, res) {
                 User.create(user, function (err) {
                     if (err) {
                         if (err.message.indexOf("E11000") < 0) {
-                            console.log("row=" + row + ", Error, user=" + user.name + ", " + err.message);
+                            console.log("row=" + (row + 1) + ", Error, user=" + user.name + ", " + err.message);
                         }
                         else { // duplicate key error
-                            console.log("row=" + row + ", " + user.username + " already in DB");
+                            // console.log("row=" + (row + 1) + ", " + user.username + " already in DB");
                         }
 
                     }
                     else {
-                        console.log("row=" + row + ", created user=" + user.name);
+                        console.log("row=" + (row + 1) + ", created user=" + user.name);
                     }
                     col += 2; // move to next counselor
                     // console.log("calling userCallback with row=" + row);
@@ -179,7 +180,7 @@ router.post("/createUsers", function (req, res) {
             }
             else {
                 if (col == sc1col) {
-                    console.log("row=" + row + " missing data, user=" + user.name + ", username=" + user.username);
+                    console.log("row=" + (row + 1) + " missing data, user=" + user.name + ", username=" + user.username);
                 }
                 row++;
                 col = sc1col;

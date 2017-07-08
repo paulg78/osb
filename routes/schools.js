@@ -198,7 +198,7 @@ router.post("/createSchools", function (req, res) {
                     if (schoolFound == undefined) {
                         School.create(school, function (err) {
                             if (err) {
-                                console.log("Error creating school, row=" + row + " school=" + school.name + ", " + err.message);
+                                console.log("Error creating school, row=" + (row + 1) + " school=" + school.name + ", " + err.message);
                             }
                             else {
                                 console.log("created school=" + school.name);
@@ -213,7 +213,7 @@ router.post("/createSchools", function (req, res) {
                             schoolFound.quota = school.quota;
                             schoolFound.save(function (err) {
                                 if (err) {
-                                    console.log("Error updating school, row=" + row + " school=" + school.name + ", " + err.message);
+                                    console.log("Error updating school, row=" + (row + 1) + " school=" + school.name + ", " + err.message);
                                 }
                                 else {
                                     console.log("Updated school=" + school.name);
