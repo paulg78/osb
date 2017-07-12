@@ -34,15 +34,24 @@ router.get("/", function (req, res) {
     });
 });
 
+function myTrim(x) {
+    if (x != undefined) {
+        return x.replace(/^[\s\uFFFD]+|\s+$/gm, '');
+    }
+    else {
+        return undefined;
+    }
+}
+
 //CREATE - add new user to DB
 router.post("/", function (req, res) {
     // get data from form and add to users collection
 
     var newUser = {
-        username: req.body.username.toLowerCase(),
-        name: req.body.name,
-        role: req.body.role,
-        school: req.body.school
+        username: myTrim(req.body.username.toLowerCase()),
+        name: myTrim(req.body.name),
+        role: myTrim(req.body.role),
+        school: myTrim(req.body.school)
     };
 
     // Create a new user and save to DB
@@ -82,10 +91,10 @@ router.get("/:id/edit", function (req, res) {
 router.put("/:id", function (req, res) {
     console.log("IN put (update user)!");
     var newData = {
-        username: req.body.username,
-        name: req.body.name,
-        role: req.body.role,
-        school: req.body.school
+        username: myTrim(req.body.username),
+        name: myTrim(req.body.name),
+        role: myTrim(req.body.role),
+        school: myTrim(req.body.school)
     };
 
     User.findByIdAndUpdate(req.params.id, {
@@ -128,14 +137,6 @@ router.get("/uploadUsers", function (req, res) {
 
 // update database users
 router.post("/createUsers", function (req, res) {
-    function myTrim(x) {
-        if (x != undefined) {
-            return x.replace(/^\s+|\s+$/gm, '');
-        }
-        else {
-            return undefined;
-        }
-    }
 
     var users = JSON.parse(req.body.usersString);
     var numUsers = users.length;
@@ -155,7 +156,7 @@ router.post("/createUsers", function (req, res) {
                 name: myTrim(users[row][col]),
                 username: myTrim(users[row][col + 1]),
                 role: "role_sc",
-                school: users[row][0]
+                school: myTrim(users[row][0])
             };
             if (user.name != undefined && user.name.length > 0 &&
                 user.username != undefined && user.username.length > 0) {
