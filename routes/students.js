@@ -188,6 +188,26 @@ router.put("/:id", function (req, res) {
     }
 });
 
+// Check In
+router.put("/:id/checkIn", function (req, res) {
+
+    Student.findByIdAndUpdate(req.params.id, {
+        $set: {
+            checkedIn: 'true'
+        }
+    }, function (err, student) {
+        if (err) {
+            console.log("checkin failed: " + err.message);
+            res.status(500).send(err.message);
+        }
+        else {
+            res.json(student);
+        }
+    });
+
+
+});
+
 // Returns index of item in array arr if present; otherwise returns null
 function getItemIndex(arr, item) {
     for (var i = 0, iLen = arr.length; i < iLen; i++) {

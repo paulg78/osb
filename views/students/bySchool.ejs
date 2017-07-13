@@ -41,11 +41,11 @@
             <td><%= student.lname %></td>
             <td><%= student.grade %></td>
             <td><% if (student.day != null) { %>
-                <%= student.day.date %></td>
-                <% } %>
+                <%= student.day.date %>
+                <% } %></td>
             <td><% if (student.slot != null) { %>
-                <%= student.slot.time %></td>
-                <% } %>
+                <%= student.slot.time %>
+                <% } %></td>
             <td>
              <form style="display: inline" action="/students/<%=student._id%>?_method=DELETE" method="POST">
                 <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-primary">Edit</a>

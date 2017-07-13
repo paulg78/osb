@@ -18,6 +18,9 @@ var studentSchema = new mongoose.Schema({
     slot: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Slot'
+    },
+    checkedIn: {
+        type: Boolean
     }
 });
 
