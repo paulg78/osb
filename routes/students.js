@@ -191,9 +191,10 @@ router.put("/:id", function (req, res) {
 // Check In
 router.put("/:id/checkIn/:checkedIn", function (req, res) {
     // console.log("req.params.checkedIn=" + req.params.checkedIn);
+    var newVal = req.params.checkedIn == "false";
     Student.findByIdAndUpdate(req.params.id, {
         $set: {
-            checkedIn: req.params.checkedIn
+            checkedIn: newVal
         }
     }, function (err) {
         if (err) {
@@ -201,7 +202,7 @@ router.put("/:id/checkIn/:checkedIn", function (req, res) {
             res.status(500).send(err.message);
         }
         else {
-            res.json();
+            res.json(newVal);
         }
     });
 });

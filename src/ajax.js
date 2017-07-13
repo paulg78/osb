@@ -8,7 +8,7 @@ $('#newStudentForm').submit(function (e) {
         type: 'POST',
         data: studentStr,
         success: function (student) {
-            console.log('Ajax post returned success');
+            // console.log('Ajax post returned success');
             $('#studentList').append(
                 `
             <tr>
