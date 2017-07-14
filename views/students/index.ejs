@@ -33,13 +33,13 @@
                 <%= student.slot.time %>
                 <% } %></td>
             <td>
-                <% if (student.checkedIn) { %>
+                <% if (student.served) { %>
                 <button type="button" class="btn btn-xs btn-primary checkIn"><span class="glyphicon glyphicon-ok"></span></button>
                 <% } else { %>
                 <button type="button" class="btn btn-xs btn-default checkIn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
                 <% } %>
                 <span class="hidden" type="text" name="studentId"><%= student._id %></span>
-                <span class="hidden" name="checkedIn"><%= student.checkedIn %></span>
+                <span class="hidden" name="served"><%= student.served %></span>
             </td>
         </tr>
     <% }); %>

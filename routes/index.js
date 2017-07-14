@@ -58,7 +58,7 @@ router.get('/requestpwreset', function (req, res) {
 });
 
 function sendEmail(emailAddress, subject, text, callBack) {
-  console.log("emailing " + emailAddress + ", subject: " + subject + ", text: " + text);
+  // console.log("emailing " + emailAddress + ", subject: " + subject + ", text: " + text);
   var mailgun = new Mailgun({
     apiKey: process.env.APIKEY,
     domain: 'test.coloradospringsbridge.com'
@@ -119,7 +119,7 @@ router.post('/requestpwreset', function (req, res, next) {
             "following link or pasting it into a browser\n\n" + link + "\n";
         }
         sendEmail(user.username, subject, text, function (err) {
-          console.log("resetString=" + text);
+          console.log("username=" + user.username + ", resetLink=" + link);
           done(err);
         });
       }
@@ -153,7 +153,7 @@ router.get('/resetpw/:token', function (req, res) {
       req.flash('error', 'Password reset token is invalid or has expired.');
       return res.redirect('/requestpwreset');
     }
-    console.log("userfound username=" + user.username + ", token=" + user.resetPasswordToken);
+    // console.log("userfound username=" + user.username + ", token=" + user.resetPasswordToken);
     res.render('resetpw', {
       user: user
     });

@@ -3,8 +3,25 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.10/js/jquery.tablesorter.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.10/js/jquery.tablesorter.widgets.min.js"></script>
 
-    <h2><%=qrySchool.name + " -- Allotment: " + qrySchool.quota + ",  Remaining: "%><span id='remaining'><%= (qrySchool.quota-students.length) %></h2>
+<%
+function missed(date) {
+    if (date == null) {
+        return false;
+    }
+    var n = date.indexOf("/");
+    var mm = date.substring(n - 2, n);
+    if (mm < 10) {
+        mm = '0' + mm[1];
+    }
+    var dd = date.substring(n + 1, n + 3);
+    if (dd[1] == "/") {
+        dd = '0' + dd[0];
+    }
+    return todayMMDD > (mm + dd);
+}
+%>
 
+    <h2><%=qrySchool.name + " -- Allotment: " + qrySchool.quota + ",  Remaining: "%><span id='remaining'><%= (qrySchool.quota-students.length) %></h2>
     <% if (qrySchool.quota-students.length > 0) { %>
         <div style="width: 100%; margin: 25px auto;">
             <form action="/students" method="POST" class="form-inline" id=newStudentForm>
@@ -32,6 +49,7 @@
              <th>Grade</th>
              <th>Day</th>
              <th>Time</th>
+             <th>Served</th>
              </tr>
         </thead>
     <tbody id='studentList'>
@@ -42,14 +60,25 @@
             <td><%= student.grade %></td>
             <td><% if (student.day != null) { %>
                 <%= student.day.date %>
-                <% } %></td>
+                <% } %>
+            </td>
             <td><% if (student.slot != null) { %>
                 <%= student.slot.time %>
-                <% } %></td>
+                <% } %>
+            </td>
+            <td>
+                <% if (student.served) { %>
+                    <p class="bg-success">Yes</p>
+                <% } else if (student.day != null && missed(student.day.date)) { %>
+                        <p class="bg-danger">NO</p>
+                <% } else { %>
+                        <p>no</p>
+                <% } %>
+            </td>
             <td>
              <form style="display: inline" action="/students/<%=student._id%>?_method=DELETE" method="POST">
                 <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-primary">Edit</a>
-                <button class="delStudBtn btn btn-xs btn-danger">Delete</button>
+                <button class="delStudBtn btn btn-xs btn-danger pull-right">Delete</button>
             </form>
             </td>
         </tr>

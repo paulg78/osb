@@ -19,7 +19,7 @@ var studentSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Slot'
     },
-    checkedIn: {
+    served: {
         type: Boolean
     }
 });

@@ -59,14 +59,6 @@ router.get("/", middleware.isLoggedIn,
                     })
                     .populate('day', 'date')
                     .populate('slot', 'time')
-                    // Alternate syntax that also works:
-                    // .populate({
-                    //     path: 'day',
-                    //     select: 'date'
-                    // }).populate({
-                    //     path: 'slot',
-                    //     select: 'time'
-                    // })
                     .exec(function (err, queryResponse) {
                         if (err) {
                             console.log(err);
@@ -74,7 +66,17 @@ router.get("/", middleware.isLoggedIn,
                             return res.redirect("back");
                         }
                         // console.log("school=" + qrySchool);
+                        var today = new Date();
+                        var day = today.getDate();
+                        var month = today.getMonth() + 1;
+                        if (day < 10) {
+                            day = '0' + day
+                        }
+                        if (month < 10) {
+                            month = '0' + month
+                        }
                         res.render("students/bySchool", {
+                            todayMMDD: month + day,
                             students: queryResponse,
                             qrySchool: qrySchool
                         });
@@ -122,7 +124,8 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
         grade: req.body.grade,
         school: res.locals.currentUser.school,
         day: null,
-        slot: null
+        slot: null,
+        served: false
     };
 
     var result = studentValid(studentData);
@@ -189,12 +192,12 @@ router.put("/:id", function (req, res) {
 });
 
 // Check In
-router.put("/:id/checkIn/:checkedIn", function (req, res) {
-    // console.log("req.params.checkedIn=" + req.params.checkedIn);
-    var newVal = req.params.checkedIn == "false";
+router.put("/:id/checkIn/:served", function (req, res) {
+    // console.log("req.params.served=" + req.params.served);
+    var newVal = req.params.served == "false";
     Student.findByIdAndUpdate(req.params.id, {
         $set: {
-            checkedIn: newVal
+            served: newVal
         }
     }, function (err) {
         if (err) {
@@ -300,7 +303,8 @@ router.get("/genStuds", function (req, res) {
                                     grade: "1",
                                     school: schools[schoolNbr].name,
                                     day: null,
-                                    slot: null
+                                    slot: null,
+                                    served: false
                                 };
                                 // save student
                                 Student.create(student, function (err) {
