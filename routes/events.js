@@ -7,13 +7,14 @@ var Day = require("../models/day");
 var Slot = require("../models/slot");
 var middleware = require("../middleware");
 var async = require('async');
+/* global logger */
 
 //INDEX - show all events
 router.get("/", function (req, res) {
     // Get all events from DB
     Event.find({}, 'name', function (err, allEvents) {
         if (err) {
-            console.log(err);
+            logger.error(err);
         }
         else { // If there is only one event, go right to days for that event
             if (allEvents.length == 1) {
@@ -21,7 +22,7 @@ router.get("/", function (req, res) {
             }
 
             else {
-                // console.log("allEvents=" + allEvents);
+                logger.debug("allEvents=" + allEvents);
                 res.render("events/index", {
                     events: allEvents
                 });
@@ -49,11 +50,11 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
     // Create a new event and save to DB
     Event.create(newEvent, function (err, newlyCreated) {
         if (err) {
-            console.log(err);
+            logger.error(err);
         }
         else {
             //redirect back to events page
-            // console.log(newlyCreated);
+            logger.debug(newlyCreated);
             res.redirect("/events");
         }
     });
@@ -66,7 +67,7 @@ router.get("/:eventId/uploadSchedule", middleware.isLoggedIn, function (req, res
     }
     Event.findById(req.params.eventId).exec(function (err, foundEvent) {
         if (err) {
-            console.log(err);
+            logger.error(err);
         }
         else {
             res.render("events/uploadSchedule", {
@@ -92,8 +93,8 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
             },
 
             function (slotCallback) {
-                // console.log("async slot iteratee called");
-                console.log("col=" + col);
+                logger.debug("async slot iteratee called");
+                logger.info("col=" + col);
                 var slot = {
                     time: scheduleArray[row][col],
                     max: scheduleArray[row + 1][col],
@@ -108,12 +109,12 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
                     // save slot and get slot ID
                     Slot.create(slot, function (err, newSlot) {
                         if (!err) {
-                            console.log("created slot=" + newSlot.time);
+                            logger.info("created slot=" + newSlot.time);
                             // add slot id to day
                             day.slots.push(newSlot._id);
                         }
                         col++;
-                        // console.log("calling slotCallback with col=" + col);
+                        logger.debug("calling slotCallback with col=" + col);
                         slotCallback(err);
                     });
                 }
@@ -124,29 +125,29 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
         );
     }
 
-    console.log("Going over the waterfall !");
+    logger.info("Going over the waterfall !");
     async.waterfall([
         findEvent,
         saveDays,
         saveEvent,
     ], function (err, result) {
         if (err) {
-            console.log("Error creating schedule");
+            logger.error("Error creating schedule");
             req.flash("error", "Schedule upload failed: " + err.message);
         }
         res.redirect("/events");
     });
 
     function findEvent(callback) {
-        console.log("starting findEvent");
+        logger.info("starting findEvent");
         Event.findById(req.params.eventId).exec(function (err, ev) {
             callback(err, ev); // calls 2nd function
         });
     }
 
     function saveDays(ev, callback) {
-        console.log("starting saveDays");
-        console.log("numRows=" + numRows);
+        logger.info("starting saveDays");
+        logger.info("numRows=" + numRows);
         var row = 0;
         var col;
         async.whilst(
@@ -154,8 +155,8 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
                 return row < numRows;
             },
             function (dayCallback) {
-                console.log("async day iteratee called");
-                console.log("row=" + row);
+                logger.info("async day iteratee called");
+                logger.info("row=" + row);
                 var day = {
                     date: scheduleArray[row][0],
                     slots: []
@@ -172,13 +173,13 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
                                 err = err2;
                             }
                             else {
-                                console.log("created day=" + newDay.date);
+                                logger.info("created day=" + newDay.date);
                                 // add day id to event
                                 ev.days.push(newDay._id);
                             }
                         }
                         row += 2;
-                        console.log("calling dayCallback with row=" + row);
+                        logger.info("calling dayCallback with row=" + row);
                         dayCallback(err);
                     });
                 });
@@ -190,10 +191,10 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
     }
 
     function saveEvent(ev, callback) {
-        console.log("starting saveEvent");
+        logger.info("starting saveEvent");
         ev.save(function (err) {
             if (!err) {
-                console.log("Uploaded days for event=" + ev.name);
+                logger.info("Uploaded days for event=" + ev.name);
                 req.flash("success", "Uploaded days for event=" + ev.name);
             }
             callback(err, ev);
@@ -214,10 +215,10 @@ router.get("/:eventId/days", middleware.isLoggedIn, function (req, res) {
         })
         .exec(function (err, foundEvent) {
             if (err) {
-                console.log(err);
+                logger.error(err);
             }
             else {
-                // console.log("foundEvent=" + foundEvent);
+                // logger.debug("foundEvent=" + foundEvent);
                 res.render("events/days", {
                     event: foundEvent
                 });
@@ -228,9 +229,9 @@ router.get("/:eventId/days", middleware.isLoggedIn, function (req, res) {
 
 // Returns index of item in array arr if present; otherwise returns null
 function getItemIndex(arr, item) {
-    // console.log("item=" + item + ",len=" + item.length);
+    logger.debug("item=" + item + ",len=" + item.length);
     for (var i = 0, iLen = arr.length; i < iLen; i++) {
-        // console.log("arr[i]=" + arr[i] + ",len=" + arr[i].length);
+        logger.debug("arr[i]=" + arr[i] + ",len=" + arr[i].length);
         if (arr[i] == item) return i;
     }
     return null;
@@ -244,10 +245,10 @@ var getPrevNextIds = function (req, res, next) {
     res.locals.nextDayId = "";
     Event.findById(req.params.eventId).exec(function (err, foundEvent) {
         if (!err) {
-            // console.log("foundEvent.days=" + foundEvent.days);
+            logger.debug("foundEvent.days=" + foundEvent.days);
             i = getItemIndex(foundEvent.days, req.params.dayId);
             if (i != null) {
-                // console.log("foundEvent.days[i]=" + foundEvent.days[i]);
+                logger.debug("foundEvent.days[i]=" + foundEvent.days[i]);
                 if (i > 0) {
                     res.locals.prevDayId = foundEvent.days[i - 1];
                 }
@@ -256,7 +257,7 @@ var getPrevNextIds = function (req, res, next) {
                 }
             }
         }
-        // console.log("before next, res.locals.prevDayId=" + res.locals.prevDayId);
+        logger.debug("getPrevNextIds, res.locals.prevDayId=" + res.locals.prevDayId);
         return next();
     });
 };
@@ -264,7 +265,7 @@ var getPrevNextIds = function (req, res, next) {
 
 // SCHEDULE By School - shows schedule for one day of an event
 router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds, function (req, res) {
-    // console.log("starting res.locals.prevDayId=" + res.locals.prevDayId);
+    logger.debug("starting res.locals.prevDayId=" + res.locals.prevDayId);
     Day.findById(req.params.dayId)
         .populate({
             path: 'slots',
@@ -275,7 +276,7 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
         })
         .exec(function (err, foundDay) {
             if (err) {
-                console.log(err);
+                logger.error(err);
             }
             else {
                 // find the unassigned students
@@ -285,11 +286,11 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
                     }, 'fname lname grade',
                     function (err, queryResponse) {
                         if (err) {
-                            console.log(err);
+                            logger.error(err);
                         }
                         else {
-                            // console.log("queryResponse=" + queryResponse);
-                            // console.log("before render, res.locals.prevDayId=" + res.locals.prevDayId);
+                            logger.debug("(unscheduled students) queryResponse=" + queryResponse);
+                            logger.debug("before render, res.locals.prevDayId=" + res.locals.prevDayId);
                             res.render("events/daySchoolSchedule", {
                                 eventId: req.params.eventId,
                                 day: foundDay,
@@ -317,7 +318,7 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, getPrevNextIds, funct
         })
         .exec(function (err, foundDay) {
             if (err) {
-                console.log(err);
+                logger.error(err);
                 req.flash("System error:", err.message);
                 return res.redirect("back");
             }
@@ -333,22 +334,22 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, getPrevNextIds, funct
 
 // Add student to slot
 router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (req, res) {
-    // console.log("adding student to slot");
-    // console.log("studentId=" + req.params.studentId);
-    // console.log("slotId=" + req.params.slotId);
+    logger.debug("adding student to slot");
+    logger.debug("studentId=" + req.params.studentId);
+    logger.debug("slotId=" + req.params.slotId);
 
     async.waterfall([
         updateSlot,
         updateStudent,
     ], function (err) {
         if (err) {
-            console.log(err);
+            logger.error(err);
             res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
         }
         else {
-            // console.log("add-sending json response");
+            logger.debug("add-sending json response");
             res.json(""); // doesn't go to success function unless data is sent
-            // console.log("add-json response sent");
+            logger.debug("add-json response sent");
         }
     });
 
@@ -374,9 +375,9 @@ router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (
 
 // Remove student from slot
 router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (req, res) {
-    // console.log("deleting student from slot");
-    // console.log("studentId=" + req.params.studentId);
-    // console.log("slotId=" + req.params.slotId);
+    logger.debug("deleting student from slot");
+    logger.debug("studentId=" + req.params.studentId);
+    logger.debug("slotId=" + req.params.slotId);
 
     async.waterfall([
         findSlot,
@@ -384,13 +385,13 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
         updateStudent,
     ], function (err) {
         if (err) {
-            console.log(err);
+            logger.error(err);
             res.redirect("/events/" + req.params.eventId + "/days/" + req.params.dayId);
         }
         else {
-            // console.log("del-sending json response");
+            logger.debug("del-sending json response");
             res.json(""); // doesn't go to success function unless data is sent
-            // console.log("del-json response sent");
+            logger.debug("del-json response sent");
         }
     });
 
@@ -401,13 +402,13 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
     }
 
     function updateSlot(slot, callback) {
-        // console.log("before=" + slot.students);
+        logger.debug("before=" + slot.students);
 
         var delIndex = getItemIndex(slot.students, req.params.studentId);
-        // console.log("delIndex=" + delIndex);
+        logger.debug("delIndex=" + delIndex);
         if (delIndex == null) {
             var err = "Error: student not found in slot";
-            console.log(err);
+            logger.error(err);
             callback(err);
         }
         else {
@@ -415,7 +416,7 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
             // The first parameter defines the (0 relative) position where elements will be deleted.
             // The second parameter defines how many elements will be removed.
             slot.students.splice(delIndex, 1);
-            // console.log("after=" + slot.students);
+            logger.debug("after=" + slot.students);
             slot.save(function (err) {
                 callback(err);
             });
@@ -449,7 +450,7 @@ router.get("/genSched", middleware.isLoggedIn, function (req, res) {
         scheduleStudents,
     ], function (err) {
         if (err) {
-            console.log(err);
+            logger.error(err);
         }
         res.redirect("back");
     });
@@ -479,7 +480,7 @@ router.get("/genSched", middleware.isLoggedIn, function (req, res) {
                 return studNbr < students.length && slotNbr < slots.length;
             },
             function (callback) {
-                // console.log("iteratee called for studNbr=" + studNbr + ", slotNbr=" + slotNbr);
+                logger.debug("iteratee called for studNbr=" + studNbr + ", slotNbr=" + slotNbr);
                 // find next available slot
                 while (slots[slotNbr].students.length >= slots[slotNbr].max &&
                     slotNbr < slots.length) {
@@ -491,7 +492,7 @@ router.get("/genSched", middleware.isLoggedIn, function (req, res) {
                     students: slots[slotNbr].students
                 }, function (err) {
                     if (!err) {
-                        // console.log("updated slot=" + slots[slotNbr]._id);
+                        logger.debug("updated slot=" + slots[slotNbr]._id);
                         // find day containing slot
                         Day.findOne({
                                 slots: {
@@ -502,14 +503,14 @@ router.get("/genSched", middleware.isLoggedIn, function (req, res) {
                             },
                             function (err, day) {
                                 if (!err) {
-                                    // console.log("found day=" + day.date + ", id=" + day._id);
+                                    logger.debug("found day=" + day.date + ", id=" + day._id);
                                     // update student
                                     Student.findByIdAndUpdate(students[studNbr]._id, {
                                         day: day._id,
                                         slot: slots[slotNbr]._id
                                     }, function (err) {
                                         studNbr++;
-                                        // console.log("Callback with studNbr=" + studNbr + ", slotNbr=" + slotNbr);
+                                        logger.debug("Callback with studNbr=" + studNbr + ", slotNbr=" + slotNbr);
                                         callback(err);
                                     });
                                 }
@@ -531,11 +532,11 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
     if (res.locals.currentUser.role != 'role_wa') {
         return res.redirect("back");
     }
-    console.log("Starting fixslots.")
+    logger.info("Starting fixslots.")
     var nbrMissing = 0;
     Slot.find(function (err, slots) {
         if (err) {
-            console.log("error finding slots: " + err.msg);
+            logger.error("error finding slots: " + err.msg);
             return res.redirect("back");
         }
         var slotNbr = 0;
@@ -545,7 +546,7 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
                 return slotNbr < slots.length;
             },
             function (slotCallback) {
-                // console.log("Slot iteratee executed for slot=" + slots[slotNbr]._id);
+                logger.debug("Slot iteratee executed for slot=" + slots[slotNbr]._id);
                 // loop thru students
                 var studNbr = 0;
                 async.whilst(
@@ -553,7 +554,7 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
                         return studNbr < slots[slotNbr].students.length;
                     },
                     function (studentCallback) {
-                        // console.log("iteratee called for studNbr=" + studNbr + ", slotNbr=" + slotNbr);
+                        logger.debug("iteratee called for studNbr=" + studNbr + ", slotNbr=" + slotNbr);
                         Student.findById(slots[slotNbr].students[studNbr], function (err, student) {
                             if (err) {
                                 studentCallback(err);
@@ -561,18 +562,18 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
                             else {
                                 if (student == undefined) {
                                     nbrMissing++;
-                                    console.log("slot=" + slots[slotNbr]._id + ", missing student=" + slots[slotNbr].students[studNbr]);
+                                    logger.info("slot=" + slots[slotNbr]._id + ", missing student=" + slots[slotNbr].students[studNbr]);
                                     Slot.findById(slots[slotNbr]._id, function (err, slot) {
                                         if (err) {
                                             studentCallback(err);
                                         }
                                         else {
-                                            // console.log("students before=" + slot.students);
+                                            logger.debug("students before=" + slot.students);
                                             slot.students.splice(studNbr, 1);
-                                            // console.log("students after=" + slot.students);
+                                            logger.debug("students after=" + slot.students);
                                             slot.save(function (err) {
                                                 if (!err) {
-                                                    console.log("missing student deleted from slot")
+                                                    logger.info("missing student deleted from slot")
                                                     studNbr++;
                                                 }
                                                 studentCallback(err);
@@ -581,7 +582,7 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
                                     })
                                 }
                                 else {
-                                    // console.log("found student=" + student.fullName);
+                                    logger.debug("found student=" + student.fullName);
                                     studNbr++;
                                     studentCallback(err);
                                 }
@@ -590,7 +591,7 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
                     },
                     function (err) {
                         if (err) {
-                            console.log("error in student loop: " + err.msg);
+                            logger.error("error in student loop: " + err.msg);
                         }
                         slotNbr++;
                         slotCallback(err);
@@ -599,9 +600,9 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
             },
             function (err) {
                 if (err) {
-                    console.log("error in slot loop: " + err.msg);
+                    logger.error("error in slot loop: " + err.msg);
                 }
-                console.log("Ending fixslots. Nbr missing students in slots=" + nbrMissing);
+                logger.info("Ending fixslots. Nbr missing students in slots=" + nbrMissing);
                 res.redirect("back");
             }
         );
@@ -614,7 +615,7 @@ router.get("/fixStudents", middleware.isLoggedIn, function (req, res) {
     if (res.locals.currentUser.role != 'role_wa') {
         return res.redirect("back");
     }
-    console.log("Starting fixStudents.")
+    logger.info("Starting fixStudents.")
     var nbrMissing = 0;
 
     Student.find({
@@ -624,7 +625,7 @@ router.get("/fixStudents", middleware.isLoggedIn, function (req, res) {
         })
         .exec(function (err, students) {
             if (err) {
-                console.log("error finding students: " + err.msg);
+                logger.error("error finding students: " + err.msg);
                 return res.redirect("back");
             }
             var studNbr = 0;
@@ -634,7 +635,7 @@ router.get("/fixStudents", middleware.isLoggedIn, function (req, res) {
                     return studNbr < students.length;
                 },
                 function (callback) {
-                    // console.log("student iteratee executed for student id=" + students[studNbr]._id);
+                    logger.debug("student iteratee executed for student id=" + students[studNbr]._id);
                     Slot.findById(students[studNbr].slot, function (err, slot) {
                         if (err) {
                             callback(err);
@@ -645,10 +646,10 @@ router.get("/fixStudents", middleware.isLoggedIn, function (req, res) {
                                 studIndex = getItemIndex(slot.students, students[studNbr]._id.toString());
                             }
                             // doesn't work to look up object id (_id) without toString
-                            // console.log("slot.students=" + slot.students);
-                            // console.log("studIndex=" + studIndex);
+                            logger.debug("slot.students=" + slot.students);
+                            logger.debug("studIndex=" + studIndex);
                             if (studIndex == null) {
-                                console.log("student=" + students[studNbr]._id + " not found in slot=" + students[studNbr].slot);
+                                logger.info("student=" + students[studNbr]._id + " not found in slot=" + students[studNbr].slot);
                                 nbrMissing++;
                                 // delete schedule data from student
                                 Student.findByIdAndUpdate(students[studNbr]._id, {
@@ -668,9 +669,9 @@ router.get("/fixStudents", middleware.isLoggedIn, function (req, res) {
                 },
                 function (err) {
                     if (err) {
-                        console.log("fixStudents: error in student loop: " + err.msg);
+                        logger.error("fixStudents: error in student loop: " + err.msg);
                     }
-                    console.log("Ending fixStudents. Nbr 'scheduled' students missing from slots=" + nbrMissing);
+                    logger.info("Ending fixStudents. Nbr 'scheduled' students missing from slots=" + nbrMissing);
                     res.redirect("back");
                 }
             );

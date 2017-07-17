@@ -1,6 +1,7 @@
 var mongoose = require("mongoose");
 var passportLocalMongoose = require("passport-local-mongoose");
 var bcrypt = require('bcrypt-nodejs');
+/* global logger */
 
 var UserSchema = new mongoose.Schema({
   username: { // email address
@@ -47,7 +48,7 @@ UserSchema.pre('save', function (next) {
 
 UserSchema.methods.comparePassword = function (candidatePassword, cb) {
   bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
-    // console.log("in compare");
+    logger.debug("in compare");
     if (err) return cb(err);
     cb(null, isMatch);
   });

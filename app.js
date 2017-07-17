@@ -3,18 +3,37 @@ var express = require("express"),
   bodyParser = require("body-parser"),
   mongoose = require("mongoose"),
   passport = require("passport"),
-  // cookieParser = require("cookie-parser"),
-  // LocalStrategy = require("passport-local"),
   flash = require("connect-flash"),
   User = require("./models/user"),
-  // session = require("express-session"),
-  // seedDB = require("./seeds"),
   methodOverride = require("method-override");
 
+const winston = require('winston');
+const fs = require('fs');
+
+const logDir = 'log';
+// Create the log directory if it does not exist
+if (!fs.existsSync(logDir)) {
+  fs.mkdirSync(logDir);
+}
+const tsFormat = () => (new Date()).toLocaleTimeString();
+global.logger = new(winston.Logger)({
+  transports: [
+    // colorize the output to the console
+    new(winston.transports.Console)({
+      timestamp: tsFormat,
+      colorize: true,
+      level: process.env.APPLOGLEVEL
+    }),
+    new(winston.transports.File)({
+      filename: `${logDir}/results.log`,
+      timestamp: tsFormat,
+      level: 'error'
+    })
+  ]
+});
+/* global logger */
 // added for password set/reset features
 var LocalStrategy = require('passport-local').Strategy;
-// var async = require('async');
-// var crypto = require('crypto');
 
 //requiring routes
 var
@@ -24,8 +43,11 @@ var
   indexRoutes = require("./routes/index"),
   userRoutes = require("./routes/users");
 
-console.log("process.env.DATABASEURL=" + process.env.DATABASEURL);
-mongoose.connect(process.env.DATABASEURL);
+logger.debug("process.env.DATABASEURL=" + process.env.DATABASEURL);
+
+mongoose.connect(process.env.DATABASEURL, {
+  useMongoClient: true,
+});
 
 app.use(bodyParser.urlencoded({
   extended: true
@@ -33,10 +55,7 @@ app.use(bodyParser.urlencoded({
 app.set("view engine", "ejs");
 app.use(express.static(__dirname + "/public"));
 app.use(methodOverride('_method'));
-// app.use(cookieParser('secret'));
 app.use(flash());
-
-// seedDB(); //seed the database
 
 // PASSPORT CONFIGURATION
 app.use(require("express-session")({
@@ -95,5 +114,5 @@ app.use("/events/:eventId", eventRoutes);
 app.use("/events/:eventId/days/:dayId", eventRoutes);
 
 app.listen(process.env.PORT, process.env.IP, function () {
-  console.log("Server running on port " + process.env.PORT + ", IP " + process.env.IP);
+  logger.debug("Server running on port " + process.env.PORT + ", IP " + process.env.IP);
 });

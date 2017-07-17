@@ -6,7 +6,7 @@ var Event = require("../models/event");
 var async = require('async');
 var crypto = require('crypto');
 var Mailgun = require('mailgun-js');
-
+/* global logger */
 
 //root route
 router.get("/", function (req, res) {
@@ -15,7 +15,7 @@ router.get("/", function (req, res) {
 
 //show login form
 router.get("/login", function (req, res) {
-  // console.log("back to login");
+  logger.debug("back to login");
   res.render("login");
 });
 
@@ -58,7 +58,7 @@ router.get('/requestpwreset', function (req, res) {
 });
 
 function sendEmail(emailAddress, subject, text, callBack) {
-  // console.log("emailing " + emailAddress + ", subject: " + subject + ", text: " + text);
+  logger.debug("emailing " + emailAddress + ", subject: " + subject + ", text: " + text);
   var mailgun = new Mailgun({
     apiKey: process.env.APIKEY,
     domain: 'test.coloradospringsbridge.com'
@@ -119,7 +119,7 @@ router.post('/requestpwreset', function (req, res, next) {
             "following link or pasting it into a browser\n\n" + link + "\n";
         }
         sendEmail(user.username, subject, text, function (err) {
-          console.log("username=" + user.username + ", resetLink=" + link);
+          logger.info("username=" + user.username + ", resetLink=" + link);
           done(err);
         });
       }
@@ -127,7 +127,7 @@ router.post('/requestpwreset', function (req, res, next) {
     function (err) {
       if (err) {
         req.flash('error', 'email error: ' + err.message);
-        console.log('error: ' + err.message);
+        logger.error('error: ' + err.message);
         res.redirect('/requestpwreset');
       }
       else {
@@ -153,7 +153,7 @@ router.get('/resetpw/:token', function (req, res) {
       req.flash('error', 'Password reset token is invalid or has expired.');
       return res.redirect('/requestpwreset');
     }
-    // console.log("userfound username=" + user.username + ", token=" + user.resetPasswordToken);
+    logger.debug("userfound username=" + user.username + ", token=" + user.resetPasswordToken);
     res.render('resetpw', {
       user: user
     });
@@ -199,7 +199,7 @@ router.post('/resetpw/:token', function (req, res) {
       text = "You may now login with your new password!";
       sendEmail(user.username, subject, text, function (err) {
         if (err) {
-          console.log('Error sending email.');
+          logger.error('Error sending email.');
         }
       });
       // no need to wait on the email callback

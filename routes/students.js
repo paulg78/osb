@@ -6,16 +6,17 @@ var Slot = require("../models/slot");
 var middleware = require("../middleware");
 // var request = require("request");
 var async = require('async');
+/* global logger */
 
 // List Students (all or by school)
 router.get("/", middleware.isLoggedIn,
     function (req, res, next) {
         if (res.locals.currentUser.role == 'role_sc') {
-            // console.log("skipping to next students handler");
+            logger.debug("skipping to next students handler");
             next();
         }
         else { // list all students
-            // console.log("after next");
+            logger.debug("after next");
             Student.find()
                 .populate('day', 'date')
                 .populate('slot', 'time')
@@ -25,12 +26,11 @@ router.get("/", middleware.isLoggedIn,
                 })
                 .exec(function (err, queryResponse) {
                     if (err) {
-                        console.log(err.errmsg);
+                        logger.error(err.errmsg);
                         req.flash("error", "System Error: " + err.message);
                         res.redirect("back");
                     }
                     else {
-                        // console.log("school=" + qrySchool);
                         res.render("students/index", {
                             students: queryResponse
                         });
@@ -44,16 +44,16 @@ router.get("/", middleware.isLoggedIn,
             })
             .exec(function (err, qrySchool) {
                 if (err) {
-                    console.log(err.errmsg);
+                    logger.error(err.errmsg);
                     req.flash("error", "System Error: " + err.message);
                     return res.redirect("back");
                 }
                 if (qrySchool == null) {
-                    console.log("School missing from database: " + res.locals.currentUser.school);
+                    logger.info("School missing from database: " + res.locals.currentUser.school);
                     req.flash("error", "School missing from database: " + res.locals.currentUser.school);
                     return res.redirect("back");
                 }
-                // console.log("in list students for a school");
+                logger.debug("in list students for a school");
                 Student.find({
                         school: res.locals.currentUser.school
                     })
@@ -61,19 +61,19 @@ router.get("/", middleware.isLoggedIn,
                     .populate('slot', 'time')
                     .exec(function (err, queryResponse) {
                         if (err) {
-                            console.log(err);
+                            logger.error(err);
                             req.flash("error", "System Error: " + err.message);
                             return res.redirect("back");
                         }
-                        // console.log("school=" + qrySchool);
+                        logger.debug("school=" + qrySchool);
                         var today = new Date();
                         var day = today.getDate();
                         var month = today.getMonth() + 1;
                         if (day < 10) {
-                            day = '0' + day
+                            day = '0' + day;
                         }
                         if (month < 10) {
-                            month = '0' + month
+                            month = '0' + month;
                         }
                         res.render("students/bySchool", {
                             todayMMDD: month + day,
@@ -132,7 +132,7 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
     if (result == "") {
         Student.create(studentData, function (err, newStudent) {
             if (err) {
-                console.log("create failed: " + err.message);
+                logger.error("create failed: " + err.message);
                 res.status(500).send(err.message);
             }
             else {
@@ -149,7 +149,7 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
 router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
     Student.findById(req.params.id, function (err, foundStudent) {
         if (err) {
-            console.log(err);
+            logger.error(err);
         }
         else {
             res.render("students/edit", {
@@ -171,21 +171,21 @@ router.put("/:id", function (req, res) {
     if (result == "") {
         Student.findByIdAndUpdate(req.params.id, {
             $set: newData
-        }, function (err, student) {
+        }, function (err) {
             if (err) {
-                console.log("edit database error");
+                logger.error("edit database error");
                 req.flash("error", err.message);
                 res.redirect("back");
             }
             else {
-                // console.log("Updating student");
+                logger.debug("Updating student");
                 req.flash("success", "Successfully Updated!");
                 res.redirect("/students");
             }
         });
     }
     else {
-        console.log("edit validation error");
+        logger.error("edit validation error");
         req.flash("error", result);
         res.redirect("back");
     }
@@ -193,7 +193,7 @@ router.put("/:id", function (req, res) {
 
 // Check In
 router.put("/:id/checkIn/:served", function (req, res) {
-    // console.log("req.params.served=" + req.params.served);
+    logger.debug("req.params.served=" + req.params.served);
     var newVal = req.params.served == "false";
     Student.findByIdAndUpdate(req.params.id, {
         $set: {
@@ -201,7 +201,7 @@ router.put("/:id/checkIn/:served", function (req, res) {
         }
     }, function (err) {
         if (err) {
-            console.log("checkin failed: " + err.message);
+            logger.error("checkin failed: " + err.message);
             res.status(500).send(err.message);
         }
         else {
@@ -220,36 +220,36 @@ function getItemIndex(arr, item) {
 
 // Delete student
 router.delete("/:studentId", middleware.isLoggedIn, function (req, res) {
-    // console.log("student to delete=" + req.params.studentId);
+    logger.debug("student to delete=" + req.params.studentId);
     Student.findOneAndRemove({
         _id: req.params.studentId
     }, function (err, student) {
         if (err) {
-            console.log("Error deleting student: " + err.message);
+            logger.error("Error deleting student: " + err.message);
             req.flash("error", err.message);
             return res.redirect("back");
         }
         if (student.slot != null) {
             Slot.findById(student.slot, function (err, slot) {
                 if (err) {
-                    console.log("Error finding slot: " + err.message);
+                    logger.error("Error finding slot: " + err.message);
                     req.flash("error", err.message);
                     return res.redirect("back");
                 }
                 var delIndex = getItemIndex(slot.students, req.params.studentId);
-                // console.log("delIndex=" + delIndex);
+                logger.debug("delIndex=" + delIndex);
                 if (delIndex == null) {
                     var err = "Error: student not found in slot";
-                    console.log(err);
+                    logger.error(err);
                     req.flash("error", err);
                     return res.redirect("back");
                 }
-                // console.log("slot.students before: " + slot.students);
+                logger.debug("slot.students before: " + slot.students);
                 slot.students.splice(delIndex, 1);
-                // console.log("slot.students after: " + slot.students);
+                logger.debug("slot.students after: " + slot.students);
                 slot.save(function (err) {
                     if (err) {
-                        console.log("Error saving updated slot: " + err.message);
+                        logger.error("Error saving updated slot: " + err.message);
                         req.flash("error", err.message);
                         return res.redirect("back");
                     }
@@ -269,7 +269,7 @@ router.get("/genStuds", function (req, res) {
     }
     School.find(function (err, schools) {
         if (err) {
-            console.log("error finding schools");
+            logger.error("error finding schools");
             req.flash("error", err.msg);
             return res.redirect("back");
         }
@@ -280,13 +280,13 @@ router.get("/genStuds", function (req, res) {
                 return schoolNbr < schools.length;
             },
             function (schoolCallback) {
-                //console.log("school iteratee called for schoolNbr=" + schoolNbr);
+                //logger.info("school iteratee called for schoolNbr=" + schoolNbr);
                 Student.find({
                         school: schools[schoolNbr].name
                     })
                     .count(function (err, nbrStuds) {
                         if (err) {
-                            console.log("Error finding students!");
+                            logger.error("Error finding students!");
                             nbrStuds = 0;
                         }
 
@@ -296,7 +296,7 @@ router.get("/genStuds", function (req, res) {
                                 return studNbr < schools[schoolNbr].quota;
                             },
                             function (studentCallback) {
-                                //console.log("student iteratee called for studNbr=" + studNbr);
+                                //logger.info("student iteratee called for studNbr=" + studNbr);
                                 var student = {
                                     fname: "Fname" + studNbr,
                                     lname: "Lname" + schoolNbr,
@@ -309,22 +309,22 @@ router.get("/genStuds", function (req, res) {
                                 // save student
                                 Student.create(student, function (err) {
                                     if (err) {
-                                        console.log("Error, studNbr=" + studNbr + " student=" + student.lname + " ," + student.fname + ", " + err.message);
+                                        logger.error("Error, studNbr=" + studNbr + " student=" + student.lname + " ," + student.fname + ", " + err.message);
                                     }
                                     else {
-                                        //console.log("created student=" + student.lname + " ," + student.fname);
+                                        //logger.info("created student=" + student.lname + " ," + student.fname);
                                     }
                                     studNbr++;
-                                    //console.log("calling studentCallback with studNbr=" + studNbr);
+                                    //logger.info("calling studentCallback with studNbr=" + studNbr);
                                     studentCallback(null); // don't stop for errors
                                 });
                             },
                             function (err) {
                                 if (err) {
-                                    console.log("error while creating students for school=" + schools[schoolNbr].name);
+                                    logger.error("error while creating students for school=" + schools[schoolNbr].name);
                                 }
                                 schoolNbr++;
-                                //console.log("calling schoolCallback with schoolNbr=" + schoolNbr);
+                                //logger.info("calling schoolCallback with schoolNbr=" + schoolNbr);
                                 schoolCallback(err);
                             }
                         );
@@ -332,7 +332,7 @@ router.get("/genStuds", function (req, res) {
             },
             function (err) {
                 if (err) {
-                    console.log("error after creating students for school=" + schools[schoolNbr].name);
+                    logger.error("error after creating students for school=" + schools[schoolNbr].name);
                 }
                 schoolNbr++;
             });
