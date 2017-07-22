@@ -6,6 +6,7 @@ var Event = require("../models/event");
 var Day = require("../models/day");
 var Slot = require("../models/slot");
 var middleware = require("../middleware");
+var shared = require("../shared");
 var async = require('async');
 /* global logger */
 
@@ -228,14 +229,14 @@ router.get("/:eventId/days", middleware.isLoggedIn, function (req, res) {
 
 
 // Returns index of item in array arr if present; otherwise returns null
-function getItemIndex(arr, item) {
-    logger.debug("item=" + item + ",len=" + item.length);
-    for (var i = 0, iLen = arr.length; i < iLen; i++) {
-        logger.debug("arr[i]=" + arr[i] + ",len=" + arr[i].length);
-        if (arr[i] == item) return i;
-    }
-    return null;
-}
+// function getItemIndex(arr, item) {
+//     logger.debug("item=" + item + ",len=" + item.length);
+//     for (var i = 0, iLen = arr.length; i < iLen; i++) {
+//         logger.debug("arr[i]=" + arr[i] + ",len=" + arr[i].length);
+//         if (arr[i] == item) return i;
+//     }
+//     return null;
+// }
 
 // Middleware function to poupluate res.locals with previous and next day Ids
 var getPrevNextIds = function (req, res, next) {
@@ -246,7 +247,7 @@ var getPrevNextIds = function (req, res, next) {
     Event.findById(req.params.eventId).exec(function (err, foundEvent) {
         if (!err) {
             logger.debug("foundEvent.days=" + foundEvent.days);
-            i = getItemIndex(foundEvent.days, req.params.dayId);
+            i = shared.getItemIndex(foundEvent.days, req.params.dayId);
             if (i != null) {
                 logger.debug("foundEvent.days[i]=" + foundEvent.days[i]);
                 if (i > 0) {
@@ -404,7 +405,7 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
     function updateSlot(slot, callback) {
         logger.debug("before=" + slot.students);
 
-        var delIndex = getItemIndex(slot.students, req.params.studentId);
+        var delIndex = shared.getItemIndex(slot.students, req.params.studentId);
         logger.debug("delIndex=" + delIndex);
         if (delIndex == null) {
             var err = "Error: student not found in slot";
@@ -643,7 +644,7 @@ router.get("/fixStudents", middleware.isLoggedIn, function (req, res) {
                         else {
                             var studIndex = null;
                             if (slot != null) {
-                                studIndex = getItemIndex(slot.students, students[studNbr]._id.toString());
+                                studIndex = shared.getItemIndex(slot.students, students[studNbr]._id.toString());
                             }
                             // doesn't work to look up object id (_id) without toString
                             logger.debug("slot.students=" + slot.students);
@@ -678,4 +679,4 @@ router.get("/fixStudents", middleware.isLoggedIn, function (req, res) {
         });
 });
 
-module.exports = router
+module.exports = router;

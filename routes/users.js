@@ -3,6 +3,7 @@ var router = express.Router();
 var User = require("../models/user");
 var middleware = require("../middleware");
 var request = require("request");
+var shared = require("../shared");
 var async = require('async');
 /* global logger */
 
@@ -35,24 +36,15 @@ router.get("/", function (req, res) {
     });
 });
 
-function myTrim(x) {
-    if (x != undefined) {
-        return x.replace(/^[\s\uFFFD]+|\s+$/gm, '');
-    }
-    else {
-        return undefined;
-    }
-}
-
 //CREATE - add new user to DB
 router.post("/", function (req, res) {
     // get data from form and add to users collection
 
     var newUser = {
-        username: myTrim(req.body.username.toLowerCase()),
-        name: myTrim(req.body.name),
-        role: myTrim(req.body.role),
-        school: myTrim(req.body.school)
+        username: shared.myTrim(req.body.username.toLowerCase()),
+        name: shared.myTrim(req.body.name),
+        role: shared.myTrim(req.body.role),
+        school: shared.myTrim(req.body.school)
     };
 
     // Create a new user and save to DB
@@ -91,10 +83,10 @@ router.get("/:id/edit", function (req, res) {
 // Update user in database
 router.put("/:id", function (req, res) {
     var newData = {
-        username: myTrim(req.body.username),
-        name: myTrim(req.body.name),
-        role: myTrim(req.body.role),
-        school: myTrim(req.body.school)
+        username: shared.myTrim(req.body.username),
+        name: shared.myTrim(req.body.name),
+        role: shared.myTrim(req.body.role),
+        school: shared.myTrim(req.body.school)
     };
 
     User.findByIdAndUpdate(req.params.id, {
@@ -130,12 +122,12 @@ router.delete("/:userId", middleware.isLoggedIn, function (req, res) {
     });
 });
 
-// upload users from CSV file
+// upload users from CSV file -- show form
 router.get("/uploadUsers", function (req, res) {
     res.render("users/uploadUsers");
 });
 
-// update database users
+// upload users from CSV file -- updated db
 router.post("/createUsers", function (req, res) {
 
     var users = JSON.parse(req.body.usersString);
@@ -153,10 +145,10 @@ router.post("/createUsers", function (req, res) {
             logger.debug("async user iteratee called");
             logger.debug("row=" + row + ", col=" + col);
             var user = {
-                name: myTrim(users[row][col]),
-                username: myTrim(users[row][col + 1]),
+                name: shared.myTrim(users[row][col]),
+                username: shared.myTrim(users[row][col + 1]),
                 role: "role_sc",
-                school: myTrim(users[row][0])
+                school: shared.myTrim(users[row][0])
             };
             if (user.name != undefined && user.name.length > 0 &&
                 user.username != undefined && user.username.length > 0) {

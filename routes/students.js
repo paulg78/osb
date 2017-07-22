@@ -4,7 +4,7 @@ var Student = require("../models/student");
 var School = require("../models/school");
 var Slot = require("../models/slot");
 var middleware = require("../middleware");
-// var request = require("request");
+var shared = require("../shared");
 var async = require('async');
 /* global logger */
 
@@ -211,12 +211,12 @@ router.put("/:id/checkIn/:served", function (req, res) {
 });
 
 // Returns index of item in array arr if present; otherwise returns null
-function getItemIndex(arr, item) {
-    for (var i = 0, iLen = arr.length; i < iLen; i++) {
-        if (arr[i] == item) return i;
-    }
-    return null;
-}
+// function getItemIndex(arr, item) {
+//     for (var i = 0, iLen = arr.length; i < iLen; i++) {
+//         if (arr[i] == item) return i;
+//     }
+//     return null;
+// }
 
 // Delete student
 router.delete("/:studentId", middleware.isLoggedIn, function (req, res) {
@@ -236,7 +236,7 @@ router.delete("/:studentId", middleware.isLoggedIn, function (req, res) {
                     req.flash("error", err.message);
                     return res.redirect("back");
                 }
-                var delIndex = getItemIndex(slot.students, req.params.studentId);
+                var delIndex = shared.getItemIndex(slot.students, req.params.studentId);
                 logger.debug("delIndex=" + delIndex);
                 if (delIndex == null) {
                     var err = "Error: student not found in slot";

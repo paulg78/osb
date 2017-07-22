@@ -3,6 +3,7 @@ var router = express.Router();
 var School = require("../models/school");
 var Student = require("../models/student");
 var middleware = require("../middleware");
+var shared = require("../shared");
 // var request = require("request");
 var async = require('async');
 /* global logger */
@@ -165,7 +166,7 @@ router.get("/", function (req, res) {
 router.post("/", function (req, res) {
 
     School.create({
-        name: req.body.name,
+        name: shared.myTrim(req.body.name),
         quota: req.body.quota
     }, function (err, newlyCreated) {
         if (err) {
@@ -174,10 +175,9 @@ router.post("/", function (req, res) {
                 req.flash("error", req.body.name + " has already been created.");
             }
             else {
-                req.flash("error", "Schedule upload failed: " + err.message);
+                req.flash("error", "Add school failed: " + err.message);
             }
             res.redirect("back");
-            // res.redirect("/schools/new");
         }
         else {
             //redirect back to schools page
@@ -228,12 +228,12 @@ router.put("/:id", function (req, res) {
     });
 });
 
-// upload schools from CSV file
+// upload schools from CSV file - show form
 router.get("/uploadSchools", function (req, res) {
     res.render("schools/uploadSchools");
 });
 
-// update database schools
+// upload schools from CSV file - updated database
 router.post("/createSchools", function (req, res) {
     var schools = JSON.parse(req.body.schoolsString);
     var numSchools = schools.length;
@@ -246,8 +246,8 @@ router.post("/createSchools", function (req, res) {
         function (schoolCallback) {
             logger.debug("iteratee called, row=" + row);
             var school = {
-                name: schools[row][0],
-                district: schools[row][1],
+                name: shared.myTrim(schools[row][0]),
+                district: shared.myTrim(schools[row][1]),
                 quota: schools[row][2]
             };
             School.findOne({
