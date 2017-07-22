@@ -15,12 +15,20 @@ const logDir = 'log';
 if (!fs.existsSync(logDir)) {
   fs.mkdirSync(logDir);
 }
-const tsFormat = () => (new Date()).toLocaleTimeString();
+
+const tsFormat = () => (new Date()).toLocaleDateString('en-US', {
+  year: '2-digit',
+  month: 'numeric',
+  day: 'numeric'
+}) + '-' + (new Date()).toLocaleTimeString('en-US', {
+  timeZone: "America/Denver",
+  hour12: false
+});
 global.logger = new(winston.Logger)({
   transports: [
     // colorize the output to the console
     new(winston.transports.Console)({
-      timestamp: tsFormat,
+      // timestamp: tsFormat,
       colorize: true,
       level: process.env.APPLOGLEVEL
     }),

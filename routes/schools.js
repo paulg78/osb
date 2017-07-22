@@ -26,6 +26,7 @@ router.get("/", function (req, res) {
         getSchools,
         getStudentCountBySchool,
         getSchedStudentCountBySchool,
+        getServedCountBySchool,
     ], function (err, schools) {
         if (err) {
             logger.error(err);
@@ -112,6 +113,46 @@ router.get("/", function (req, res) {
                     }
                     else {
                         school.schedCount = 0;
+                    }
+                });
+                callback(err, schools);
+            });
+    }
+
+    function getServedCountBySchool(schools, callback) {
+        logger.debug("Getting served student count by school");
+        Student.aggregate([{
+                $match: {
+                    served: {
+                        $eq: true
+                    }
+                }
+            }, {
+                $group: {
+                    _id: '$school',
+                    count: {
+                        $sum: 1
+                    }
+                }
+            }, {
+                $sort: {
+                    _id: 1
+                }
+            }])
+            .exec(function (err, schoolCounts) {
+                var i = 0;
+                var len = schoolCounts.length;
+                schools.forEach(function (school) {
+                    while (i < len && schoolCounts[i]._id < school.name) {
+                        i++;
+                        logger.debug("i=" + i);
+                    }
+                    if (i < len && school.name == schoolCounts[i]._id) {
+                        school.servedCount = schoolCounts[i].count;
+                        logger.debug("school.name=" + school.name + ", student servedCount=" + school.servedCount);
+                    }
+                    else {
+                        school.servedCount = 0;
                     }
                 });
                 callback(err, schools);

@@ -16,6 +16,7 @@
              <th>Quota</th>
              <th>Students Available</th>
              <th>Students Unscheduled</th>
+             <th>Students Served</th>
              </tr>
         </thead>
          <tbody>
@@ -26,6 +27,7 @@
                 <td><%= school.quota %></td>
                 <td><%= school.quota - school.count %></td>
                 <td><%= school.quota - school.schedCount %></td>
+                <td><%= school.servedCount %></td>
                 <td>
                     <form style="display: inline" action="/schools/<%=school._id%>?_method=DELETE" method="POST">
                         <a href="/schools/<%=school._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
