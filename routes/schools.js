@@ -22,23 +22,10 @@ router.use(middleware.isLoggedIn, function (req, res, next) {
 //INDEX - list schools
 router.get("/", function (req, res) {
 
-    // this function is inefficient since it does a sequential search for each school
-    // could be a problem when students are created for all the schools
-    // could switch to binary search
-    function count(school, schoolData) {
-        for (var i = 0; i < schoolData.length; i++) {
-            // logger.debug("schoolData[i]._id=" + schoolData[i]._id);
-            if (schoolData[i]._id == school) {
-                return schoolData[i].count;
-            }
-        }
-        return "0";
-    }
-
     async.waterfall([
         getSchools,
         getStudentCountBySchool,
-        getUnschStudentCountBySchool,
+        getSchedStudentCountBySchool,
     ], function (err, schools) {
         if (err) {
             logger.error(err);
@@ -58,25 +45,41 @@ router.get("/", function (req, res) {
     }
 
     function getStudentCountBySchool(schools, callback) {
-        Student.aggregate({
+        logger.debug("Getting student count by school");
+        Student.aggregate([{
                 $group: {
                     _id: '$school',
                     count: {
                         $sum: 1
                     }
                 }
-            })
+            }, {
+                $sort: {
+                    _id: 1
+                }
+            }])
             .exec(function (err, schoolCounts) {
+                var i = 0;
+                var len = schoolCounts.length;
                 schools.forEach(function (school) {
-                    // logger.debug("school.name=" + school.name);
-                    school.count = count(school.name, schoolCounts);
-                    // logger.debug("count=" + school.count);
+                    while (i < len && schoolCounts[i]._id < school.name) {
+                        i++;
+                        logger.debug("i=" + i);
+                    }
+                    if (i < len && school.name == schoolCounts[i]._id) {
+                        school.count = schoolCounts[i].count;
+                        logger.debug("school.name=" + school.name + ", student count=" + school.count);
+                    }
+                    else {
+                        school.count = 0;
+                    }
                 });
                 callback(err, schools);
             });
     }
 
-    function getUnschStudentCountBySchool(schools, callback) {
+    function getSchedStudentCountBySchool(schools, callback) {
+        logger.debug("Getting scheduled student count by school");
         Student.aggregate([{
                 $match: {
                     slot: {
@@ -90,12 +93,26 @@ router.get("/", function (req, res) {
                         $sum: 1
                     }
                 }
+            }, {
+                $sort: {
+                    _id: 1
+                }
             }])
             .exec(function (err, schoolCounts) {
+                var i = 0;
+                var len = schoolCounts.length;
                 schools.forEach(function (school) {
-                    // logger.debug("school.name=" + school.name);
-                    school.unschedCount = count(school.name, schoolCounts);
-                    // logger.debug("count=" + school.unschedCount);
+                    while (i < len && schoolCounts[i]._id < school.name) {
+                        i++;
+                        logger.debug("i=" + i);
+                    }
+                    if (i < len && school.name == schoolCounts[i]._id) {
+                        school.schedCount = schoolCounts[i].count;
+                        logger.debug("school.name=" + school.name + ", student schedCount=" + school.schedCount);
+                    }
+                    else {
+                        school.schedCount = 0;
+                    }
                 });
                 callback(err, schools);
             });

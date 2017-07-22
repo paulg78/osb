@@ -1,4 +1,4 @@
-<% include ../partials/header %> 
+<% include ../partials/header %>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/css/theme.bootstrap_3.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.widgets.min.js"></script>
@@ -12,26 +12,26 @@
          <thead>
              <tr>
              <th>Name</th>
-             <th>District</th>             
+             <th>District</th>
              <th>Quota</th>
              <th>Students Available</th>
-             <th>Students Unscheduled</th>         
+             <th>Students Unscheduled</th>
              </tr>
         </thead>
          <tbody>
          <% schools.forEach(function(school){ %>
             <tr>
                 <td><%= school.name %></td>
-                <td><%= school.district %></td>                
+                <td><%= school.district %></td>
                 <td><%= school.quota %></td>
                 <td><%= school.quota - school.count %></td>
-                <td><%= school.quota - school.unschedCount %></td>
+                <td><%= school.quota - school.schedCount %></td>
                 <td>
                     <form style="display: inline" action="/schools/<%=school._id%>?_method=DELETE" method="POST">
                         <a href="/schools/<%=school._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
                         <button class="hidden" class="btn btn-xs btn-danger">DELETE</button>
                 </form>
-                </td>            
+                </td>
             </tr>
         <% }); %>
         </tbody>
