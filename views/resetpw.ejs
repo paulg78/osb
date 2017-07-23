@@ -2,6 +2,7 @@
 <div class="container">
     <div class="row">
         <h1 style="text-align: center">Create New Password</h1>
+        <h2 style="text-align: center">For username = <%= user.username %></h2>
         <h4 style="text-align: center">Please enter new password twice.</h4>
         <div style="width: 30%; margin: 25px auto;">
             <form action="/resetpw/<%=user.resetPasswordToken%>" method="post">

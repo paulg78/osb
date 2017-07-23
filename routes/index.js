@@ -118,7 +118,13 @@ router.post('/requestpwreset', function (req, res, next) {
           text = "To reset your password, create a new password after clicking on the\n" +
             "following link or pasting it into a browser\n\n" + link + "\n";
         }
-        sendEmail(user.username, subject, text, function (err) {
+        // handle special case when username is more than an email address
+        var emailAddr = user.username;
+        var i = emailAddr.indexOf(":");
+        if (i > -1) {
+          emailAddr = emailAddr.substring(0, i);
+        }
+        sendEmail(emailAddr, subject, text, function (err) {
           logger.info("username=" + user.username + ", resetLink=" + link);
           done(err);
         });
@@ -197,7 +203,13 @@ router.post('/resetpw/:token', function (req, res) {
         subject = "Successfully Reset password for Operation School Bell";
       }
       text = "You may now login with your new password!";
-      sendEmail(user.username, subject, text, function (err) {
+      // handle special case when username is more than an email address
+      var emailAddr = user.username;
+      var i = emailAddr.indexOf(":");
+      if (i > -1) {
+        emailAddr = emailAddr.substring(0, i);
+      }
+      sendEmail(emailAddr, subject, text, function (err) {
         if (err) {
           logger.error('Error sending email.');
         }
