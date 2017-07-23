@@ -264,7 +264,7 @@ router.post("/createSchools", function (req, res) {
                                 logger.error("Error creating school, row=" + (row + 1) + " school=" + school.name + ", " + err.message);
                             }
                             else {
-                                logger.info("created school=" + school.name);
+                                logger.info("row=" + (row + 1) + " created school=" + school.name);
                             }
                             row++;
                             schoolCallback(err);
@@ -279,7 +279,7 @@ router.post("/createSchools", function (req, res) {
                                     logger.error("Error updating school, row=" + (row + 1) + " school=" + school.name + ", " + err.message);
                                 }
                                 else {
-                                    logger.info("Updated school=" + school.name);
+                                    logger.info("row=" + (row + 1) + " Updated school=" + school.name);
                                 }
                                 row++;
                                 schoolCallback(err);

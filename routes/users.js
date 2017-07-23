@@ -159,7 +159,7 @@ router.post("/createUsers", function (req, res) {
                             logger.error("row=" + (row + 1) + ", Error, user=" + user.name + ", " + err.message);
                         }
                         else { // duplicate key error
-                            logger.debug("row=" + (row + 1) + ", " + user.username + " already in DB");
+                            logger.info("row=" + (row + 1) + ", " + user.username + " already in DB");
                         }
 
                     }
