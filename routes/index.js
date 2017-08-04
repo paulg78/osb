@@ -65,7 +65,7 @@ function sendEmail(emailAddress, subject, text, callBack) {
   });
 
   var data = {
-    from: 'OSB <admin@mg.schoolbell.us>',
+    from: 'OSB <admin@schoolbell.us>',
     to: emailAddress,
     subject: subject,
     text: text
@@ -138,7 +138,7 @@ router.post('/requestpwreset', function (req, res, next) {
       }
       else {
         req.flash('success', 'An e-mail has been sent to ' + req.body.username + ' with further instructions.');
-        res.redirect('/login');
+        res.redirect('/requestpwreset');
       }
     });
 });

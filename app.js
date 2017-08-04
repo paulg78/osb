@@ -57,6 +57,7 @@ mongoose.connect(process.env.DATABASEURL, {
   useMongoClient: true,
 });
 
+app.enable('trust proxy');
 app.use(bodyParser.urlencoded({
   extended: true
 }));
