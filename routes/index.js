@@ -61,11 +61,11 @@ function sendEmail(emailAddress, subject, text, callBack) {
   logger.debug("emailing " + emailAddress + ", subject: " + subject + ", text: " + text);
   var mailgun = new Mailgun({
     apiKey: process.env.APIKEY,
-    domain: 'test.coloradospringsbridge.com'
+    domain: 'mg.schoolbell.us'
   });
 
   var data = {
-    from: 'admin@coloradospringsbridge.com',
+    from: 'OSB <admin@mg.schoolbell.us>',
     to: emailAddress,
     subject: subject,
     text: text
