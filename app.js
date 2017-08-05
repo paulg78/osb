@@ -57,6 +57,16 @@ mongoose.connect(process.env.DATABASEURL, {
   useMongoClient: true,
 });
 
+var forceSsl = function (req, res, next) {
+  if (req.headers['x-forwarded-proto'] !== 'https') {
+    console.log("not https");
+    return res.redirect(['https://', req.get('Host'), req.url].join(''));
+  }
+  console.log("https");
+  return next();
+};
+app.use(forceSsl);
+
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({
   extended: true
