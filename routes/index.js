@@ -46,7 +46,6 @@ router.post('/login', function (req, res, next) {
 // logout route
 router.get("/logout", function (req, res) {
   req.logout();
-  // req.flash("success", "LOGGED YOU OUT!");
   res.redirect("/");
 });
 

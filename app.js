@@ -114,13 +114,10 @@ app.use(function (req, res, next) {
 });
 
 app.use("/", indexRoutes);
-app.use("/resetpw/:token", indexRoutes);
 app.use("/users", userRoutes);
 app.use("/students", studentRoutes);
 app.use("/schools", schoolRoutes);
 app.use("/events", eventRoutes);
-app.use("/events/:eventId", eventRoutes);
-app.use("/events/:eventId/days/:dayId", eventRoutes);
 
 app.listen(process.env.PORT, process.env.IP, function () {
   logger.debug("Server running on port " + process.env.PORT + ", IP " + process.env.IP);
