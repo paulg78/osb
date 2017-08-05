@@ -1,8 +1,6 @@
 .solidborder {
     border-style: solid;
     border-width: 1px;
-    /*border-right: none;*/
-    /*border-bottom: none;*/
 }
 
 .availSlots,

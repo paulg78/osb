@@ -109,14 +109,17 @@ router.post('/requestpwreset', function (req, res, next) {
         var link = req.protocol + "://" + req.get('host') + '/resetpw/' + token;
         if (user.password == undefined) {
           subject = "Register for Assistance League Operation School Bell";
-          text = "To register, create a password after clicking on the following link\n" +
-            "or pasting it into a browser:\n\n" + link + "\n";
+          text = "To register, create a password after clicking on the following link " +
+            "or pasting it into a browser.";
         }
         else {
           subject = "Reset password for Assistance League Operation School Bell";
-          text = "To reset your password, create a new password after clicking on the\n" +
-            "following link or pasting it into a browser\n\n" + link + "\n";
+          text = "To reset your password, create a new password after clicking on the " +
+            "following link or pasting it into a browser.";
         }
+        text += "\n\n" + link + "\n\n" +
+          "No need to reply to this email.\n\n" +
+          "This email will self-destruct in one hour ... actually, the link will just stop working.";
         // handle special case when username is more than an email address
         var emailAddr = user.username;
         var i = emailAddr.indexOf(":");
