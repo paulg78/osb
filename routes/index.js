@@ -139,7 +139,9 @@ router.post('/requestpwreset', function (req, res, next) {
         res.redirect('/requestpwreset');
       }
       else {
-        req.flash('success', 'An e-mail has been sent to ' + req.body.username + ' with further instructions.');
+        req.flash('success', 'An e-mail has been sent from OSB (admin@schoolbell.us) to ' +
+          req.body.username + ' with further instructions. ' +
+          "If you don't receive the email in your inbox, please check your junk or spam folder.");
         res.redirect('/requestpwreset');
       }
     });
