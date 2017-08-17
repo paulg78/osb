@@ -35,7 +35,7 @@ global.logger = new(winston.Logger)({
     new(winston.transports.File)({
       filename: `${logDir}/results.log`,
       timestamp: tsFormat,
-      level: 'error'
+      level: process.env.CONLOGLEVEL
     })
   ]
 });

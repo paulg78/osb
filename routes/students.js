@@ -101,12 +101,12 @@ function firstLetterUpCase(val) {
 function studentValid(student) {
     student.fname = firstLetterUpCase(student.fname);
     student.lname = firstLetterUpCase(student.lname);
-    student.grade = student.grade.toString().trim();
+    student.grade = student.grade.toString().trim().toUpperCase();
     if (student.fname == "" || student.lname == "" || student.grade == "") {
         return "first name, last name, and grade are required fields";
     }
     var len = student.grade.length;
-    if ((len == 1 && (student.grade < "1" || student.grade > "9")) ||
+    if ((len == 1 && (student.grade < "1" || student.grade > "9") && student.grade != "K") ||
         (len == 2 && (student.grade < "10" || student.grade > "12")) ||
         (len < 1) || (len > 2)
     ) {
@@ -210,13 +210,6 @@ router.put("/:id/checkIn/:served", function (req, res) {
     });
 });
 
-// Returns index of item in array arr if present; otherwise returns null
-// function getItemIndex(arr, item) {
-//     for (var i = 0, iLen = arr.length; i < iLen; i++) {
-//         if (arr[i] == item) return i;
-//     }
-//     return null;
-// }
 
 // Delete student
 router.delete("/:studentId", middleware.isLoggedIn, function (req, res) {
