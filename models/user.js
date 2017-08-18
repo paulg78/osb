@@ -11,7 +11,7 @@ var UserSchema = new mongoose.Schema({
   },
   password: {
     type: String
-      // required: true
+    // required: true
   },
   resetPasswordToken: String,
   resetPasswordExpires: Date,
@@ -24,8 +24,7 @@ var UserSchema = new mongoose.Schema({
     required: true
   },
   school: {
-    type: String,
-    required: true
+    type: String
   }
 });
 
