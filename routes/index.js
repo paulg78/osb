@@ -91,7 +91,7 @@ router.post('/requestpwreset', function (req, res, next) {
           username: req.body.username.toLowerCase()
         }, function (err, user) {
           if (!user) {
-            req.flash('error', "No account with email address " + req.body.username + " exists.");
+            req.flash('error', "No account with Username " + req.body.username + " exists.");
             return res.redirect('/requestpwreset');
           }
 
