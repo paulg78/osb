@@ -31,12 +31,12 @@ global.logger = new(winston.Logger)({
       // timestamp: tsFormat,
       colorize: true,
       level: process.env.APPLOGLEVEL
-    }),
-    new(winston.transports.File)({
-      filename: `${logDir}/results.log`,
-      timestamp: tsFormat,
-      level: process.env.CONLOGLEVEL
     })
+    // new(winston.transports.File)({
+    //   filename: `${logDir}/results.log`,
+    //   timestamp: tsFormat,
+    //   level: process.env.CONLOGLEVEL
+    // })
   ]
 });
 /* global logger */

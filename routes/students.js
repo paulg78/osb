@@ -59,6 +59,10 @@ router.get("/", middleware.isLoggedIn,
                     })
                     .populate('day', 'date')
                     .populate('slot', 'time')
+                    .sort({
+                        fname: 1,
+                        lname: 1
+                    })
                     .exec(function (err, queryResponse) {
                         if (err) {
                             logger.error(err);
