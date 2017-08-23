@@ -114,7 +114,7 @@ function studentValid(student) {
         (len == 2 && (student.grade < "10" || student.grade > "12")) ||
         (len < 1) || (len > 2)
     ) {
-        return "grade must be a number from 1 to 12";
+        return "grade must be K or a number from 1 to 12";
     }
     return "";
 }
