@@ -50,12 +50,16 @@ router.post("/", function (req, res) {
     // Create a new user and save to DB
     User.create(newUser, function (err) {
         if (err) {
-            logger.error(err);
-            req.flash("error", err.message);
+            var msg = err.message;
+            if (msg.indexOf("E11000") >= 0) { // duplicate key error
+                msg = newUser.username + " is already in the database";
+            }
+            logger.error(msg);
+            req.flash("error", msg);
             res.redirect("back");
         }
         else {
-            req.flash("success", "New user created");
+            req.flash("success", "New user " + newUser.username + " created");
             res.redirect("/users");
         }
     });
