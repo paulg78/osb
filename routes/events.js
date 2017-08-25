@@ -272,7 +272,7 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
             path: 'slots',
             populate: {
                 path: 'students'
-                    // select: '_id fname lname grade' // doesn't populate anything
+                // select: '_id fname lname grade' // doesn't populate anything
             }
         })
         .exec(function (err, foundDay) {
@@ -314,7 +314,7 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, getPrevNextIds, funct
             path: 'slots',
             populate: {
                 path: 'students'
-                    // select: '_id fname lname grade' // doesn't populate anything
+                // select: '_id fname lname grade' // doesn't populate anything
             }
         })
         .exec(function (err, foundDay) {
@@ -602,8 +602,10 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
             function (err) {
                 if (err) {
                     logger.error("error in slot loop: " + err.msg);
+                    req.flash("error", "fixSlots: error in slot loop: " + err.msg);
                 }
                 logger.info("Ending fixslots. Nbr missing students in slots=" + nbrMissing);
+                req.flash("success", nbrMissing + " slots containing 'unscheduled' students were fixed.");
                 res.redirect("back");
             }
         );
@@ -671,7 +673,9 @@ router.get("/fixStudents", middleware.isLoggedIn, function (req, res) {
                 function (err) {
                     if (err) {
                         logger.error("fixStudents: error in student loop: " + err.msg);
+                        req.flash("error", "fixStudents: error in student loop: " + err.msg);
                     }
+                    req.flash("success", nbrMissing + " 'scheduled' students missing from slots were fixed.");
                     logger.info("Ending fixStudents. Nbr 'scheduled' students missing from slots=" + nbrMissing);
                     res.redirect("back");
                 }
