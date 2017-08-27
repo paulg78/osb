@@ -554,7 +554,7 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
                                     nbrMissing++;
                                     logger.info("For slot Id=" + slots[slotNbr]._id + ", unscheduled student Id=" + slots[slotNbr].students[studNbr] + " found");
                                     if (student != undefined) {
-                                        logger.debug(student.fullName + " found with scheduled slot=" + student.slot);
+                                        logger.info(student.fullName + " found with scheduled slot=" + student.slot);
                                     }
                                     Slot.findById(slots[slotNbr]._id, function (err, slot) {
                                         if (err) {
@@ -572,13 +572,13 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
                                                 logger.debug("deleting student at array index=" + delIndex);
                                                 slot.students.splice(delIndex, 1);
                                                 logger.debug("students after=" + slot.students);
-                                                // slot.save(function (err) {
-                                                //     if (!err) {
-                                                //         logger.info("unscheduled student deleted from slot")
-                                                studNbr++;
-                                                //     }
-                                                studentCallback(err);
-                                                // });
+                                                slot.save(function (err) {
+                                                    if (!err) {
+                                                        logger.info("unscheduled student deleted from slot")
+                                                        studNbr++;
+                                                    }
+                                                    studentCallback(err);
+                                                });
                                             }
                                         }
                                     })
