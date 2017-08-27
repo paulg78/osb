@@ -26,9 +26,9 @@ const tsFormat = () => (new Date()).toLocaleDateString('en-US', {
 });
 global.logger = new(winston.Logger)({
   transports: [
-    // colorize the output to the console
     new(winston.transports.Console)({
-      level: process.env.APPLOGLEVEL
+      level: process.env.APPLOGLEVEL,
+      colorize: false
     })
     // new(winston.transports.File)({
     //   filename: `${logDir}/results.log`,

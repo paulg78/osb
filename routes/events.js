@@ -21,7 +21,6 @@ router.get("/", function (req, res) {
             if (allEvents.length == 1) {
                 res.redirect("events/" + allEvents[0]._id + "/days");
             }
-
             else {
                 logger.debug("allEvents=" + allEvents);
                 res.render("events/index", {
@@ -227,16 +226,6 @@ router.get("/:eventId/days", middleware.isLoggedIn, function (req, res) {
         });
 });
 
-
-// Returns index of item in array arr if present; otherwise returns null
-// function getItemIndex(arr, item) {
-//     logger.debug("item=" + item + ",len=" + item.length);
-//     for (var i = 0, iLen = arr.length; i < iLen; i++) {
-//         logger.debug("arr[i]=" + arr[i] + ",len=" + arr[i].length);
-//         if (arr[i] == item) return i;
-//     }
-//     return null;
-// }
 
 // Middleware function to poupluate res.locals with previous and next day Ids
 var getPrevNextIds = function (req, res, next) {
@@ -561,29 +550,41 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
                                 studentCallback(err);
                             }
                             else {
-                                if (student == undefined) {
+                                if (student == undefined || student.slot != slots[slotNbr]._id.toString()) {
                                     nbrMissing++;
-                                    logger.info("slot=" + slots[slotNbr]._id + ", missing student=" + slots[slotNbr].students[studNbr]);
+                                    logger.info("For slot Id=" + slots[slotNbr]._id + ", unscheduled student Id=" + slots[slotNbr].students[studNbr] + " found");
+                                    if (student != undefined) {
+                                        logger.debug(student.fullName + " found with scheduled slot=" + student.slot);
+                                    }
                                     Slot.findById(slots[slotNbr]._id, function (err, slot) {
                                         if (err) {
                                             studentCallback(err);
                                         }
                                         else {
                                             logger.debug("students before=" + slot.students);
-                                            slot.students.splice(studNbr, 1);
-                                            logger.debug("students after=" + slot.students);
-                                            slot.save(function (err) {
-                                                if (!err) {
-                                                    logger.info("missing student deleted from slot")
-                                                    studNbr++;
-                                                }
+                                            var delIndex = shared.getItemIndex(slot.students, slots[slotNbr].students[studNbr].toString());
+                                            if (delIndex == null) {
+                                                err = " in fixSlots, student ID to delete not found in slot";
+                                                logger.error(err);
                                                 studentCallback(err);
-                                            });
+                                            }
+                                            else {
+                                                logger.debug("deleting student at array index=" + delIndex);
+                                                slot.students.splice(delIndex, 1);
+                                                logger.debug("students after=" + slot.students);
+                                                // slot.save(function (err) {
+                                                //     if (!err) {
+                                                //         logger.info("unscheduled student deleted from slot")
+                                                studNbr++;
+                                                //     }
+                                                studentCallback(err);
+                                                // });
+                                            }
                                         }
                                     })
                                 }
                                 else {
-                                    logger.debug("found student=" + student.fullName);
+                                    logger.debug("found student=" + student.fullName + " with slot Id=" + slots[slotNbr]._id);
                                     studNbr++;
                                     studentCallback(err);
                                 }
@@ -604,8 +605,10 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
                     logger.error("error in slot loop: " + err.msg);
                     req.flash("error", "fixSlots: error in slot loop: " + err.msg);
                 }
+                else {
+                    req.flash("success", nbrMissing + " slots containing 'unscheduled' students were fixed.");
+                }
                 logger.info("Ending fixslots. Nbr missing students in slots=" + nbrMissing);
-                req.flash("success", nbrMissing + " slots containing 'unscheduled' students were fixed.");
                 res.redirect("back");
             }
         );
