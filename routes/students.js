@@ -38,7 +38,7 @@ router.get("/", middleware.isLoggedIn,
                 });
         }
     },
-    function (req, res) { //  List students for school counselor
+    function (req, res) { //  List students for school
         School.findOne({
                 name: res.locals.currentUser.school
             })
@@ -79,6 +79,8 @@ router.get("/", middleware.isLoggedIn,
                         if (month < 10) {
                             month = '0' + month;
                         }
+                        // res.locals.remaining = qrySchool.quota - queryResponse.length;
+                        // logger.debug("in students; remaining=" + res.locals.remaining);
                         res.render("students/bySchool", {
                             todayMMDD: month + day,
                             students: queryResponse,
@@ -132,7 +134,15 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
         served: false
     };
 
-    var result = studentValid(studentData);
+    var result;
+    // logger.debug("before add student; remaining=" + res.locals.remaining);
+    // if (res.locals.remaining <= 0) {
+    //     result = "allotment exhausted";
+    // }
+    // else {
+        result = studentValid(studentData);
+    // }
+
     if (result == "") {
         Student.create(studentData, function (err, newStudent) {
             if (err) {
@@ -140,7 +150,9 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
                 res.status(500).send(err.message);
             }
             else {
+                // res.locals.remaining--;
                 res.json(newStudent);
+                // logger.debug("after add student; remaining=" + res.locals.remaining);
             }
         });
     }
@@ -151,11 +163,15 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
 
 // Find student and render form
 router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
+    //logger.debug("rendering edit form; remaining=" + res.locals.remaining);
     Student.findById(req.params.id, function (err, foundStudent) {
         if (err) {
             logger.error(err);
         }
         else {
+            if (foundStudent == null) {
+                return res.redirect("back");
+            }
             res.render("students/edit", {
                 student: foundStudent
             });
@@ -189,7 +205,7 @@ router.put("/:id", function (req, res) {
         });
     }
     else {
-        logger.error("edit validation error");
+        logger.debug("edit validation error");
         req.flash("error", result);
         res.redirect("back");
     }
@@ -226,34 +242,35 @@ router.delete("/:studentId", middleware.isLoggedIn, function (req, res) {
             req.flash("error", err.message);
             return res.redirect("back");
         }
-        if (student.slot != null) {
-            Slot.findById(student.slot, function (err, slot) {
-                if (err) {
-                    logger.error("Error finding slot: " + err.message);
-                    req.flash("error", err.message);
-                    return res.redirect("back");
-                }
-                var delIndex = shared.getItemIndex(slot.students, req.params.studentId);
-                logger.debug("delIndex=" + delIndex);
-                if (delIndex == null) {
-                    var err = "Error: student not found in slot";
-                    logger.error(err);
-                    req.flash("error", err);
-                    return res.redirect("back");
-                }
-                logger.debug("slot.students before: " + slot.students);
-                slot.students.splice(delIndex, 1);
-                logger.debug("slot.students after: " + slot.students);
-                slot.save(function (err) {
+        if (student != null) { // need null check in case student has been deleted in another window
+            if (student.slot != null) {
+                Slot.findById(student.slot, function (err, slot) {
                     if (err) {
-                        logger.error("Error saving updated slot: " + err.message);
-                        req.flash("error", err.message);
-                        return res.redirect("back");
+                        logger.error("DelStud: Error finding slot: " + err.message);
+                        return;
                     }
+                    var delIndex = shared.getItemIndex(slot.students, req.params.studentId);
+                    logger.debug("delIndex=" + delIndex);
+                    if (delIndex == null) {
+                        logger.error("DelStud: student not found in slot");
+                        return;
+                    }
+                    logger.debug("slot.students before: " + slot.students);
+                    slot.students.splice(delIndex, 1);
+                    logger.debug("slot.students after: " + slot.students);
+                    slot.save(function (err) {
+                        if (err) {
+                            logger.error("DelStud: Error saving updated slot: " + err.message);
+                            return;
+                        }
+                    });
                 });
-            });
+            }
+            req.flash("success", "Deleted " + student.fullName);
         }
-        req.flash("success", "Deleted " + student.fullName);
+        else {
+            req.flash("success", "Student deleted ");
+        }
         res.redirect("back");
     });
 });

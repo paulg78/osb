@@ -200,7 +200,6 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
             callback(err, ev);
         });
     }
-
 });
 
 // SHOW - days in an event
@@ -255,7 +254,7 @@ var getPrevNextIds = function (req, res, next) {
 
 // SCHEDULE By School - shows schedule for one day of an event
 router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds, function (req, res) {
-    logger.debug("starting res.locals.prevDayId=" + res.locals.prevDayId);
+    logger.debug("starting show schedule by school; res.locals.prevDayId=" + res.locals.prevDayId);
     Day.findById(req.params.dayId)
         .populate({
             path: 'slots',
@@ -397,9 +396,7 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
         var delIndex = shared.getItemIndex(slot.students, req.params.studentId);
         logger.debug("delIndex=" + delIndex);
         if (delIndex == null) {
-            var err = "Error: student not found in slot";
-            logger.error(err);
-            callback(err);
+            callback("In unschedule: student not found in slot");
         }
         else {
             // "clever" use of splice to remove elements
