@@ -17,12 +17,8 @@ $('#newStudentForm').submit(function (e) {
             $('#addMsg').text(student.fname + " " + student.lname + " added.");
             var remaining = $('#remaining').text() - 1;
             $('#remaining').text(remaining);
-            if (remaining < 1) {
-                $('#newStudentForm').hide();
-            } else {
-                $('#newStudentForm').find('.form-control').val("");
-                $('#newStudentForm').find('.form-control').first().focus();
-            }
+            $('#newStudentForm').find('.form-control').val("");
+            $('#newStudentForm').find('.form-control').first().focus();
         },
         error: function error(err) {
             console.log('Ajax post returned error: ' + err.responseText);

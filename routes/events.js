@@ -204,8 +204,6 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
 
 // SHOW - days in an event
 router.get("/:eventId/days", middleware.isLoggedIn, function (req, res) {
-    //find the event with provided ID
-    // Event.findById(req.params.eventId).populate("slots").exec(function(err, foundEvent) {  // populates slots but not students
     Event.findById(req.params.eventId)
         .populate({
             path: 'days',
@@ -217,7 +215,7 @@ router.get("/:eventId/days", middleware.isLoggedIn, function (req, res) {
                 logger.error(err);
             }
             else {
-                // logger.debug("foundEvent=" + foundEvent);
+                //logger.debug("foundEvent=" + foundEvent);
                 res.render("events/days", {
                     event: foundEvent
                 });
@@ -259,8 +257,9 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
         .populate({
             path: 'slots',
             populate: {
-                path: 'students'
-                // select: '_id fname lname grade' // doesn't populate anything
+                path: 'students',
+                model: Student,
+                select: 'fname lname grade'
             }
         })
         .exec(function (err, foundDay) {
@@ -268,6 +267,8 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
                 logger.error(err);
             }
             else {
+                // logger.debug("foundDay=" + foundDay);
+                // logger.debug("foundDay.slots[7]=" + foundDay.slots[7]);
                 // find the unassigned students
                 Student.find({
                         school: res.locals.currentUser.school,
@@ -278,7 +279,7 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
                             logger.error(err);
                         }
                         else {
-                            logger.debug("(unscheduled students) queryResponse=" + queryResponse);
+                            // logger.debug("(unscheduled students) queryResponse=" + queryResponse);
                             logger.debug("before render, res.locals.prevDayId=" + res.locals.prevDayId);
                             res.render("events/daySchoolSchedule", {
                                 eventId: req.params.eventId,
@@ -301,8 +302,9 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, getPrevNextIds, funct
         .populate({
             path: 'slots',
             populate: {
-                path: 'students'
-                // select: '_id fname lname grade' // doesn't populate anything
+                path: 'students',
+                model: Student,
+                select: 'fname lname grade'
             }
         })
         .exec(function (err, foundDay) {

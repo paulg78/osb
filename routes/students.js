@@ -17,9 +17,9 @@ router.get("/", middleware.isLoggedIn,
         }
         else { // list all students
             logger.debug("after next");
-            Student.find()
-                .populate('day', 'date')
-                .populate('slot', 'time')
+            Student.find({}, { _id: 0 })
+                .populate('day', { date: 1, _id: 0 })
+                .populate('slot', { time: 1, _id: 0 })
                 .sort({
                     fname: 1,
                     lname: 1
@@ -31,6 +31,7 @@ router.get("/", middleware.isLoggedIn,
                         res.redirect("back");
                     }
                     else {
+                        // logger.debug("queryResponse=" + queryResponse);
                         res.render("students/index", {
                             students: queryResponse
                         });
@@ -56,9 +57,9 @@ router.get("/", middleware.isLoggedIn,
                 logger.debug("in list students for a school");
                 Student.find({
                         school: res.locals.currentUser.school
-                    })
-                    .populate('day', 'date')
-                    .populate('slot', 'time')
+                    }, { school: 0 })
+                    .populate('day', { date: 1, _id: 0 })
+                    .populate('slot', { time: 1, _id: 0 })
                     .sort({
                         fname: 1,
                         lname: 1
@@ -69,7 +70,8 @@ router.get("/", middleware.isLoggedIn,
                             req.flash("error", "System Error: " + err.message);
                             return res.redirect("back");
                         }
-                        logger.debug("school=" + qrySchool);
+                        // logger.debug("qrySchool=" + qrySchool);
+                        // logger.debug("queryResponse=" + queryResponse);
                         var today = new Date();
                         var day = today.getDate();
                         var month = today.getMonth() + 1;
@@ -79,8 +81,6 @@ router.get("/", middleware.isLoggedIn,
                         if (month < 10) {
                             month = '0' + month;
                         }
-                        // res.locals.remaining = qrySchool.quota - queryResponse.length;
-                        // logger.debug("in students; remaining=" + res.locals.remaining);
                         res.render("students/bySchool", {
                             todayMMDD: month + day,
                             students: queryResponse,
@@ -121,6 +121,39 @@ function studentValid(student) {
     return "";
 }
 
+function getRemaining(school, callbackfunction) {
+    School.findOne({
+            name: school
+        }, { _id: 0, quota: 1 })
+        .exec(function (err, qrySchool) {
+            if (err) {
+                logger.error("getRemaining, finding school, " + err.errmsg);
+                callbackfunction(0);
+            }
+            else {
+                if (qrySchool == null) {
+                    logger.error("getRemaining, School missing: " + school);
+                    callbackfunction(0);
+                }
+                else {
+                    logger.debug("qrySchool=" + qrySchool);
+                    Student.count({
+                            school: school
+                        })
+                        .exec(function (err, cnt) {
+                            if (err) {
+                                logger.error("getRemaining, getting student count, " + err.errmsg);
+                                callbackfunction(0);
+                            }
+                            else {
+                                callbackfunction(qrySchool.quota - cnt);
+                            }
+                        });
+                }
+            }
+        });
+}
+
 //CREATE - add new student to DB
 router.post("/", middleware.isLoggedIn, function (req, res) {
 
@@ -134,25 +167,24 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
         served: false
     };
 
-    var result;
-    // logger.debug("before add student; remaining=" + res.locals.remaining);
-    // if (res.locals.remaining <= 0) {
-    //     result = "allotment exhausted";
-    // }
-    // else {
-        result = studentValid(studentData);
-    // }
+    var result = studentValid(studentData);
 
     if (result == "") {
-        Student.create(studentData, function (err, newStudent) {
-            if (err) {
-                logger.error("create failed: " + err.message);
-                res.status(500).send(err.message);
+        getRemaining(studentData.school, function (remain) {
+            logger.debug("remain=" + remain);
+            if (remain > 0) {
+                Student.create(studentData, function (err, newStudent) {
+                    if (err) {
+                        logger.error("create failed: " + err.message);
+                        res.status(500).send(err.message);
+                    }
+                    else {
+                        res.json(newStudent);
+                    }
+                });
             }
             else {
-                // res.locals.remaining--;
-                res.json(newStudent);
-                // logger.debug("after add student; remaining=" + res.locals.remaining);
+                res.status(500).send("Allotment used; student not added.");
             }
         });
     }
@@ -163,7 +195,6 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
 
 // Find student and render form
 router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
-    //logger.debug("rendering edit form; remaining=" + res.locals.remaining);
     Student.findById(req.params.id, function (err, foundStudent) {
         if (err) {
             logger.error(err);
