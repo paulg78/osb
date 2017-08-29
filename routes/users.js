@@ -169,7 +169,7 @@ router.post("/createUsers", function (req, res) {
 
                     }
                     else {
-                        logger.info("row=" + (row + 1) + ", created user=" + user.name);
+                        logger.info("row=" + (row + 1) + ", created user=" + user.name + ", username=" + user.username);
                     }
                     col += 2; // move to next counselor
                     logger.debug("calling userCallback with row=" + row);
