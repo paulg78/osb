@@ -12,7 +12,7 @@
                         <span class="hidden" type="text" name="slotId"><%= slot._id %></span>
                         <form class="form-inline" method="POST">
                         <span class="slot-time"><%= slot.time %></span>
-                        <% var remaining = slot.max - slot.students.length; %>
+                        <% var remaining = slot.max - slot.count; %>
                         <span class="availDelim"> (</span>
                         <span class="availSlots"><%=remaining%></span>
                         <span class="availDelim">)</span>
@@ -24,17 +24,15 @@
                         </form>
                           <form class="form-inline role_sc" method="POST">
                                     <button type=submit style="display: none;" class="remStudBtn">-</button>
-                            </form>                    
+                            </form>
                     <ul class="list-group schedList">
                         <% slot.students.forEach(function(student){ %>
-                            <% if (student.school == currentUser.school) { %>
-                                <li class="list-group-item schedStud">
-                                    <span name="studentText"><%= student.fullName + "(" + student.grade + ")" %></span>
-                                    <span name="studentId" class="hidden"><%= student._id %></span>
-                                </li>
-                            <% } %>
+                            <li class="list-group-item schedStud">
+                                <span name="studentText"><%= student.fullName + "(" + student.grade + ")" %></span>
+                                <span name="studentId" class="hidden"><%= student._id %></span>
+                            </li>
                         <% }) %>
-                    </ul>                        
+                    </ul>
                     </div>
                 <% }) %>
             </div>
@@ -43,14 +41,14 @@
                 <% var url = "/events/" + eventId + "/days"; %>
                 <% if (prevDayId) { %>
                 <%     url = url + "/" + prevDayId + "/school" %>
-                <%     } %>  
+                <%     } %>
                  <a class="btn btn-info" href= <%= url %> ><span class="glyphicon glyphicon-chevron-left"></span></a>
-                 <a class="btn btn-info" href="/events/<%= eventId %>/days">List days</a>  
+                 <a class="btn btn-info" href="/events/<%= eventId %>/days">List days</a>
                 <% url = "/events/" + eventId + "/days"; %>
                 <% if (nextDayId) { %>
                 <%     url = url + "/" + nextDayId + "/school" %>
-                <%     } %>  
-                <a class="btn btn-info" href= <%= url %> ><span class="glyphicon glyphicon-chevron-right"></span></a>            
+                <%     } %>
+                <a class="btn btn-info" href= <%= url %> ><span class="glyphicon glyphicon-chevron-right"></span></a>
                 </div>
             </div>
         </div>
@@ -64,9 +62,9 @@
                     </li>
                 <% }) %>
             </ul>
-        </div>  
+        </div>
     </div>
 </div>
- 
+
 <script src="/scripts/selectStudent.js"></script>
 <% include ../partials/footer %>

@@ -254,12 +254,14 @@ var getPrevNextIds = function (req, res, next) {
 router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds, function (req, res) {
     logger.debug("starting show schedule by school; res.locals.prevDayId=" + res.locals.prevDayId);
     Day.findById(req.params.dayId)
+        .populate('slot')
         .populate({
             path: 'slots',
             populate: {
                 path: 'students',
                 model: Student,
-                select: 'fname lname grade school'
+                match: { school: { $eq: res.locals.currentUser.school } },
+                select: 'fname lname grade'
             }
         })
         .exec(function (err, foundDay) {
@@ -267,8 +269,8 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
                 logger.error(err);
             }
             else {
-                // logger.debug("foundDay=" + foundDay);
-                // logger.debug("foundDay.slots[2]=" + foundDay.slots[2]);
+                logger.debug("foundDay=" + foundDay);
+                logger.debug("foundDay.slots[2]=" + foundDay.slots[2]);
                 // find the unscheduled students
                 Student.find({
                         school: res.locals.currentUser.school,
@@ -348,19 +350,78 @@ router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (
         Slot.findByIdAndUpdate(req.params.slotId, {
             $push: {
                 students: req.params.studentId
+            },
+            $inc: { count: 1 }
+        }, {
+            projection: { _id: 0, count: 1, max: 1 },
+            returnNewDocument: false // returns count before increment, true doesn't seem to work
+        }, function (err, slot) {
+            logger.debug("slot before update=" + slot);
+            if (err) {
+                callback(err);
             }
-        }, function (err) {
-            callback(err);
+            else {
+                if (slot.count >= slot.max) // count is one less than actual
+                {
+                    // remove student since slot is full
+                    logger.debug("removing student from slot");
+                    Slot.findByIdAndUpdate(req.params.slotId, {
+                            $pop: {
+                                students: req.params.studentId
+                            },
+                            $inc: { count: -1 }
+                        },
+                        function (err) {
+                            if (err) {
+                                callback(err);
+                            }
+                            else {
+                                callback("Slot is full");
+                            }
+                        });
+                }
+                else {
+                    callback(null);
+                }
+            }
         });
     }
 
     function updateStudent(callback) {
         Student.findByIdAndUpdate(req.params.studentId, {
-            day: req.params.dayId,
-            slot: req.params.slotId
-        }, function (err) {
-            callback(err);
-        });
+                day: req.params.dayId,
+                slot: req.params.slotId // todo add projection
+            }, {
+                projection: { fname: 0, lname: 0, grade: 0, school: 0, day: 0, slot: 0, served: 0 }
+            },
+            function (err, student) {
+                logger.debug("student scheduled=" + student);
+                if (err) {
+                    callback(err);
+                }
+                else {
+                    if (student == null) {
+                        logger.debug("removing non-existent student from slot");
+                        Slot.findByIdAndUpdate(req.params.slotId, {
+                                $pop: {
+                                    students: req.params.studentId
+                                },
+                                $inc: { count: -1 }
+                            },
+                            function (err) {
+                                if (err) {
+                                    callback(err);
+                                }
+                                else {
+                                    callback("scheduled student not found");
+                                }
+                            });
+                    }
+                    else {
+                        callback(null);
+                    }
+                }
+            });
     }
 });
 
@@ -406,6 +467,7 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
             // The second parameter defines how many elements will be removed.
             slot.students.splice(delIndex, 1);
             logger.debug("after=" + slot.students);
+            slot.count--;
             slot.save(function (err) {
                 callback(err);
             });

@@ -8,7 +8,7 @@
                 <% day.slots.forEach(function(slot){ %>
                     <div class="col-sm-3 solidborder">
                         <span class="slot-time"><%= slot.time %></span>
-                        <% var remaining = slot.max - slot.students.length; %>
+                        <% var remaining = slot.max - slot.count; %>
                         <span class="availDelim">(</span>
                         <span class="availSlots"><%=remaining%></span>
                         <span class="availDelim">)</span>

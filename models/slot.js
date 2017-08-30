@@ -2,12 +2,12 @@ var mongoose = require("mongoose");
 
 var slotSchema = mongoose.Schema({
    time: String,
-   max: Number,
-   students: [
-      {
-         type: mongoose.Schema.Types.ObjectId, 
-         ref: "Student"
-      }]
+   max: Number, // students allowed in slot
+   count: Number, // students in slot
+   students: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Student"
+   }]
 });
 
 module.exports = mongoose.model("Slot", slotSchema);
