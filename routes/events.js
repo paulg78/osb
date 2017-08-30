@@ -259,7 +259,7 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
             populate: {
                 path: 'students',
                 model: Student,
-                select: 'fname lname grade'
+                select: 'fname lname grade school'
             }
         })
         .exec(function (err, foundDay) {
@@ -268,8 +268,8 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
             }
             else {
                 // logger.debug("foundDay=" + foundDay);
-                // logger.debug("foundDay.slots[7]=" + foundDay.slots[7]);
-                // find the unassigned students
+                // logger.debug("foundDay.slots[2]=" + foundDay.slots[2]);
+                // find the unscheduled students
                 Student.find({
                         school: res.locals.currentUser.school,
                         slot: null
