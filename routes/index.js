@@ -96,7 +96,7 @@ router.post('/requestpwreset', function (req, res, next) {
           }
 
           user.resetPasswordToken = token;
-          user.resetPasswordExpires = Date.now() + 3600000; // 1 hour
+          user.resetPasswordExpires = Date.now() + 28800000; // 8 hours
 
           user.save(function (err) {
             done(err, token, user);
@@ -119,7 +119,7 @@ router.post('/requestpwreset', function (req, res, next) {
         }
         text += "\n\n" + link + "\n\n" +
           "No need to reply to this email.\n\n" +
-          "This email will self-destruct in one hour ... actually, the link will just stop working.";
+          "This link will expire in 8 hours.";
         // handle special case when username is more than an email address
         var emailAddr = user.username;
         var i = emailAddr.indexOf(":");

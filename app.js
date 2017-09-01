@@ -8,22 +8,22 @@ var express = require("express"),
   methodOverride = require("method-override");
 
 const winston = require('winston');
-const fs = require('fs');
+// const fs = require('fs');
 
-const logDir = 'log';
-// Create the log directory if it does not exist
-if (!fs.existsSync(logDir)) {
-  fs.mkdirSync(logDir);
-}
+// const logDir = 'log';
+// // Create the log directory if it does not exist
+// if (!fs.existsSync(logDir)) {
+//   fs.mkdirSync(logDir);
+// }
 
-const tsFormat = () => (new Date()).toLocaleDateString('en-US', {
-  year: '2-digit',
-  month: 'numeric',
-  day: 'numeric'
-}) + '-' + (new Date()).toLocaleTimeString('en-US', {
-  timeZone: "America/Denver",
-  hour12: false
-});
+// const tsFormat = () => (new Date()).toLocaleDateString('en-US', {
+//   year: '2-digit',
+//   month: 'numeric',
+//   day: 'numeric'
+// }) + '-' + (new Date()).toLocaleTimeString('en-US', {
+//   timeZone: "America/Denver",
+//   hour12: false
+// });
 global.logger = new(winston.Logger)({
   transports: [
     new(winston.transports.Console)({

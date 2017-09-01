@@ -289,6 +289,7 @@ router.delete("/:studentId", middleware.isLoggedIn, function (req, res) {
                     logger.debug("slot.students before: " + slot.students);
                     slot.students.splice(delIndex, 1);
                     logger.debug("slot.students after: " + slot.students);
+                    slot.count--;
                     slot.save(function (err) {
                         if (err) {
                             logger.error("DelStud: Error saving updated slot: " + err.message);

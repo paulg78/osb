@@ -98,7 +98,8 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
                 var slot = {
                     time: scheduleArray[row][col],
                     max: scheduleArray[row + 1][col],
-                    students: []
+                    students: [],
+                    count: 0
                 };
                 // since scheduleArray is 2D, some columns will be blank if slots per day varies
                 if (slot.time == "") {
@@ -490,7 +491,7 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
     if (res.locals.currentUser.role != 'role_wa') {
         return res.redirect("back");
     }
-    logger.info("Starting fixslots.")
+    logger.info("Starting fixslots.");
     var nbrMissing = 0;
     Slot.find(function (err, slots) {
         if (err) {
@@ -540,6 +541,7 @@ router.get("/fixSlots", middleware.isLoggedIn, function (req, res) {
                                                 logger.debug("deleting student at array index=" + delIndex);
                                                 slot.students.splice(delIndex, 1);
                                                 logger.debug("students after=" + slot.students);
+                                                slot.count--;
                                                 slot.save(function (err) {
                                                     if (!err) {
                                                         logger.info("unscheduled student deleted from slot")
