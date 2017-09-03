@@ -15,6 +15,14 @@
                     <label for="grade">Grade (K or 1-12)*:</label>
                     <input class="form-control" id="grade" type="text" name="grade" value="<%= student.grade %>">
                 </div>
+                <% if(student.day){ %>
+                    <div class="form-group">
+                        <p style="font-size: 1.25em;">Scheduled for <%= student.day.date %>, <%= student.slot.time %></p>
+                        <div class="checkbox">
+                              <label><input type="checkbox" name="unschedule" value="y"><span style="font-size: 1.25em;">Check box to unschedule Student</span></label>
+                        </div>
+                    </div>
+                <% } %>
                 <div class="form-group">
                     <button class="btn btn-lg btn-primary btn-block">Save</button>
                 </div>

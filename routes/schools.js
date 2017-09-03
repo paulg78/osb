@@ -10,12 +10,12 @@ var async = require('async');
 
 // All school routes start here; blocks school actions by role_sc
 router.use(middleware.isLoggedIn, function (req, res, next) {
-    logger.debug("went to all user routes");
+    // logger.debug("went to all user routes");
     if (res.locals.currentUser.role == 'role_sc') {
         res.redirect("back");
     }
     else {
-        logger.debug("going to next user route");
+        // logger.debug("going to next user route");
         next('route');
     }
 });
@@ -47,7 +47,7 @@ router.get("/", function (req, res) {
     }
 
     function getStudentCountBySchool(schools, callback) {
-        logger.debug("Getting student count by school");
+        // logger.debug("Getting student count by school");
         Student.aggregate([{
                 $group: {
                     _id: '$school',
@@ -66,11 +66,11 @@ router.get("/", function (req, res) {
                 schools.forEach(function (school) {
                     while (i < len && schoolCounts[i]._id < school.name) {
                         i++;
-                        logger.debug("i=" + i);
+                        // logger.debug("i=" + i);
                     }
                     if (i < len && school.name == schoolCounts[i]._id) {
                         school.count = schoolCounts[i].count;
-                        logger.debug("school.name=" + school.name + ", student count=" + school.count);
+                        // logger.debug("school.name=" + school.name + ", student count=" + school.count);
                     }
                     else {
                         school.count = 0;
@@ -81,7 +81,7 @@ router.get("/", function (req, res) {
     }
 
     function getSchedStudentCountBySchool(schools, callback) {
-        logger.debug("Getting scheduled student count by school");
+        // logger.debug("Getting scheduled student count by school");
         Student.aggregate([{
                 $match: {
                     slot: {
@@ -106,11 +106,11 @@ router.get("/", function (req, res) {
                 schools.forEach(function (school) {
                     while (i < len && schoolCounts[i]._id < school.name) {
                         i++;
-                        logger.debug("i=" + i);
+                        // logger.debug("i=" + i);
                     }
                     if (i < len && school.name == schoolCounts[i]._id) {
                         school.schedCount = schoolCounts[i].count;
-                        logger.debug("school.name=" + school.name + ", student schedCount=" + school.schedCount);
+                        // logger.debug("school.name=" + school.name + ", student schedCount=" + school.schedCount);
                     }
                     else {
                         school.schedCount = 0;
@@ -121,7 +121,7 @@ router.get("/", function (req, res) {
     }
 
     function getServedCountBySchool(schools, callback) {
-        logger.debug("Getting served student count by school");
+        // logger.debug("Getting served student count by school");
         Student.aggregate([{
                 $match: {
                     served: {
@@ -146,11 +146,11 @@ router.get("/", function (req, res) {
                 schools.forEach(function (school) {
                     while (i < len && schoolCounts[i]._id < school.name) {
                         i++;
-                        logger.debug("i=" + i);
+                        // logger.debug("i=" + i);
                     }
                     if (i < len && school.name == schoolCounts[i]._id) {
                         school.servedCount = schoolCounts[i].count;
-                        logger.debug("school.name=" + school.name + ", student servedCount=" + school.servedCount);
+                        // logger.debug("school.name=" + school.name + ", student servedCount=" + school.servedCount);
                     }
                     else {
                         school.servedCount = 0;
@@ -181,7 +181,7 @@ router.post("/", function (req, res) {
         }
         else {
             //redirect back to schools page
-            logger.debug(newlyCreated);
+            // logger.debug(newlyCreated);
             res.redirect("/schools");
         }
     });
@@ -244,7 +244,7 @@ router.post("/createSchools", function (req, res) {
             return row < numSchools;
         },
         function (schoolCallback) {
-            logger.debug("iteratee called, row=" + row);
+            // logger.debug("iteratee called, row=" + row);
             var school = {
                 name: shared.myTrim(schools[row][0]),
                 district: shared.myTrim(schools[row][1]),

@@ -9,12 +9,12 @@ var async = require('async');
 
 // All user routes start here; blocks user actions by role_sc
 router.use(middleware.isLoggedIn, function (req, res, next) {
-    logger.debug("went to all user routes");
+    // logger.debug("went to all user routes");
     if (res.locals.currentUser.role == 'role_sc') {
         res.redirect("back");
     }
     else {
-        logger.debug("going to next user route");
+        // logger.debug("going to next user route");
         next('route');
     }
 });
@@ -113,7 +113,7 @@ router.put("/:id", function (req, res) {
 
 // Delete user
 router.delete("/:userId", middleware.isLoggedIn, function (req, res) {
-    logger.debug("user to delete=" + req.params.userId);
+    // logger.debug("user to delete=" + req.params.userId);
     User.findOneAndRemove({
         _id: req.params.userId
     }, function (err, user) {
@@ -147,8 +147,8 @@ router.post("/createUsers", function (req, res) {
             return row < numUsers;
         },
         function (userCallback) {
-            logger.debug("async user iteratee called");
-            logger.debug("row=" + row + ", col=" + col);
+            // logger.debug("async user iteratee called");
+            // logger.debug("row=" + row + ", col=" + col);
             var user = {
                 name: shared.myTrim(users[row][col]),
                 username: shared.myTrim(users[row][col + 1]),
@@ -164,7 +164,7 @@ router.post("/createUsers", function (req, res) {
                             logger.error("row=" + (row + 1) + ", Error, user=" + user.name + ", " + err.message);
                         }
                         else { // duplicate key error
-                            logger.debug("row=" + (row + 1) + ", " + user.username + " already in DB");
+                            // logger.debug("row=" + (row + 1) + ", " + user.username + " already in DB");
                         }
 
                     }
@@ -172,7 +172,7 @@ router.post("/createUsers", function (req, res) {
                         logger.info("row=" + (row + 1) + ", created user=" + user.name + ", username=" + user.username);
                     }
                     col += 2; // move to next counselor
-                    logger.debug("calling userCallback with row=" + row);
+                    // logger.debug("calling userCallback with row=" + row);
                     userCallback(null); // don't stop for errors
                 });
             }

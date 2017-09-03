@@ -15,7 +15,7 @@ router.get("/", function (req, res) {
 
 //show login form
 router.get("/login", function (req, res) {
-  logger.debug("back to login");
+  // logger.debug("back to login");
   res.render("login");
 });
 
@@ -57,7 +57,7 @@ router.get('/requestpwreset', function (req, res) {
 });
 
 function sendEmail(emailAddress, subject, text, callBack) {
-  logger.debug("emailing " + emailAddress + ", subject: " + subject + ", text: " + text);
+  // logger.debug("emailing " + emailAddress + ", subject: " + subject + ", text: " + text);
   var mailgun = new Mailgun({
     apiKey: process.env.APIKEY,
     domain: 'mg.schoolbell.us'
@@ -163,7 +163,7 @@ router.get('/resetpw/:token', function (req, res) {
       req.flash('error', 'Password reset token is invalid or has expired.');
       return res.redirect('/requestpwreset');
     }
-    logger.debug("userfound username=" + user.username + ", token=" + user.resetPasswordToken);
+    // logger.debug("userfound username=" + user.username + ", token=" + user.resetPasswordToken);
     res.render('resetpw', {
       user: user
     });
