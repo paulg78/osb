@@ -255,7 +255,6 @@ var getPrevNextIds = function (req, res, next) {
 router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds, function (req, res) {
     // logger.debug("starting show schedule by school; res.locals.prevDayId=" + res.locals.prevDayId);
     Day.findById(req.params.dayId)
-        .populate('slot')
         .populate({
             path: 'slots',
             populate: {
@@ -341,18 +340,18 @@ function mmdd(date) {
 
 // Set slot dates
 router.get("/:eventId/setslotdates", middleware.isLoggedIn, function (req, res) {
-
-    Event.findById(req.params.eventId, { _id: 1, days: 1 })
-        .populate('days', { _id: 1, date: 1, slots: 1 })
+    Event.findById(req.params.eventId)
         .populate({
-            path: 'slots'
+            path: 'days',
+            populate: {
+                path: 'slots'
+            }
         })
         .exec(function (err, event) {
             if (err) {
                 logger.error(err);
             }
             else {
-                // logger.debug("Finding next avail for event=" + event);
                 var dayNbr = 0;
                 // loop thru days
                 async.whilst(
@@ -360,45 +359,69 @@ router.get("/:eventId/setslotdates", middleware.isLoggedIn, function (req, res) 
                         return dayNbr < event.days.length;
                     },
                     function (callback) {
-                        // logger.debug("day iteratee executed for day id=" + event.days[dayNbr]._id);
-                        // logger.debug("eventDate mmdd=" + mmdd(event.days[dayNbr].date));
+                        logger.debug("day iteratee executed for day " + event.days[dayNbr].date);
+                        var n = event.days[dayNbr].date.indexOf("/");
+                        var month = Number(event.days[dayNbr].date.substring(n - 2, n)) - 1;
+                        var day = event.days[dayNbr].date.substring(n + 1, n + 3);
+                        if (day[1] == "/") {
+                            day = day[0];
+                        }
+                        logger.debug("month=" + month);
+                        logger.debug("day=" + day);
                         // loop thru slots and set sdate
                         var slotNbr = 0;
                         async.whilst(
                             function () {
-                                return slotNbr < event.days.slots.length;
+                                return slotNbr < event.days[dayNbr].slots.length;
                             },
                             function (slotcallback) {
-                                Slot.findByIdAndUpdate(event.days.slots[slotNbr]._id, {
+                                logger.debug("slot iteratee executed for " + event.days[dayNbr].slots[slotNbr].time);
+
+                                n = event.days[dayNbr].slots[slotNbr].time.indexOf(":");
+                                var amPm = event.days[dayNbr].slots[slotNbr].time[n + 4, n + 4];
+                                // logger.debug("am/pm=" + amPm);
+                                var hour = Number(event.days[dayNbr].slots[slotNbr].time.substring(0, n));
+                                if (amPm == "P") {
+                                    hour = hour + 12;
+                                }
+                                var min = Number(event.days[dayNbr].slots[slotNbr].time.substring(n + 1, n + 3));
+
+                                logger.debug("hour=" + hour);
+                                logger.debug("min=" + min);
+                                var d = new Date(2017, month, day, hour, min);
+                                logger.debug("d=" + d);
+                                Slot.findByIdAndUpdate(event.days[dayNbr].slots[slotNbr]._id, {
                                     $set: {
-                                        sdate: event.days.date /// ???
+                                        sdate: d
                                     },
                                 }, function (err) {
-                                    // logger.debug("slot before update=" + slot);
-                                    if (err) {
-                                        callback(err);
-                                    }
-                                    else {
-                                        slotcallback(null);
-                                    }
+                                    slotNbr++;
+                                    slotcallback(err);
                                 });
                             },
                             function (err) {
                                 if (err) {
-                                    logger.error("error in day loop " + err.msg);
-                                    res.redirect("/events/" + req.params.eventId);
+                                    logger.error("error in slot loop");
+                                    res.redirect("/events/" + req.params.eventId + "/days");
                                 }
-                                else {}
+                                else {
+                                    dayNbr++;
+                                    callback(err);
+                                }
                             }
-                        )
+                        );
                     },
                     function (err) {
                         if (err) {
-                            logger.error("find next avail, error in day loop " + err.msg);
-                            req.flash("error", "system error:" + err.msg);
-                            res.redirect("/events/" + req.params.eventId);
+                            logger.error("setslotdates, error in day loop;" + err);
+                            req.flash("error", "system error: " + err);
+                            res.redirect("/events/" + req.params.eventId + "/days");
                         }
-                        else {}
+                        else {
+                            logger.debug("ending setslotdates");
+                            req.flash("success", "Updated slots");
+                            res.redirect("/events/" + req.params.eventId + "/days");
+                        }
                     }
                 );
             }

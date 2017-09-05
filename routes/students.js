@@ -17,7 +17,7 @@ router.get("/", middleware.isLoggedIn,
         }
         else { // list all students
             // logger.debug("after next");
-            Student.find({}, { _id: 0 })
+            Student.find()
                 .populate('day', { date: 1, _id: 0 })
                 .populate('slot', { time: 1, _id: 0 })
                 .sort({
