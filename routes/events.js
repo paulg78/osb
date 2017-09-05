@@ -255,7 +255,6 @@ var getPrevNextIds = function (req, res, next) {
 router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds, function (req, res) {
     // logger.debug("starting show schedule by school; res.locals.prevDayId=" + res.locals.prevDayId);
     Day.findById(req.params.dayId)
-        .populate('slot')
         .populate({
             path: 'slots',
             populate: {
