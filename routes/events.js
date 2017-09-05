@@ -339,6 +339,74 @@ function mmdd(date) {
 }
 
 
+// Set slot dates
+router.get("/:eventId/setslotdates", middleware.isLoggedIn, function (req, res) {
+
+    Event.findById(req.params.eventId, { _id: 1, days: 1 })
+        .populate('days', { _id: 1, date: 1, slots: 1 })
+        .populate({
+            path: 'slots'
+        })
+        .exec(function (err, event) {
+            if (err) {
+                logger.error(err);
+            }
+            else {
+                // logger.debug("Finding next avail for event=" + event);
+                var dayNbr = 0;
+                // loop thru days
+                async.whilst(
+                    function () {
+                        return dayNbr < event.days.length;
+                    },
+                    function (callback) {
+                        // logger.debug("day iteratee executed for day id=" + event.days[dayNbr]._id);
+                        // logger.debug("eventDate mmdd=" + mmdd(event.days[dayNbr].date));
+                        // loop thru slots and set sdate
+                        var slotNbr = 0;
+                        async.whilst(
+                            function () {
+                                return slotNbr < event.days.slots.length;
+                            },
+                            function (slotcallback) {
+                                Slot.findByIdAndUpdate(event.days.slots[slotNbr]._id, {
+                                    $set: {
+                                        sdate: event.days.date /// ???
+                                    },
+                                }, function (err) {
+                                    // logger.debug("slot before update=" + slot);
+                                    if (err) {
+                                        callback(err);
+                                    }
+                                    else {
+                                        slotcallback(null);
+                                    }
+                                });
+                            },
+                            function (err) {
+                                if (err) {
+                                    logger.error("error in day loop " + err.msg);
+                                    res.redirect("/events/" + req.params.eventId);
+                                }
+                                else {}
+                            }
+                        )
+                    },
+                    function (err) {
+                        if (err) {
+                            logger.error("find next avail, error in day loop " + err.msg);
+                            req.flash("error", "system error:" + err.msg);
+                            res.redirect("/events/" + req.params.eventId);
+                        }
+                        else {}
+                    }
+                );
+            }
+        });
+});
+
+
+
 // Show SCHEDULE for next available day of an event (one with open slots)
 router.get("/:eventId/nextAvail", middleware.isLoggedIn, function (req, res) {
     var today = new Date(); // returns UTC time, 6 hours ahead of MT, which is OK
