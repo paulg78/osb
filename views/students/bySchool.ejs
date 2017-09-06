@@ -8,16 +8,33 @@ function missed(date) {
     if (date == null) {
         return false;
     }
-    var n = date.indexOf("/");
-    var mm = date.substring(n - 2, n);
-    if (mm < 10) {
-        mm = '0' + mm[1];
+    var mm=(date.getMonth() + 1).toString();
+    if (mm.length == 1) {
+        mm="0" + mm;
     }
-    var dd = date.substring(n + 1, n + 3);
-    if (dd[1] == "/") {
-        dd = '0' + dd[0];
+    var dd=date.getDate().toString();
+    if (dd.length == 1) {
+        dd="0" + dd;
     }
     return todayMMDD > (mm + dd);
+}
+
+function dateString(d) {
+    var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    var h=d.getHours();
+    var ap;
+    if (h>12) {
+        h=h-12;
+        ap="PM";
+    }
+    else {
+        ap="AM";
+    }
+    var m = d.getMinutes();
+    if (m==0) {
+        m="00";
+    }
+    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
 }
 %>
 
@@ -47,8 +64,7 @@ function missed(date) {
              <th>First Name</th>
              <th>Last Name</th>
              <th>Grade</th>
-             <th>Day Scheduled</th>
-             <th>Time</th>
+             <th class="sorter-shortDate dateFormat-ddmmyyyy">Scheduled</th>
              <th>Served</th>
              </tr>
         </thead>
@@ -58,18 +74,15 @@ function missed(date) {
             <td><%= student.fname %></td>
             <td><%= student.lname %></td>
             <td><%= student.grade %></td>
-            <td><% if (student.day != null) { %>
-                <%= student.day.date %>
+            <% if (student.slot != null) { %>
+                <td><%= dateString(student.slot.sdate) %></td>
+            <% } else { %>
+                <td></td>
                 <% } %>
-            </td>
-            <td><% if (student.slot != null) { %>
-                <%= student.slot.time %>
-                <% } %>
-            </td>
             <td>
                 <% if (student.served) { %>
                     <p class="bg-success">Yes</p>
-                <% } else if (student.day != null && missed(student.day.date)) { %>
+                <% } else if (student.slot != null && missed(student.slot.sdate)) { %>
                         <p class="bg-danger">NO</p>
                 <% } else { %>
                         <p>no</p>

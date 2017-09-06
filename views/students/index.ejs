@@ -1,8 +1,28 @@
 <% include ../partials/header %>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/css/theme.bootstrap_3.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.widgets.min.js"></script>
 
+<%
+function dateString(d) {
+    var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    var h=d.getHours();
+    var ap;
+    if (h>12) {
+        h=h-12;
+        ap="PM";
+    }
+    else {
+        ap="AM";
+    }
+    var m = d.getMinutes();
+    if (m==0) {
+        m="00";
+    }
+    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
+}
+%>
      <header>
         <h1>Students</h1>
      </header>
@@ -14,8 +34,7 @@
              <th>Last Name</th>
              <th>School</th>
              <th>Grade</th>
-             <th>Day</th>
-             <th>Time</th>
+             <th class="sorter-shortDate dateFormat-ddmmyyyy">Scheduled</th>
              <th>Served</th>
              </tr>
         </thead>
@@ -26,12 +45,12 @@
             <td><%= student.lname %></td>
             <td><%= student.school %></td>
             <td><%= student.grade %></td>
-            <td><% if (student.day != null) { %>
-                <%= student.day.date %>
-                <% } %></td>
-            <td><% if (student.slot != null) { %>
-                <%= student.slot.time %>
-                <% } %></td>
+            <% if (student.slot != null) { %>
+                <td><%= dateString(student.slot.sdate) %></td>
+            <% } else { %>
+                <td></td>
+                <% } %>
+            <td>
             <td>
                 <% if (student.served) { %>
                 <button type="button" class="btn btn-xs btn-primary checkIn"><span class="glyphicon glyphicon-ok"></span></button>

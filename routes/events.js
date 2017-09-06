@@ -77,6 +77,7 @@ router.get("/:eventId/uploadSchedule", middleware.isLoggedIn, function (req, res
     });
 });
 
+// !!! This needs to be modified and tested; needs to populate the sdate field in slot
 // update database with days and slots (schedule of fittings)
 router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
@@ -429,96 +430,48 @@ router.get("/:eventId/setslotdates", middleware.isLoggedIn, function (req, res) 
 });
 
 
-
 // Show SCHEDULE for next available day of an event (one with open slots)
 router.get("/:eventId/nextAvail", middleware.isLoggedIn, function (req, res) {
-    var today = new Date(); // returns UTC time, 6 hours ahead of MT, which is OK
-    // logger.debug("today=" + today);
-    var day = today.getDate();
-    var month = today.getMonth() + 1;
-    if (day < 10) {
-        day = '0' + day;
-    }
-    if (month < 10) {
-        month = '0' + month;
-    }
-    var todaymmdd = month + day;
-    // logger.debug("todaymmdd=" + todaymmdd);
-    Event.findById(req.params.eventId, { _id: 1, days: 1 })
-        .populate('days', { _id: 1, date: 1 })
-        .exec(function (err, event) {
+
+    Slot.find({ $where: "this.sdate > new Date() && this.count < this.max" }, { sdate: 1 }).limit(1).hint("sdate_1")
+        .exec(function (err, slots) {
             if (err) {
                 logger.error(err);
+                res.redirect("/events/" + req.params.eventId + "/days");
             }
             else {
-                // logger.debug("Finding next avail for event=" + event);
-                var dayNbr = 0;
-                var found = false;
-                // loop thru days
-                async.whilst(
-                    function () {
-                        return dayNbr < event.days.length && !found;
-                    },
-                    function (callback) {
-                        // logger.debug("day iteratee executed for day id=" + event.days[dayNbr]._id);
-                        // logger.debug("eventDate mmdd=" + mmdd(event.days[dayNbr].date));
-                        if (todaymmdd > mmdd(event.days[dayNbr].date)) {
-                            dayNbr++;
-                            callback(null);
-                        }
-                        else {
-                            Day.findById(event.days[dayNbr]._id, { _id: 1, slots: 1 })
-                                .populate('slots', { _id: 0, count: 1, max: 1 })
-                                .exec(function (err, day) {
-                                    if (err) {
-                                        callback(err);
-                                    }
-                                    else {
-                                        // logger.debug("day=" + day);
-                                        // loop thru slots
-                                        var i = 0;
-                                        while (i < day.slots.length) {
-                                            // logger.debug("slot=" + day.slots[i]);
-                                            if (day.slots[i].count < day.slots[i].max) {
-                                                found = true;
-                                                break;
-                                            }
-                                            i++;
-                                        }
-                                        dayNbr++;
-                                        callback(null);
-                                    }
-                                });
-                        }
-                    },
-                    function (err) {
-                        if (err) {
-                            logger.error("find next avail, error in day loop " + err.msg);
-                            req.flash("error", "system error:" + err.msg);
-                            res.redirect("/events/" + req.params.eventId);
-                        }
-                        else {
-                            if (found) {
-                                dayNbr--;
+                if (slots == null || slots[0] == null) {
+                    logger.error("No available slot found");
+                    res.redirect("/events/" + req.params.eventId + "/days");
+                }
+                else {
+                    // logger.debug("slots[0]=" + slots[0]);
+                    var s = (slots[0].sdate.getMonth() + 1) + "/" + slots[0].sdate.getDate();
+                    // logger.debug("s=" + s);
+                    Day.findOne({ date: { $regex: ".*" + s + ".*" } }, { _id: 1 })
+                        .exec(function (err, day) {
+                            if (err) {
+                                logger.error(err);
+                                res.redirect("/events/" + req.params.eventId + "/days");
+                            }
+                            if (day == null) {
+                                logger.error("nextavail; day not found");
+                                res.redirect("/events/" + req.params.eventId + "/days");
                             }
                             else {
-                                dayNbr = 0;
-                                logger.error("next avail day not found");
+                                // logger.debug("day=" + day);
+                                if (res.locals.currentUser.role == 'role_sc') {
+                                    res.redirect("/events/" + req.params.eventId + "/days/" + day._id + "/school");
+                                }
+                                else {
+                                    res.redirect("/events/" + req.params.eventId + "/days/" + day._id);
+                                }
                             }
-                            // logger.debug("next avail day id=" + event.days[dayNbr]._id);
-                            if (res.locals.currentUser.role == 'role_sc') {
-                                res.redirect("/events/" + req.params.eventId + "/days/" + event.days[dayNbr]._id + "/school");
-                            }
-                            else {
-                                res.redirect("/events/" + req.params.eventId + "/days/" + event.days[dayNbr]._id);
-                            }
-                        }
-                    }
-                );
+                        });
+                }
             }
         });
 });
-
 
 
 // Add student to slot

@@ -18,8 +18,9 @@ router.get("/", middleware.isLoggedIn,
         else { // list all students
             // logger.debug("after next");
             Student.find()
-                .populate('day', { date: 1, _id: 0 })
-                .populate('slot', { time: 1, _id: 0 })
+                // .populate('day', { date: 1, _id: 0 })
+                // .populate('slot', { sdate: 1, time: 1, _id: 0 })
+                .populate('slot', { sdate: 1, _id: 0 })
                 .sort({
                     fname: 1,
                     lname: 1
@@ -58,8 +59,9 @@ router.get("/", middleware.isLoggedIn,
                 Student.find({
                         school: res.locals.currentUser.school
                     }, { school: 0 })
-                    .populate('day', { date: 1, _id: 0 })
-                    .populate('slot', { time: 1, _id: 0 })
+                    // .populate('day', { date: 1, _id: 0 })
+                    // .populate('slot', { sdate: 1, time: 1, _id: 0 })
+                    .populate('slot', { sdate: 1, _id: 0 })
                     .sort({
                         fname: 1,
                         lname: 1
@@ -73,16 +75,16 @@ router.get("/", middleware.isLoggedIn,
                         // logger.debug("qrySchool=" + qrySchool);
                         // logger.debug("queryResponse=" + queryResponse);
                         var today = new Date();
-                        var day = today.getDate();
-                        var month = today.getMonth() + 1;
-                        if (day < 10) {
-                            day = '0' + day;
+                        var mm = (today.getMonth() + 1).toString();
+                        if (mm.length == 1) {
+                            mm = "0" + mm;
                         }
-                        if (month < 10) {
-                            month = '0' + month;
+                        var dd = today.getDate().toString();
+                        if (dd.length == 1) {
+                            dd = "0" + dd;
                         }
                         res.render("students/bySchool", {
-                            todayMMDD: month + day,
+                            todayMMDD: mm + dd,
                             students: queryResponse,
                             qrySchool: qrySchool
                         });
@@ -196,8 +198,8 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
 // Find student and render form
 router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
     Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, day: 1, slot: 1 })
-        .populate('day', { _id: 0, date: 1 })
-        .populate('slot', { _id: 1, time: 1 })
+        // .populate('day', { _id: 0, date: 1 })
+        .populate('slot', { _id: 1, sdate: 1 })
         .exec(function (err, foundStudent) {
             if (err) {
                 logger.error(err);
