@@ -403,7 +403,7 @@ router.get("/:eventId/nextAvail", middleware.isLoggedIn, function (req, res) {
                         if (err) {
                             logger.error("find next avail, error in day loop " + err.msg);
                             req.flash("error", "system error:" + err.msg);
-                            res.redirect("/events/" + req.params.eventId);
+                            res.redirect("/events/" + req.params.eventId + "/days");
                         }
                         else {
                             if (found) {
