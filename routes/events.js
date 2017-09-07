@@ -255,42 +255,83 @@ var getPrevNextIds = function (req, res, next) {
 // SCHEDULE By School - shows schedule for one day of an event
 router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds, function (req, res) {
     // logger.debug("starting show schedule by school; res.locals.prevDayId=" + res.locals.prevDayId);
+    // Day.findById(req.params.dayId)
+    //     .populate({
+    //         path: 'slots',
+    //         populate: {
+    //             path: 'students',
+    //             model: Student,
+    //             match: { school: { $eq: res.locals.currentUser.school } },
+    //             select: 'fname lname grade'
+    //         }
+    //     })
     Day.findById(req.params.dayId)
-        .populate({
-            path: 'slots',
-            populate: {
-                path: 'students',
-                model: Student,
-                match: { school: { $eq: res.locals.currentUser.school } },
-                select: 'fname lname grade'
-            }
-        })
+        .populate('slots', { sdate: 1, max: 1, count: 1 })
         .exec(function (err, foundDay) {
             if (err) {
                 logger.error(err);
             }
             else {
-                // logger.debug("foundDay=" + foundDay);
+                logger.debug("foundDay=" + JSON.stringify(foundDay));
                 // logger.debug("foundDay.slots[2]=" + foundDay.slots[2]);
                 // find the unscheduled students
+                // Student.find({
+                //         school: res.locals.currentUser.school,
+                //         slot: null
+                //     }, 'fname lname grade',
+                // find the students in the school who are scheduled for this day or are unscheduled
                 Student.find({
                         school: res.locals.currentUser.school,
-                        slot: null
-                    }, 'fname lname grade',
-                    function (err, queryResponse) {
-                        if (err) {
-                            logger.error(err);
-                        }
-                        else {
-                            // logger.debug("(unscheduled students) queryResponse=" + queryResponse);
-                            // logger.debug("before render, res.locals.prevDayId=" + res.locals.prevDayId);
-                            res.render("events/daySchoolSchedule", {
-                                eventId: req.params.eventId,
-                                day: foundDay,
-                                students: queryResponse
-                            });
-                        }
-                    });
+                        $or: [{ day: req.params.dayId }, { day: null }]
+                        // day: req.params.dayId
+                    }, 'fname lname grade slot')
+                    .sort({
+                        fname: 1,
+                        lname: 1
+                    })
+                    .exec(
+                        function (err, queryResponse) {
+                            if (err) {
+                                logger.error(err);
+                            }
+                            else {
+                                var unsched = [];
+                                var sched = [];
+                                logger.debug("(students) queryResponse=" + queryResponse);
+                                // logger.debug("before render, res.locals.prevDayId=" + res.locals.prevDayId);
+                                // split students into scheduled vs. unscheduled
+                                for (var j = 0, jLim = foundDay.slots.length; j < jLim; j++) {
+                                    sched[j] = { students: [] };
+                                }
+                                for (var i = 0, iLim = queryResponse.length; i < iLim; i++) {
+                                    logger.debug("stud=" + queryResponse[i].fullName);
+                                    // find slot
+                                    var foundj = null;
+                                    for (var j = 0, jLim = foundDay.slots.length; j < jLim; j++) {
+                                        if (queryResponse[i].slot != null && queryResponse[i].slot.toString() == foundDay.slots[j]._id) {
+                                            foundj = j;
+                                            break;
+                                        }
+                                    }
+                                    if (foundj) {
+                                        logger.debug("  foundj=" + foundj);
+                                        sched[foundj].students.push(queryResponse[i]);
+                                    }
+                                    else {
+                                        unsched.push(queryResponse[i]);
+                                    }
+                                }
+                                // logger.debug("foundDay with students=" + JSON.stringify(foundDay));
+                                logger.debug("sched=" + JSON.stringify(sched));
+                                logger.debug("unsched=" + unsched);
+                                res.render("events/daySchoolSchedule", {
+                                    eventId: req.params.eventId,
+                                    day: foundDay,
+                                    sched: sched,
+                                    unsched: unsched
+                                });
+                            }
+                        });
             }
         });
 });
@@ -301,15 +342,17 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, getPrevNextIds, funct
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
+    // Day.findById(req.params.dayId)
+    //     .populate({
+    //         path: 'slots',
+    //         populate: {
+    //             path: 'students',
+    //             model: Student,
+    //             select: 'fname lname grade'
+    //         }
+    //     })
     Day.findById(req.params.dayId)
-        .populate({
-            path: 'slots',
-            populate: {
-                path: 'students',
-                model: Student,
-                select: 'fname lname grade'
-            }
-        })
+        .populate('slots', { sdate: 1, max: 1, count: 1 })
         .exec(function (err, foundDay) {
             if (err) {
                 logger.error(err);
@@ -317,13 +360,70 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, getPrevNextIds, funct
                 return res.redirect("back");
             }
             else {
-                res.render("events/daySchedule", {
-                    eventId: req.params.eventId,
-                    day: foundDay
-                });
+                logger.debug("foundDay=" + JSON.stringify(foundDay));
+                // logger.debug("foundDay.slots[2]=" + foundDay.slots[2]);
+                // find the unscheduled students
+                // Student.find({
+                //         school: res.locals.currentUser.school,
+                //         slot: null
+                //     }, 'fname lname grade',
+                // find the students scheduled for this day
+                Student.find({ day: req.params.dayId }, 'fname lname grade slot')
+                    .sort({
+                        fname: 1,
+                        lname: 1
+                    })
+                    .exec(
+                        function (err, queryResponse) {
+                            if (err) {
+                                logger.error(err);
+                            }
+                            else {
+                                var sched = [];
+                                logger.debug("(students) queryResponse=" + queryResponse);
+                                // logger.debug("before render, res.locals.prevDayId=" + res.locals.prevDayId);
+                                // populate scheduled students into slots
+                                for (var j = 0, jLim = foundDay.slots.length; j < jLim; j++) {
+                                    sched[j] = { students: [] };
+                                }
+                                for (var i = 0, iLim = queryResponse.length; i < iLim; i++) {
+                                    logger.debug("stud=" + queryResponse[i].fullName);
+                                    // find slot
+                                    var foundj = null;
+                                    for (var j = 0, jLim = foundDay.slots.length; j < jLim; j++) {
+                                        if (queryResponse[i].slot != null && queryResponse[i].slot.toString() == foundDay.slots[j]._id) {
+                                            foundj = j;
+                                            break;
+                                        }
+                                    }
+                                    if (foundj) {
+                                        logger.debug("  foundj=" + foundj);
+                                        sched[foundj].students.push(queryResponse[i]);
+                                    }
+                                }
+                                // logger.debug("foundDay with students=" + JSON.stringify(foundDay));
+                                logger.debug("sched=" + JSON.stringify(sched));
+                                // res.redirect("/events/" + req.params.eventId + "/days");
+                                res.render("events/daySchedule", {
+                                    eventId: req.params.eventId,
+                                    day: foundDay,
+                                    sched: sched
+                                });
+                            }
+                        });
             }
+
+
+
+
+            // {
+            //     // find students by day -- day: req.params.dayId
+
+
+            // }
         });
 });
+
 
 function mmdd(date) {
     var n = date.indexOf("/");
