@@ -341,6 +341,9 @@ function mmdd(date) {
 
 // Set slot dates
 router.get("/:eventId/setslotdates", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("back");
+    }
     Event.findById(req.params.eventId)
         .populate({
             path: 'days',
