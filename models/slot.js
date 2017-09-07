@@ -1,6 +1,7 @@
 var mongoose = require("mongoose");
 
 var slotSchema = mongoose.Schema({
+   sdate: Date,
    time: String,
    max: Number, // students allowed in slot
    count: Number, // students in slot
