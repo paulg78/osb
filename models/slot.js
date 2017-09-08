@@ -5,10 +5,10 @@ var slotSchema = mongoose.Schema({
    time: String,
    max: Number, // students allowed in slot
    count: Number, // students in slot
-   students: [{
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Student"
-   }]
+   // students: [{
+   //    type: mongoose.Schema.Types.ObjectId,
+   //    ref: "Student"
+   // }]
 });
 
 module.exports = mongoose.model("Slot", slotSchema);

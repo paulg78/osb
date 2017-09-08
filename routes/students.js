@@ -18,13 +18,14 @@ router.get("/", middleware.isLoggedIn,
         else { // list all students
             // logger.debug("after next");
             Student.find()
+                .hint("fname_1_lname_1")
                 // .populate('day', { date: 1, _id: 0 })
                 // .populate('slot', { sdate: 1, time: 1, _id: 0 })
                 .populate('slot', { sdate: 1, _id: 0 })
-                .sort({
-                    fname: 1,
-                    lname: 1
-                })
+                // .sort({
+                //     fname: 1,
+                //     lname: 1
+                // })
                 .exec(function (err, queryResponse) {
                     if (err) {
                         logger.error(err.errmsg);
@@ -237,46 +238,21 @@ router.put("/:id", function (req, res) {
             },
             function (err, student) {
                 if (err) {
-                    logger.error("edit student" + err.message);
+                    logger.error("edit student, saving student" + err.message);
                     req.flash("error", err.message);
                     res.redirect("back");
                 }
                 else {
                     // logger.debug("student=" + student);
                     if (req.body.unschedule == "y") { // remove student from slot
-                        Slot.findById(student.slot, function (err, slot) {
-                            if (err) {
-                                logger.error("edit student, find slot" + err.message);
-                            }
-                            else {
-                                if (slot == null) {
-                                    logger.error("edit student, slot not found");
+                        Slot.findByIdAndUpdate(student.slot, {
+                                $inc: { count: -1 }
+                            },
+                            function (err) {
+                                if (err) {
+                                    logger.error("edit student, saving slot" + err.message);
                                 }
-                                else {
-                                    // logger.debug("slot before=" + slot);
-
-                                    var delIndex = shared.getItemIndex(slot.students, student._id.toString());
-                                    // logger.debug("delIndex=" + delIndex);
-                                    if (delIndex == null) {
-                                        logger.error("edit student: student not found in slot");
-                                    }
-                                    else {
-                                        // "clever" use of splice to remove elements
-                                        // The first parameter defines the (0 relative) position where elements will be deleted.
-                                        // The second parameter defines how many elements will be removed.
-                                        slot.students.splice(delIndex, 1);
-                                        // logger.debug("slot after=" + slot);
-                                        slot.count--;
-                                        slot.save(function (err) {
-                                            if (err) {
-                                                logger.error("edit student, save slot" + err.message);
-                                            }
-                                        });
-                                    }
-                                }
-
-                            }
-                        });
+                            });
                     }
                     // logger.debug("Updating student");
                     req.flash("success", "Successfully Updated!");
@@ -322,37 +298,18 @@ router.delete("/:studentId", middleware.isLoggedIn, function (req, res) {
             req.flash("error", err.message);
             return res.redirect("back");
         }
-        if (student != null) { // need null check in case student has been deleted in another window
-            if (student.slot != null) {
-                Slot.findById(student.slot, function (err, slot) {
-                    if (err) {
-                        logger.error("DelStud: Error finding slot: " + err.message);
-                        return;
-                    }
-                    if (slot == null) {
-                        logger.error("DelStud: slot not found");
-                        return;
-                    }
-                    var delIndex = shared.getItemIndex(slot.students, req.params.studentId);
-                    // logger.debug("delIndex=" + delIndex);
-                    if (delIndex == null) {
-                        logger.error("DelStud: student not found in slot");
-                        return;
-                    }
-                    // logger.debug("slot.students before: " + slot.students);
-                    slot.students.splice(delIndex, 1);
-                    // logger.debug("slot.students after: " + slot.students);
-                    slot.count--;
-                    slot.save(function (err) {
-                        if (err) {
-                            logger.error("DelStud: Error saving updated slot: " + err.message);
-                            return;
-                        }
-                    });
-                });
-            }
-            req.flash("success", "Deleted " + student.fullName);
-        }
+        if (student != null) {// need null check in case student has been deleted in another window
+         if (student.slot != null) {
+             Slot.findByIdAndUpdate(student.slot, {
+                     $inc: { count: -1 }
+                 },
+                 function (err) {
+                     if (err) {
+                         logger.error("delete student, decrementing count" + err.message);
+                     }
+                 });
+         }
+         req.flash("success", "Deleted " + student.fullName);}
         else {
             req.flash("success", "Student deleted ");
         }
