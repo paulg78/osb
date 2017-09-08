@@ -119,7 +119,7 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
                 logger.error(err);
             }
             else {
-                logger.debug("foundDay=" + JSON.stringify(foundDay));
+                // logger.debug("foundDay=" + JSON.stringify(foundDay));
                 // logger.debug("foundDay.slots[2]=" + foundDay.slots[2]);
                 // find the students in the school who are scheduled for this day or are unscheduled
                 Student.find({
@@ -139,7 +139,7 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
                             else {
                                 var unsched = [];
                                 var sched = [];
-                                logger.debug("(students) queryResponse=" + queryResponse);
+                                // logger.debug("(students) queryResponse=" + queryResponse);
                                 // logger.debug("before render, res.locals.prevDayId=" + res.locals.prevDayId);
                                 // split students into scheduled vs. unscheduled
                                 for (var j = 0, jLim = foundDay.slots.length; j < jLim; j++) {
@@ -157,7 +157,7 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
                                         }
                                     }
                                     if (foundj > -1) {
-                                        logger.debug("  foundj=" + foundj);
+                                        // logger.debug("  foundj=" + foundj);
                                         sched[foundj].students.push(queryResponse[i]);
                                     }
                                     else {
@@ -165,8 +165,8 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
                                     }
                                 }
                                 // logger.debug("foundDay with students=" + JSON.stringify(foundDay));
-                                logger.debug("sched=" + JSON.stringify(sched));
-                                logger.debug("unsched=" + unsched);
+                                // logger.debug("sched=" + JSON.stringify(sched));
+                                // logger.debug("unsched=" + unsched);
                                 res.render("events/daySchoolSchedule", {
                                     eventId: req.params.eventId,
                                     day: foundDay,
@@ -194,7 +194,7 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, getPrevNextIds, funct
                 return res.redirect("back");
             }
             else {
-                logger.debug("foundDay=" + JSON.stringify(foundDay));
+                // logger.debug("foundDay=" + JSON.stringify(foundDay));
                 // logger.debug("foundDay.slots[2]=" + foundDay.slots[2]);
                 // find the students scheduled for this day
                 Student.find({ day: req.params.dayId }, 'fname lname grade slot')
@@ -209,14 +209,14 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, getPrevNextIds, funct
                             }
                             else {
                                 var sched = [];
-                                logger.debug("(students) queryResponse=" + queryResponse);
+                                // logger.debug("(students) queryResponse=" + queryResponse);
                                 // logger.debug("before render, res.locals.prevDayId=" + res.locals.prevDayId);
                                 // populate scheduled students into slots
                                 for (var j = 0, jLim = foundDay.slots.length; j < jLim; j++) {
                                     sched[j] = { students: [] };
                                 }
                                 for (var i = 0, iLim = queryResponse.length; i < iLim; i++) {
-                                    logger.debug("stud=" + queryResponse[i].fullName);
+                                    // logger.debug("stud=" + queryResponse[i].fullName);
                                     // find slot
                                     var foundj = -1;
                                     for (var j = 0, jLim = foundDay.slots.length; j < jLim; j++) {
@@ -226,12 +226,12 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, getPrevNextIds, funct
                                         }
                                     }
                                     if (foundj > -1) {
-                                        logger.debug("  foundj=" + foundj);
+                                        // logger.debug("  foundj=" + foundj);
                                         sched[foundj].students.push(queryResponse[i]);
                                     }
                                 }
                                 // logger.debug("foundDay with students=" + JSON.stringify(foundDay));
-                                logger.debug("sched=" + JSON.stringify(sched));
+                                // logger.debug("sched=" + JSON.stringify(sched));
                                 // res.redirect("/events/" + req.params.eventId + "/days");
                                 res.render("events/daySchedule", {
                                     eventId: req.params.eventId,
