@@ -414,14 +414,13 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
         }
     });
 
-    function updateSlot(slot, callback) {
+    function updateSlot(callback) {
+        // logger.debug("in updateSlot");
         Slot.findByIdAndUpdate(req.params.slotId, {
                 $inc: { count: -1 }
             },
             function (err) {
-                if (err) {
-                    callback(err);
-                }
+                callback(err);
             });
     }
 
@@ -432,6 +431,7 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
         // }, function (err, student) {
         //     callback(err);
         // });
+        // logger.debug("in updateStudent");
         Student.findByIdAndUpdate(req.params.studentId, {
                 day: null,
                 slot: null
@@ -439,7 +439,6 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
                 projection: { fname: 0, lname: 0, grade: 0, school: 0, day: 0, slot: 0, served: 0 }
             },
             function (err, student) {
-                // logger.debug("student scheduled=" + student);
                 if (err) {
                     callback(err);
                 }
@@ -459,6 +458,7 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
                             });
                     }
                     else {
+                        // logger.debug("student unscheduled=" + student);
                         callback(null);
                     }
                 }
