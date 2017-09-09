@@ -385,7 +385,7 @@ router.put("/:eventId/days/:dayId/slots/:slotId/students/:studentId", function (
                                         callback(err);
                                     }
                                     else {
-                                        logger.debug("schedule: student not found or already scheduled");
+                                        // logger.debug("schedule: student not found or already scheduled");
                                         callback(null, avail + 1, false);
                                     }
                                 });
@@ -455,7 +455,7 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
                                     callback(err);
                                 }
                                 else {
-                                    logger.debug("unschedule: student not found or already unscheduled")
+                                    // logger.debug("unschedule: student not found or already unscheduled");
                                     callback(null, avail - 1);
                                 }
                             });
@@ -470,7 +470,7 @@ router.delete("/:eventId/days/:dayId/slots/:slotId/students/:studentId", functio
 });
 
 
-// in slots, find and delete student IDs that don't point to any student
+// in slots, find and optionally fix counts that don't match actual number of students scheduled
 router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function (req, res) {
     if (res.locals.currentUser.role != 'role_wa') {
         return res.redirect("back");

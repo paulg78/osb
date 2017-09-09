@@ -180,7 +180,6 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
                     if (err) {
                         logger.error("create failed: " + err.message);
                         res.json({ "msg": err.message });
-                        // res.status(500).send(err.message);
                     }
                     else {
                         res.json({ "student": newStudent, "remaining": remain - 1 });
@@ -189,13 +188,11 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
             }
             else {
                 res.json({ "remaining": 0, "msg": "Allotment used; student not added." });
-                // res.status(500).send("Allotment used; student not added.");
             }
         });
     }
     else {
         res.json({ "msg": errMsg });
-        // res.status(500).send(result);
     }
 });
 

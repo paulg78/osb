@@ -31,7 +31,6 @@ $(".addStudBtn").on('click', function (e) {
         url: "/events/" + eventId + "/days/" + dayId + "/slots/" + slotId + "/students/" + studentId,
         type: 'PUT',
         success: function (result) {
-            // move student text and id to schedule
             // console.log("updated database and ajax callback executed");
             // console.log("result=" + result);
             if (result.move) {
@@ -45,7 +44,6 @@ $(".addStudBtn").on('click', function (e) {
                 result.avail = 0;
             }
             // set slots remaining
-            // var avail = Number(availElem.text());
             availElem.text(result.avail);
         }
     });
@@ -90,10 +88,7 @@ $(".remStudBtn").on('click', function (e) {
         type: 'DELETE',
         success: function (result) {
             // console.log("updated database and ajax callback executed");
-
-            // increment slots remaining
             var availElem = fromListItem.parent().siblings().children(".availSlots");
-            // var avail = Number(availElem.text());
             availElem.text(result.avail);
             if (result.avail > 0) {
                 availElem.siblings(".addStudBtn").removeClass('hidden');
