@@ -34,16 +34,19 @@ $(".addStudBtn").on('click', function (e) {
             // move student text and id to schedule
             // console.log("updated database and ajax callback executed");
             // console.log("result=" + result);
-            fromListItem.removeClass('unschedStud active');
-            fromListItem.addClass('schedStud');
-            toList.append(fromListItem); // no need to remove from fromList since this moves the element
-            // decrement slots remaining
-            var availElem = toList.siblings().children(".availSlots");
-            var avail = Number(availElem.text());
-            availElem.text(--avail);
-            if (avail < 1) {
-                availElem.siblings(".addStudBtn").addClass('hidden');
+            if (result.move) {
+                fromListItem.removeClass('unschedStud active');
+                fromListItem.addClass('schedStud');
+                toList.append(fromListItem); // no need to remove from fromList since this moves the element
             }
+            var availElem = toList.siblings().children(".availSlots");
+            if (result.avail <= 0) {
+                availElem.siblings(".addStudBtn").addClass('hidden');
+                result.avail = 0;
+            }
+            // set slots remaining
+            // var avail = Number(availElem.text());
+            availElem.text(result.avail);
         }
     });
     // console.log("finished ajax call");
@@ -90,9 +93,9 @@ $(".remStudBtn").on('click', function (e) {
 
             // increment slots remaining
             var availElem = fromListItem.parent().siblings().children(".availSlots");
-            var avail = Number(availElem.text());
-            availElem.text(++avail);
-            if (avail == 1) {
+            // var avail = Number(availElem.text());
+            availElem.text(result.avail);
+            if (result.avail > 0) {
                 availElem.siblings(".addStudBtn").removeClass('hidden');
             }
             fromListItem.removeClass('schedStud active');

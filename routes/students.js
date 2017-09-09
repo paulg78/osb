@@ -170,29 +170,32 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
         served: false
     };
 
-    var result = studentValid(studentData);
+    var errMsg = studentValid(studentData);
 
-    if (result == "") {
+    if (errMsg == "") {
         getRemaining(studentData.school, function (remain) {
             // logger.debug("remain=" + remain);
             if (remain > 0) {
                 Student.create(studentData, function (err, newStudent) {
                     if (err) {
                         logger.error("create failed: " + err.message);
-                        res.status(500).send(err.message);
+                        res.json({ "msg": err.message });
+                        // res.status(500).send(err.message);
                     }
                     else {
-                        res.json(newStudent);
+                        res.json({ "student": newStudent, "remaining": remain - 1 });
                     }
                 });
             }
             else {
-                res.status(500).send("Allotment used; student not added.");
+                res.json({ "remaining": 0, "msg": "Allotment used; student not added." });
+                // res.status(500).send("Allotment used; student not added.");
             }
         });
     }
     else {
-        res.status(500).send(result);
+        res.json({ "msg": errMsg });
+        // res.status(500).send(result);
     }
 });
 
@@ -298,18 +301,19 @@ router.delete("/:studentId", middleware.isLoggedIn, function (req, res) {
             req.flash("error", err.message);
             return res.redirect("back");
         }
-        if (student != null) {// need null check in case student has been deleted in another window
-         if (student.slot != null) {
-             Slot.findByIdAndUpdate(student.slot, {
-                     $inc: { count: -1 }
-                 },
-                 function (err) {
-                     if (err) {
-                         logger.error("delete student, decrementing count" + err.message);
-                     }
-                 });
-         }
-         req.flash("success", "Deleted " + student.fullName);}
+        if (student != null) { // need null check in case student has been deleted in another window
+            if (student.slot != null) {
+                Slot.findByIdAndUpdate(student.slot, {
+                        $inc: { count: -1 }
+                    },
+                    function (err) {
+                        if (err) {
+                            logger.error("delete student, decrementing count" + err.message);
+                        }
+                    });
+            }
+            req.flash("success", "Deleted " + student.fullName);
+        }
         else {
             req.flash("success", "Student deleted ");
         }
