@@ -17,7 +17,6 @@ $('#newStudentForm').submit(function (e) {
                 <td>${student.grade}</td>
                 <td></td>
                 <td></td>
-                <td></td>
                 <td>
                  <form style="display: inline" action="/students/${student._id}?_method=DELETE" method="POST">
                     <a href="/students/${student._id}/edit" class="btn btn-xs btn-primary">Edit</a>

@@ -127,9 +127,9 @@ router.get("/:eventId/days/:dayId/school", middleware.isLoggedIn, getPrevNextIds
                         $or: [{ day: req.params.dayId }, { day: null }]
                         // day: req.params.dayId
                     }, 'fname lname grade slot')
-                    .sort({
-                        fname: 1,
-                        lname: 1
+                    .sort({ // sort by lname to highlight sibling groups
+                        lname: 1,
+                        fname: 1
                     })
                     .exec(
                         function (err, queryResponse) {
