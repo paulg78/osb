@@ -56,128 +56,50 @@ router.get('/requestpwreset', function (req, res) {
   });
 });
 
-function sendEmail(emailAddress, subject, text, callBack) {
-  // logger.debug("emailing " + emailAddress + ", subject: " + subject + ", text: " + text);
-  var mailgun = new Mailgun({
-    apiKey: process.env.APIKEY,
-    domain: 'mg.schoolbell.us'
-  });
-
-  var data = {
-    from: 'OSB <admin@schoolbell.us>',
-    to: emailAddress,
-    subject: subject,
-    text: text
-  };
-
-  mailgun.messages().send(data, function (err, body) {
-    callBack(err);
-  });
-}
-
 // reset password
-router.post('/requestpwreset', function (req, res, next) {
-  async.waterfall([
+router.post('/requestpwreset', function (req, res) {
 
-      function (done) {
-        crypto.randomBytes(20, function (err, buf) {
-          var token = buf.toString('hex');
-          done(err, token);
-        });
-      },
-
-      function (token, done) {
-        User.findOne({
-          username: req.body.username.toLowerCase()
-        }, function (err, user) {
-          if (!user) {
-            req.flash('error', "No account with Username " + req.body.username + " exists.");
-            return res.redirect('/requestpwreset');
-          }
-
-          user.resetPasswordToken = token;
-          user.resetPasswordExpires = Date.now() + 28800000; // 8 hours
-
-          user.save(function (err) {
-            done(err, token, user);
-          });
-        });
-      },
-
-      function (token, user, done) {
-        var subject, text;
-        var link = req.protocol + "://" + req.get('host') + '/resetpw/' + token;
-        if (user.password == undefined) {
-          subject = "Register for Assistance League Operation School Bell";
-          text = "To register, create a password after clicking on the following link " +
-            "or pasting it into a browser.";
-        }
-        else {
-          subject = "Reset password for Assistance League Operation School Bell";
-          text = "To reset your password, create a new password after clicking on the " +
-            "following link or pasting it into a browser.";
-        }
-        text += "\n\n" + link + "\n\n" +
-          "No need to reply to this email.\n\n" +
-          "This link will expire in 8 hours.";
-        // handle special case when username is more than an email address
-        var emailAddr = user.username;
-        var i = emailAddr.indexOf(":");
-        if (i > -1) {
-          emailAddr = emailAddr.substring(0, i);
-        }
-        sendEmail(emailAddr, subject, text, function (err) {
-          logger.info("username=" + user.username + ", resetLink=" + link);
-          done(err);
-        });
-      }
-    ],
-    function (err) {
-      if (err) {
-        req.flash('error', 'email error: ' + err.message);
-        logger.error('error: ' + err.message);
-        res.redirect('/requestpwreset');
-      }
-      else {
-        req.flash('success', 'An e-mail has been sent from OSB (admin@schoolbell.us) to ' +
-          req.body.username + ' with further instructions. ' +
-          "If you don't receive the email in your inbox, please check your junk or spam folder.");
-        res.redirect('/requestpwreset');
-      }
-    });
-});
-
-// show password reset form if token valid
-router.get('/resetpw/:token', function (req, res) {
   User.findOne({
-    resetPasswordToken: req.params.token,
-    resetPasswordExpires: {
-      $gt: Date.now()
-    }
+    username: req.body.username.toLowerCase()
   }, function (err, user) {
     if (err) {
-      req.flash('error', err.message);
+      req.flash('error', "System error on user lookup " + req.body.username);
+      logger.error("System error on user lookup " + req.body.username);
       return res.redirect('/requestpwreset');
     }
-    else if (!user) {
-      req.flash('error', 'Password reset token is invalid or has expired.');
+    if (user == null) {
+      req.flash('error', "No account with Username " + req.body.username + " exists.");
       return res.redirect('/requestpwreset');
     }
     // logger.debug("userfound username=" + user.username + ", token=" + user.resetPasswordToken);
-    res.render('resetpw', {
-      user: user
-    });
+    // res.render('resetpw', {
+    //   username: user.username
+    // });
+    res.redirect("/resetpw/" + user.username);
   });
 });
 
+
+// show password reset form if token valid
+router.get('/resetpw/:username', function (req, res) {
+  res.render('resetpw', {
+    username: req.params.username
+  });
+});
+
+
+
 // reset password
-router.post('/resetpw/:token', function (req, res) {
+router.post('/resetpw/:username', function (req, res) {
   if (req.body.password != req.body.confirm) {
     req.flash('error', "Password confirmation doesn't match first password entered.");
-    return res.redirect('back');
+    // res.render('resetpw', {
+    //   username: req.params.username
+    // });
+    return res.redirect("/resetpw/" + req.params.username);
   }
   User.findOne({
-    resetPasswordToken: req.params.token
+    username: req.params.username
   }, function (err, user) {
     if (err) {
       req.flash('error', err.message);
@@ -188,36 +110,14 @@ router.post('/resetpw/:token', function (req, res) {
       return res.redirect('/requestpwreset');
     }
 
-    var isRegistering = user.password == undefined;
     user.password = req.body.password;
-    user.resetPasswordToken = null;
-    user.resetPasswordExpires = null;
 
     user.save(function (err) {
       if (err) {
-        req.flash('failureRedirect', "Error--new password didn't save.");
+        req.flash('error', "Error--new password didn't save.");
         return res.redirect('/requestpwreset');
       }
       req.flash('success', 'Success! Your new password has been saved.');
-      var subject, text;
-      if (isRegistering) {
-        subject = "Successfully Registered for Operation School Bell";
-      }
-      else {
-        subject = "Successfully Reset password for Operation School Bell";
-      }
-      text = "You may now login with your new password!";
-      // handle special case when username is more than an email address
-      var emailAddr = user.username;
-      var i = emailAddr.indexOf(":");
-      if (i > -1) {
-        emailAddr = emailAddr.substring(0, i);
-      }
-      sendEmail(emailAddr, subject, text, function (err) {
-        if (err) {
-          logger.error('Error sending email.');
-        }
-      });
       // no need to wait on the email callback
       res.redirect('/login');
     });
