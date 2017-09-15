@@ -60,6 +60,16 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
 });
 
 
+function toStr2(x) {
+    var s = x.toString();
+    if (s.length < 2) {
+        return "0" + s;
+    }
+    else {
+        return s;
+    }
+}
+
 // SHOW - days in an event
 router.get("/:eventId/days", middleware.isLoggedIn, function (req, res) {
     Event.findById(req.params.eventId)
@@ -78,7 +88,7 @@ router.get("/:eventId/days", middleware.isLoggedIn, function (req, res) {
                 // logger.debug("today=" + today);
                 res.render("events/days", {
                     event: foundEvent,
-                    todayStr: today.getFullYear().toString() + "-" + (today.getMonth() + 1).toString() + "-" + today.getDate().toString()
+                    todayStr: today.getFullYear().toString() + "-" + toStr2(today.getMonth() + 1) + "-" + toStr2(today.getDate())
                 });
             }
         });

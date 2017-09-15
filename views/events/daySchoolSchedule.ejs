@@ -16,6 +16,15 @@ function timeString(d) {
     }
     return h + ":" + m + " " + ap;
 }
+function toStr2(x) {
+    var s = x.toString();
+    if (s.length < 2) {
+        return "0" + s;
+    }
+    else {
+        return s;
+    }
+}
 function dateString(dt) {
     // logger.debug("** first time slot dt=" + dt);
     // drop the time (so it will be start of day) and add a day (javascript will roll to next month as needed)
@@ -30,7 +39,7 @@ function dateString(dt) {
         d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
         // logger.debug("future day d=" + d);
     }
-    return d.getFullYear().toString() + "-" + (d.getMonth() + 1).toString() + "-" + d.getDate().toString();
+    return d.getFullYear().toString() + "-" + toStr2(d.getMonth() + 1) + "-" + toStr2(d.getDate());
 }
 %>
 <div class="container">
