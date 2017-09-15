@@ -1,7 +1,6 @@
 var express = require("express");
 var router = express.Router();
 var Student = require("../models/student");
-//var User = require("../models/user");
 var Event = require("../models/event");
 var Day = require("../models/day");
 var Slot = require("../models/slot");
@@ -243,20 +242,6 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, getPrevNextIds, funct
             }
         });
 });
-
-
-function mmdd(date) {
-    var n = date.indexOf("/");
-    var mm = date.substring(n - 2, n);
-    if (mm < 10) {
-        mm = '0' + mm[1];
-    }
-    var dd = date.substring(n + 1, n + 3);
-    if (dd[1] == "/") {
-        dd = '0' + dd[0];
-    }
-    return mm + dd;
-}
 
 
 // Show SCHEDULE for next available day of an event (one with open slots)
