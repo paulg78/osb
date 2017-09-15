@@ -16,6 +16,22 @@ function timeString(d) {
     }
     return h + ":" + m + " " + ap;
 }
+function dateString(dt) {
+    // logger.debug("** first time slot dt=" + dt);
+    // drop the time (so it will be start of day) and add a day (javascript will roll to next month as needed)
+    var d = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+    d.setDate(d.getDate() + 1);
+    // logger.debug("next day d=" + d);
+    // use today's date if > next day
+    var today = new Date();
+    // logger.debug("today=" + today);
+    if (today > d) {
+        // logger.debug("skipping to future date");
+        d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        // logger.debug("future day d=" + d);
+    }
+    return d.getFullYear().toString() + "-" + (d.getMonth() + 1).toString() + "-" + d.getDate().toString();
+}
 %>
 <div class="container">
     <span class="hidden" id="eventId"><%= eventId %></span>
@@ -65,8 +81,9 @@ function timeString(d) {
                 <% url = "/events/" + eventId + "/days"; %>
                 <% if (nextDayId) { %>
                 <%     url = url + "/" + nextDayId + "/school" %>
-                <%     } %>
                 <a class="btn btn-info" href= <%= url %> ><span class="glyphicon glyphicon-chevron-right"></span></a>
+                 <a class="btn btn-info" href=<%="/events/" + eventId + "/nextAvail/" + dateString(day.slots[0].sdate)%>>Next Avail</a>
+                <%     } %>
                 </div>
             </div>
         </div>

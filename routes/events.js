@@ -74,8 +74,11 @@ router.get("/:eventId/days", middleware.isLoggedIn, function (req, res) {
             }
             else {
                 // logger.debug("foundEvent=" + foundEvent);
+                var today = new Date();
+                // logger.debug("today=" + today);
                 res.render("events/days", {
-                    event: foundEvent
+                    event: foundEvent,
+                    todayStr: today.getFullYear().toString() + "-" + (today.getMonth() + 1).toString() + "-" + today.getDate().toString()
                 });
             }
         });
@@ -245,9 +248,10 @@ router.get("/:eventId/days/:dayId", middleware.isLoggedIn, getPrevNextIds, funct
 
 
 // Show SCHEDULE for next available day of an event (one with open slots)
-router.get("/:eventId/nextAvail", middleware.isLoggedIn, function (req, res) {
-
-    Slot.find({ $where: "this.sdate > new Date() && this.count < this.max" }, { sdate: 1 }).limit(1).hint("sdate_1")
+router.get("/:eventId/nextAvail/:date", middleware.isLoggedIn, function (req, res) {
+    var qry = "this.sdate > new Date('" + req.params.date + "') && this.count < this.max";
+    // logger.debug("* qry=" + qry);
+    Slot.find({ $where: qry }, { sdate: 1 }).limit(1).hint("sdate_1")
         .exec(function (err, slots) {
             if (err) {
                 logger.error(err);

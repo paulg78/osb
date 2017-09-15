@@ -8,7 +8,7 @@
             <tr>
                 <td class="dayList" style="background-color: #dff0d8;">Next Available Day &nbsp;</td>
                 <td>
-                    <a href="/events/<%= event._id %>/nextAvail" class="btn btn-xs btn-primary role_al role_wa role_sc">Schedule</a>
+                    <a href=<%="/events/" + event._id + "/nextAvail/" + todayStr%> class="btn btn-xs btn-primary role_al role_wa role_sc">Schedule</a>
                 </td>
             </tr>
             <% event.days.forEach(function(day){ %>
