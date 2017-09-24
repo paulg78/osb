@@ -21,7 +21,7 @@ function toStr2(x) {
 
 
 //INDEX - show all events
-router.get("/", function (req, res) {
+router.get("/", middleware.isLoggedIn, function (req, res) {
     Event.find({})
         .populate({
             path: 'days',
