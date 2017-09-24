@@ -86,7 +86,7 @@ function dateString(dt) {
                 <%     url = url + "/" + prevDayId + "/school" %>
                 <%     } %>
                  <a class="btn btn-info" href= <%= url %> ><span class="glyphicon glyphicon-chevron-left"></span></a>
-                 <a class="btn btn-info" href="/events/<%= eventId %>/days">List days</a>
+                 <a class="btn btn-info" href="/events">List days</a>
                 <% url = "/events/" + eventId + "/days"; %>
                 <% if (nextDayId) { %>
                 <%     url = url + "/" + nextDayId + "/school" %>
