@@ -9,25 +9,47 @@ var shared = require("../shared");
 var async = require('async');
 /* global logger */
 
+function toStr2(x) {
+    var s = x.toString();
+    if (s.length < 2) {
+        return "0" + s;
+    }
+    else {
+        return s;
+    }
+}
+
+
 //INDEX - show all events
 router.get("/", function (req, res) {
-    // Get all events from DB
-    Event.find({}, 'name', function (err, allEvents) {
-        if (err) {
-            logger.error(err);
-        }
-        else { // If there is only one event, go right to days for that event
-            if (allEvents.length == 1) {
-                res.redirect("events/" + allEvents[0]._id + "/days");
+    Event.find({})
+        .populate({
+            path: 'days',
+            model: 'Day',
+            select: 'date'
+        })
+        .exec(function (err, allEvents) {
+            if (err) {
+                logger.error(err);
             }
-            else {
-                // logger.debug("allEvents=" + allEvents);
-                res.render("events/index", {
-                    events: allEvents
-                });
+            else { // If there is only one event, go right to days for that event
+                if (allEvents.length == 1) {
+                    // logger.debug("foundEvent=" + foundEvent);
+                    var today = new Date();
+                    // logger.debug("today=" + today);
+                    res.render("events/days", {
+                        event: allEvents[0],
+                        todayStr: today.getFullYear().toString() + "-" + toStr2(today.getMonth() + 1) + "-" + toStr2(today.getDate())
+                    });
+                }
+                else {
+                    // logger.debug("allEvents=" + allEvents);
+                    res.render("events/index", {
+                        events: allEvents
+                    });
+                }
             }
-        }
-    });
+        });
 });
 
 //NEW - show form to create new event
@@ -57,41 +79,6 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
             res.redirect("/events");
         }
     });
-});
-
-
-function toStr2(x) {
-    var s = x.toString();
-    if (s.length < 2) {
-        return "0" + s;
-    }
-    else {
-        return s;
-    }
-}
-
-// SHOW - days in an event
-router.get("/:eventId/days", middleware.isLoggedIn, function (req, res) {
-    Event.findById(req.params.eventId)
-        .populate({
-            path: 'days',
-            model: 'Day',
-            select: 'date'
-        })
-        .exec(function (err, foundEvent) {
-            if (err) {
-                logger.error(err);
-            }
-            else {
-                // logger.debug("foundEvent=" + foundEvent);
-                var today = new Date();
-                // logger.debug("today=" + today);
-                res.render("events/days", {
-                    event: foundEvent,
-                    todayStr: today.getFullYear().toString() + "-" + toStr2(today.getMonth() + 1) + "-" + toStr2(today.getDate())
-                });
-            }
-        });
 });
 
 
