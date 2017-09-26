@@ -2,7 +2,6 @@ var express = require("express");
 var router = express.Router();
 var Event = require("../models/event");
 var middleware = require("../middleware");
-var async = require('async');
 /* global logger */
 
 

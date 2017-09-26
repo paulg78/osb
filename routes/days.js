@@ -4,6 +4,7 @@ var Student = require("../models/student");
 var Day = require("../models/day");
 var Slot = require("../models/slot");
 var middleware = require("../middleware");
+var async = require('async');
 /* global logger */
 
 
@@ -90,25 +91,25 @@ router.get("/:dayId/school", middleware.isLoggedIn, getPrevNextIds, function (re
                             else {
                                 var unsched = [];
                                 var sched = [];
-                                logger.debug("(students) queryResponse=" + queryResponse);
+                                // logger.debug("(students) queryResponse=" + queryResponse);
                                 // logger.debug("before render, res.locals.prevDayId=" + res.locals.prevDayId);
                                 // split students into scheduled vs. unscheduled
                                 for (var j = 0, jLim = foundDay.slots.length; j < jLim; j++) {
                                     sched[j] = { students: [] };
                                 }
                                 for (var i = 0, iLim = queryResponse.length; i < iLim; i++) {
-                                    logger.debug("stud=" + queryResponse[i].fullName);
+                                    // logger.debug("stud=" + queryResponse[i].fullName);
                                     // find slot
                                     var foundj = -1;
                                     for (var j = 0, jLim = foundDay.slots.length; j < jLim; j++) {
-                                        logger.debug("j=" + j + ", slot=" + foundDay.slots[j]._id);
+                                        // logger.debug("j=" + j + ", slot=" + foundDay.slots[j]._id);
                                         if (queryResponse[i].slot != null && queryResponse[i].slot.toString() == foundDay.slots[j]._id) {
                                             foundj = j;
                                             break;
                                         }
                                     }
                                     if (foundj > -1) {
-                                        logger.debug("  foundj=" + foundj);
+                                        // logger.debug("  foundj=" + foundj);
                                         sched[foundj].students.push(queryResponse[i]);
                                     }
                                     else {
@@ -241,4 +242,169 @@ router.get("/nextAvail/:date", middleware.isLoggedIn, function (req, res) {
 });
 
 
+// Add student to slot
+router.put("/:dayId/slots/:slotId/students/:studentId", function (req, res) {
+    // logger.debug("adding student to slot");
+    // logger.debug("studentId=" + req.params.studentId);
+    // logger.debug("slotId=" + req.params.slotId);
+
+    async.waterfall([
+        updateSlot,
+        updateStudent,
+    ], function (err, avail, move) {
+        if (err) {
+            logger.error(err.message);
+            res.redirect("/days/" + req.params.dayId + "/school");
+        }
+        else {
+            // logger.debug("add-sending json response");
+            res.json({ "avail": avail, "move": move });
+            // logger.debug("add-json response sent");
+        }
+    });
+
+    function updateSlot(callback) {
+        Slot.findByIdAndUpdate(req.params.slotId, {
+            $inc: { count: 1 }
+        }, {
+            projection: { _id: 0, count: 1, max: 1 },
+            returnNewDocument: false // returns count before increment, true doesn't seem to work
+        }, function (err, slot) {
+            // logger.debug("slot before update=" + slot);
+            if (err) {
+                callback(err);
+            }
+            else {
+                if (slot.count >= slot.max) // count is one less than actual
+                {
+                    // restore original since slot is full and student won't be added
+                    Slot.findByIdAndUpdate(req.params.slotId, {
+                            $inc: { count: -1 }
+                        },
+                        function (err) {
+                            if (err) {
+                                callback(err);
+                            }
+                            else {
+                                callback(null, 0, false);
+                            }
+                        });
+                }
+                else {
+                    callback(null, slot.max - slot.count - 1, true);
+                }
+            }
+        });
+    }
+
+    function updateStudent(avail, move, callback) {
+        if (!move) { // slot already full so can't add student
+            callback(null, 0, false);
+        }
+        else {
+            Student.findByIdAndUpdate(req.params.studentId, {
+                    day: req.params.dayId,
+                    slot: req.params.slotId
+                }, {
+                    projection: { slot: 1 }
+                },
+                function (err, student) {
+                    // logger.debug("student scheduled=" + student);
+                    if (err) {
+                        callback(err);
+                    }
+                    else {
+                        if (student == null || (student != null && student.slot != null)) {
+                            // restore original count since student wasn't found or was already scheduled
+                            Slot.findByIdAndUpdate(req.params.slotId, {
+                                    $inc: { count: -1 }
+                                },
+                                function (err) {
+                                    if (err) {
+                                        callback(err);
+                                    }
+                                    else {
+                                        // logger.debug("schedule: student not found or already scheduled");
+                                        callback(null, avail + 1, false);
+                                    }
+                                });
+                        }
+                        else {
+                            callback(null, avail, true);
+                        }
+                    }
+                });
+        }
+    }
+});
+
+// Remove student from slot
+router.delete("/:dayId/slots/:slotId/students/:studentId", function (req, res) {
+    // logger.debug("deleting student from slot");
+    // logger.debug("studentId=" + req.params.studentId);
+    // logger.debug("slotId=" + req.params.slotId);
+
+    async.waterfall([
+        updateSlot,
+        updateStudent,
+    ], function (err, avail) {
+        if (err) {
+            logger.error(err.message);
+            res.redirect("/days/" + req.params.dayId + "/school");
+        }
+        else {
+            // logger.debug("del-sending json response");
+            res.json({ "avail": avail });
+            // logger.debug("del-json response sent");
+        }
+    });
+
+    function updateSlot(callback) {
+        // logger.debug("in updateSlot");
+        Slot.findByIdAndUpdate(req.params.slotId, {
+            $inc: { count: -1 }
+        }, {
+            projection: { _id: 0, count: 1, max: 1 },
+            returnNewDocument: false // returns count before increment, true doesn't seem to work
+        }, function (err, slot) {
+            callback(err, slot.max - slot.count + 1);
+        });
+    }
+
+    function updateStudent(avail, callback) {
+        Student.findByIdAndUpdate(req.params.studentId, {
+                day: null,
+                slot: null
+            }, {
+                projection: { slot: 1 },
+                returnNewDocument: false // returns student before update
+            },
+            function (err, student) {
+                if (err) {
+                    callback(err);
+                }
+                else {
+                    if (student == null || (student != null && student.slot == null)) {
+                        // restore original count since student wasn't found/unscheduled
+                        Slot.findByIdAndUpdate(req.params.slotId, {
+                                $inc: { count: 1 }
+                            },
+                            function (err) {
+                                if (err) {
+                                    callback(err);
+                                }
+                                else {
+                                    // logger.debug("unschedule: student not found or already unscheduled");
+                                    callback(null, avail - 1);
+                                }
+                            });
+                    }
+                    else {
+                        // logger.debug("student unscheduled=" + student);
+                        callback(null, avail);
+                    }
+                }
+            });
+    }
+});
 module.exports = router;
