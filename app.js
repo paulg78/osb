@@ -5,6 +5,7 @@ var express = require("express"),
   passport = require("passport"),
   flash = require("connect-flash"),
   User = require("./models/user"),
+  Event = require("./models/event"),
   methodOverride = require("method-override");
 
 const winston = require('winston');
@@ -46,6 +47,8 @@ var
   studentRoutes = require("./routes/students"),
   schoolRoutes = require("./routes/schools"),
   eventRoutes = require("./routes/events"),
+  dayRoutes = require("./routes/days"),
+  slotRoutes = require("./routes/slots"),
   indexRoutes = require("./routes/index"),
   userRoutes = require("./routes/users");
 
@@ -120,11 +123,38 @@ app.use(function (req, res, next) {
   next();
 });
 
+// logger.debug("EVENTNAME=" + process.env.EVENTNAME);
+
+// global.currEvent = null;
+// Event.findOne({ name: process.env.EVENTNAME })
+//   .populate({
+//     path: 'days',
+//     model: 'Day',
+//     select: 'date'
+//   })
+//   .exec(function (err, configEvent) {
+//     if (err) {
+//       logger.error(err);
+//     }
+//     else {
+//       if (configEvent == null) {
+//         console.log("Configured event not found");
+//       }
+//       else {
+//         // logger.debug("configEvent=" + configEvent);
+//         global.currEvent = configEvent;
+//       }
+//     }
+//   });
+
+
 app.use("/", indexRoutes);
 app.use("/users", userRoutes);
 app.use("/students", studentRoutes);
 app.use("/schools", schoolRoutes);
 app.use("/events", eventRoutes);
+app.use("/days", dayRoutes);
+app.use("/slots", slotRoutes);
 
 app.listen(process.env.PORT, process.env.IP, function () {
   logger.debug("Server running on port " + process.env.PORT + ", IP " + process.env.IP);

@@ -9,12 +9,4 @@ module.exports = {
         }
     },
 
-    // Returns index of item in array arr if present; otherwise returns null
-    getItemIndex: function (arr, item) {
-        for (var i = 0, iLen = arr.length; i < iLen; i++) {
-            if (arr[i] == item) return i;
-        }
-        return null;
-    }
-
 };
