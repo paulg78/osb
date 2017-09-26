@@ -1,0 +1,30 @@
+<% include ../partials/header %>
+
+<h1>Days in Event <%= global.evnt.name %></h1>
+
+<div class="container">
+  <table class="dayList">
+        <tbody>
+            <tr>
+                <td class="dayList" style="background-color: #dff0d8;">Next Available Day &nbsp;</td>
+                <td>
+                    <a href=<%="/days/nextAvail/" + todayStr%> class="btn btn-xs btn-primary role_al role_wa role_sc">Schedule</a>
+                </td>
+            </tr>
+            <% global.evnt.days.forEach(function(day){ %>
+                <tr>
+                    <td class="dayList"> <%= day.date %> &nbsp;</td>
+                    <td>
+                        <% if(currentUser.role == "role_sc"){ %>
+                            <a href="/days/<%=day._id%>/school" class="btn btn-xs btn-primary role_sc">Schedule</a>
+                        <% } else { %>
+                            <a href="/days/<%=day._id%>" class="btn btn-xs btn-primary role_al role_wa">Schedule</a>
+                        <% } %>
+                    </td>
+                </tr>
+            <% }); %>
+       </tbody>
+    </table>
+</div>
+
+<% include ../partials/footer %>

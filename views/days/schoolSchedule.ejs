@@ -1,0 +1,108 @@
+<% include ../partials/header %>
+<%
+function timeString(d) {
+    var h=d.getHours();
+    var ap;
+    if (h>12) {
+        h=h-12;
+        ap="PM";
+    }
+    else {
+        ap="AM";
+    }
+    var m = d.getMinutes();
+    if (m==0) {
+        m="00";
+    }
+    return h + ":" + m + " " + ap;
+}
+function toStr2(x) {
+    var s = x.toString();
+    if (s.length < 2) {
+        return "0" + s;
+    }
+    else {
+        return s;
+    }
+}
+function dateString(dt) {
+    // logger.debug("** first time slot dt=" + dt);
+    // drop the time (so it will be start of day) and add a day (javascript will roll to next month as needed)
+    var d = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
+    d.setDate(d.getDate() + 1);
+    // logger.debug("next day d=" + d);
+    // use today's date if > next day
+    var today = new Date();
+    // logger.debug("today=" + today);
+    if (today > d) {
+        // logger.debug("skipping to future date");
+        d = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        // logger.debug("future day d=" + d);
+    }
+    return d.getFullYear().toString() + "-" + toStr2(d.getMonth() + 1) + "-" + toStr2(d.getDate());
+}
+%>
+<div class="container">
+    <span class="hidden" id="school"><%= currentUser.school %></span>
+    <div class="row">
+        <div class="col-sm-10">
+            <h2 style="text-align: center">Fitting Schedule <%= day.date %></h2>
+            <div class="row" style="display:flex; flex-wrap: wrap;">
+                <% for (var i = 0, iLim = day.slots.length; i < iLim; i++){ %>
+                    <div class="col-sm-3 solidborder">
+                        <span class="hidden" type="text" name="slotId"><%= day.slots[i]._id %></span>
+                        <form class="form-inline" method="POST">
+                        <span class="slot-time"><%= timeString(day.slots[i].sdate) %></span>
+                        <% var remaining = day.slots[i].max - day.slots[i].count; %>
+                        <span class="availDelim"> (</span>
+                        <span class="availSlots"><%=remaining%></span>
+                        <span class="availDelim">)</span>
+                        <% if (remaining > 0) { %>
+                            <button type=submit class="addStudBtn role_sc" disabled=disabled>+</button>
+                          <%  } else { %>
+                            <button type=submit class="addStudBtn role_sc hidden" disabled=disabled>+</button>
+                           <%  } %>
+                        </form>
+                          <form class="form-inline role_sc" method="POST">
+                                    <button type=submit style="display: none;" class="remStudBtn">-</button>
+                            </form>
+                    <ul class="list-group schedList">
+                        <% sched[i].students.forEach(function(student){ %>
+                            <li class="list-group-item schedStud">
+                                <span name="studentText"><%= student.fullName + "(" + student.grade + ")" %></span>
+                                <span name="studentId" class="hidden"><%= student._id %></span>
+                            </li>
+                        <% }) %>
+                    </ul>
+                    </div>
+                <% } %>
+            </div>
+            <div class="col-sm-12" style="margin: 10px auto;">
+                <div class="text-center">
+                <% if (prevDayId) { %>
+                       <a class="btn btn-info" href= <%= "/days/" + prevDayId + "/school" %> ><span class="glyphicon glyphicon-chevron-left"></span></a>
+                <%     } %>
+                <a class="btn btn-info" href="/events">List days</a>
+                <% if (nextDayId) { %>
+                    <a class="btn btn-info" href= <%= "/days/" + nextDayId + "/school" %> ><span class="glyphicon glyphicon-chevron-right"></span></a>
+                    <a class="btn btn-info" href=<%="/days/nextAvail/" + dateString(day.slots[0].sdate)%>>Next Avail</a>
+                <%     } %>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-2 role_sc">
+            <h4>Unscheduled:</h4>
+            <ul class="list-group unschedList">
+                <% unsched.forEach(function(student) { %>
+                    <li class="list-group-item unschedStud">
+                        <span name="studentText"><%= student.fullName + "(" + student.grade + ")"%></span>
+                        <span name="studentId" class="hidden"><%= student._id %></span>
+                    </li>
+                <% }) %>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script src="/scripts/selectStudent.js"></script>
+<% include ../partials/footer %>
