@@ -208,9 +208,9 @@ router.get("/nextAvail/:date", middleware.isLoggedIn, function (req, res) {
                 res.redirect("/events/" + req.params.eventId + "/days");
             }
             else {
-                if (slots == null || slots[0] == null) {
+                if (slots.length < 1) {
                     logger.error("No available slot found");
-                    res.redirect("/events/" + req.params.eventId + "/days");
+                    res.redirect("/events");
                 }
                 else {
                     // logger.debug("slots[0]=" + slots[0]);
@@ -220,11 +220,11 @@ router.get("/nextAvail/:date", middleware.isLoggedIn, function (req, res) {
                         .exec(function (err, day) {
                             if (err) {
                                 logger.error(err);
-                                res.redirect("/events/" + req.params.eventId + "/days");
+                                res.redirect("/events");
                             }
                             if (day == null) {
                                 logger.error("nextavail; day not found");
-                                res.redirect("/events/" + req.params.eventId + "/days");
+                                res.redirect("/events");
                             }
                             else {
                                 // logger.debug("day=" + day);
