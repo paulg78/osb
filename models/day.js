@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 
 var daySchema = new mongoose.Schema({
-   date: String,
+   date: Date,
    slots: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "Slot"

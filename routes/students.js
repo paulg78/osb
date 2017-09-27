@@ -19,16 +19,10 @@ router.get("/", middleware.isLoggedIn,
             // logger.debug("after next");
             Student.find()
                 .hint("fname_1_lname_1")
-                // .populate('day', { date: 1, _id: 0 })
-                // .populate('slot', { sdate: 1, time: 1, _id: 0 })
                 .populate('slot', { sdate: 1, _id: 0 })
-                // .sort({
-                //     fname: 1,
-                //     lname: 1
-                // })
                 .exec(function (err, queryResponse) {
                     if (err) {
-                        logger.error(err.errmsg);
+                        logger.error(err.message);
                         req.flash("error", "System Error: " + err.message);
                         res.redirect("back");
                     }
@@ -60,8 +54,6 @@ router.get("/", middleware.isLoggedIn,
                 Student.find({
                         school: res.locals.currentUser.school
                     }, { school: 0 })
-                    // .populate('day', { date: 1, _id: 0 })
-                    // .populate('slot', { sdate: 1, time: 1, _id: 0 })
                     .populate('slot', { sdate: 1, _id: 0 })
                     .sort({
                         fname: 1,

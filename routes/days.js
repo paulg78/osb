@@ -120,7 +120,6 @@ router.get("/:dayId/school", middleware.isLoggedIn, getPrevNextIds, function (re
                                 // logger.debug("sched=" + JSON.stringify(sched));
                                 // logger.debug("unsched=" + unsched);
                                 res.render("days/schoolSchedule", {
-                                    // eventId: req.params.eventId,
                                     day: foundDay,
                                     sched: sched,
                                     unsched: unsched
@@ -186,7 +185,6 @@ router.get("/:dayId", middleware.isLoggedIn, getPrevNextIds, function (req, res)
                                 // logger.debug("sched=" + JSON.stringify(sched));
                                 // res.redirect("/events/" + req.params.eventId + "/days");
                                 res.render("days/schedule", {
-                                    eventId: req.params.eventId,
                                     day: foundDay,
                                     sched: sched
                                 });
@@ -205,7 +203,7 @@ router.get("/nextAvail/:date", middleware.isLoggedIn, function (req, res) {
         .exec(function (err, slots) {
             if (err) {
                 logger.error(err);
-                res.redirect("/events/" + req.params.eventId + "/days");
+                res.redirect("/events");
             }
             else {
                 if (slots.length < 1) {
@@ -213,10 +211,9 @@ router.get("/nextAvail/:date", middleware.isLoggedIn, function (req, res) {
                     res.redirect("/events");
                 }
                 else {
-                    // logger.debug("slots[0]=" + slots[0]);
-                    var s = (slots[0].sdate.getMonth() + 1) + "/" + slots[0].sdate.getDate();
-                    // logger.debug("s=" + s);
-                    Day.findOne({ date: { $regex: ".*" + s + ".*" } }, { _id: 1 })
+                    logger.debug("slots[0]=" + slots[0]);
+                    var d=slots[0].sdate;
+                    Day.findOne({ date: new Date(d.getFullYear(), d.getMonth(), d.getDate()) }, { _id: 1 })
                         .exec(function (err, day) {
                             if (err) {
                                 logger.error(err);

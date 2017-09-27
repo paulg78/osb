@@ -20,7 +20,7 @@ function timeString(d) {
 <div class="container">
     <div class="row">
         <div class="col-sm-12">
-            <h2 style="text-align: center">Fitting Schedule <%= day.date %></h2>
+            <h2 style="text-align: center">Fitting Schedule: <%= day.date.toLocaleDateString("en-US", {weekday: 'long', year: '2-digit', month: '2-digit', day: 'numeric'}) %></h2>
             <div class="row" style="display:flex; flex-wrap: wrap;">
                 <% for (var i = 0, iLim = day.slots.length; i < iLim; i++){ %>
                     <div class="col-sm-3 solidborder">
