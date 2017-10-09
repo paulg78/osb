@@ -256,8 +256,8 @@ router.get("/:eventId/nextAvail/:date", middleware.isLoggedIn, function (req, re
             }
             else {
                 if (slots == null || slots[0] == null) {
-                    logger.error("No available slot found");
-                    res.redirect("/events/" + req.params.eventId + "/days");
+                    logger.info("No available slot found");
+                    res.redirect("/events");
                 }
                 else {
                     // logger.debug("slots[0]=" + slots[0]);

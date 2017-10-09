@@ -56,13 +56,13 @@ mongoose.connect(process.env.DATABASEURL, {
 });
 
 // redirect http to https
-var forceSsl = function (req, res, next) {
-  if (req.headers['x-forwarded-proto'] !== 'https') {
-    return res.redirect(['https://', req.get('Host'), req.url].join(''));
-  }
-  return next();
-};
-app.use(forceSsl);
+// var forceSsl = function (req, res, next) {
+    //   if (req.headers['x-forwarded-proto'] !== 'https') {
+    //     return res.redirect(['https://', req.get('Host'), req.url].join(''));
+    //   }
+    //   return next();
+    // };
+    // app.use(forceSsl);
 
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({
