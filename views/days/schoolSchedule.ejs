@@ -25,7 +25,7 @@ function toStr2(x) {
         return s;
     }
 }
-function dateString(dt) {
+function nextDate(dt) {
     // logger.debug("** first time slot dt=" + dt);
     // drop the time (so it will be start of day) and add a day (javascript will roll to next month as needed)
     var d = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
@@ -86,7 +86,7 @@ function dateString(dt) {
                 <a class="btn btn-info" href="/events">List days</a>
                 <% if (nextDayId) { %>
                     <a class="btn btn-info" href= <%= "/days/" + nextDayId + "/school" %> ><span class="glyphicon glyphicon-chevron-right"></span></a>
-                    <a class="btn btn-info" href=<%="/days/nextAvail/" + dateString(day.slots[0].sdate)%>>Next Avail</a>
+                    <a class="btn btn-info" href=<%="/days/nextAvail/" + nextDate(day.slots[0].sdate)%>>Next Avail</a>
                 <%     } %>
                 </div>
             </div>

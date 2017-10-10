@@ -36,7 +36,7 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
 });
 
 
-// Middleware function to poupluate res.locals with previous and next day Ids
+// Middleware function to popluate res.locals with previous and next day Ids
 var getPrevNextIds = function (req, res, next) {
     // Find event to populate previous and next days
     res.locals.prevDayId = "";
@@ -141,7 +141,7 @@ router.get("/:dayId", middleware.isLoggedIn, getPrevNextIds, function (req, res)
         .exec(function (err, foundDay) {
             if (err) {
                 logger.error(err);
-                req.flash("System error:", err.message);
+                req.flash("error", "System error:" + err.message);
                 return res.redirect("back");
             }
             else {
@@ -202,37 +202,41 @@ router.get("/nextAvail/:date", middleware.isLoggedIn, function (req, res) {
     Slot.find({ $where: qry }, { sdate: 1 }).limit(1).hint("sdate_1")
         .exec(function (err, slots) {
             if (err) {
-                logger.error(err);
-                res.redirect("/events");
+                logger.error("error finding next avail: " + err.message);
+                req.flash("error", "Next available day not found.");
+                res.redirect("back");
             }
             else {
                 if (slots.length < 1) {
-                    logger.error("No available slot found");
-                    res.redirect("/events");
+                    logger.info("No available slot found");
+                    req.flash("error", "Next available day not found.");
+                    res.redirect("back");
                 }
                 else {
-                    logger.debug("slots[0]=" + slots[0]);
-                    var d=slots[0].sdate;
-                    Day.findOne({ date: new Date(d.getFullYear(), d.getMonth(), d.getDate()) }, { _id: 1 })
-                        .exec(function (err, day) {
-                            if (err) {
-                                logger.error(err);
-                                res.redirect("/events");
-                            }
-                            if (day == null) {
-                                logger.error("nextavail; day not found");
-                                res.redirect("/events");
-                            }
-                            else {
-                                // logger.debug("day=" + day);
-                                if (res.locals.currentUser.role == 'role_sc') {
-                                    res.redirect("/days/" + day._id + "/school");
-                                }
-                                else {
-                                    res.redirect("/days/" + day._id);
-                                }
-                            }
-                        });
+                    // logger.debug("slots[0]=" + slots[0]);
+                    // get day Id for slot found
+                    var slotMMDD = slots[0].sdate.getMonth() + slots[0].sdate.getDate();
+                    for (var i = 0, iLen = global.evnt.days.length; i < iLen; i++) {
+                        // logger.debug("i=" + i + ", iLen=" + iLen + ", global.evnt.days[i]._id=" + global.evnt.days[i]._id);
+                        if (slotMMDD == global.evnt.days[i].date.getMonth() + global.evnt.days[i].date.getDate()) {
+                            // logger.debug("global.evnt.days[i]=" + global.evnt.days[i]);
+                            break;
+                        }
+                    }
+                    if (i < iLen) {
+                        // logger.debug("day=" + day);
+                        if (res.locals.currentUser.role == 'role_sc') {
+                            res.redirect("/days/" + global.evnt.days[i]._id + "/school");
+                        }
+                        else {
+                            res.redirect("/days/" + global.evnt.days[i]._id);
+                        }
+                    }
+                    else {
+                        logger.error("nextavail; day not found");
+                        req.flash("error", "Next available day not found.");
+                        res.redirect("back");
+                    }
                 }
             }
         });
