@@ -18,7 +18,8 @@ $('#newStudentForm').submit(function (e) {
                 $('#addMsg').text(result.student.fname + " " + result.student.lname + " added.");
                 $('#newStudentForm').find('.form-control').val("");
                 $('#newStudentForm').find('.form-control').first().focus();
-            } else {
+            }
+            else {
                 if (result.msg != null) {
                     $('#addMsg').removeClass('failMsg successMsg');
                     $('#addMsg').addClass('failMsg');
@@ -43,4 +44,16 @@ $(".delStudBtn").on('click', function (e) {
     if (confirm("Ready to delete " + tds[0].innerText + " " + tds[1].innerText + ".  Click Cancel or OK.") != true) {
         e.preventDefault();
     }
+});
+
+$(".schedStdnt").on('shown.bs.select', function (e) {
+    e.preventDefault();
+    this.oldValue = this.value;
+    console.log("old=" + this.oldValue);
+});
+
+
+$(".schedStdnt").on('changed.bs.select', function (e) {
+    e.preventDefault();
+    console.log("changed schedule from " + this.oldValue + " to " + this.value);
 });

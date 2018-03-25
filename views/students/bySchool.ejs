@@ -89,7 +89,7 @@ function dateString(d) {
             <td><%= student.lname %></td>
             <td><%= student.grade %></td>
             <td>
-            <select class="selectpicker">
+            <select class="selectpicker schedStdnt">
                 <option>
             <% if (student.slot != null) { %>
                 <%= dateString(student.slot.sdate) %>
@@ -144,5 +144,4 @@ $(function(){
 });
 
 </script>
-
 <% include ../partials/footer %>
