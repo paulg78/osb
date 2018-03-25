@@ -1,4 +1,17 @@
 <% include ../partials/header %>
+
+<!-- Bootstrap-select files -->
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
+
+<!-- (Optional) Latest compiled and minified JavaScript translation files
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/i18n/defaults-*.min.js"></script>
+-->
+
+<!-- tablesorter files -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/css/theme.bootstrap_3.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.widgets.min.js"></script>
@@ -58,6 +71,7 @@ function dateString(d) {
             </form>
             <p></p>
     <% } %>
+
      <table id="studentTable" class="table table-striped tablesorter">
          <thead>
              <tr>
@@ -75,7 +89,7 @@ function dateString(d) {
             <td><%= student.lname %></td>
             <td><%= student.grade %></td>
             <td>
-            <select>
+            <select class="selectpicker">
                 <option>
             <% if (student.slot != null) { %>
                 <%= dateString(student.slot.sdate) %>
@@ -83,8 +97,9 @@ function dateString(d) {
             </option>
             <option>wed</option>
             <optgroup label="thu">
+            <option>thu 9/14/18 10:00 AM</option>
             <option>thu 9/14/18 11:00 AM</option>
-            <option>thu 9/14/18 11:00 AM</option>
+            <option>thu 9/14/18 12:00 AM</option>
             </optgroup>
             <option>fri 9/15/18 12:00 AM</option>
             </select>
@@ -111,12 +126,21 @@ function dateString(d) {
 <script src="/js/ajax.js"></script>
 
 <script>
+
+$(document).ready(function () {
+
+$('.selectpicker').selectpicker({
+  style: 'btn-info',
+  size: 20
+});
+
 $(function(){
   $("#studentTable").tablesorter(
       { theme: 'bootstrap',
         headerTemplate : '{content} {icon}',
         widgets : [ "uitheme" ]
       });
+});
 });
 
 </script>
