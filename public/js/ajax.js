@@ -1,6 +1,7 @@
 'use strict';
 
 /* global $ */
+/* global Option */
 $('#newStudentForm').submit(function (e) {
     e.preventDefault();
     var studentStr = $(this).serialize();
@@ -46,14 +47,22 @@ $(".delStudBtn").on('click', function (e) {
     }
 });
 
-$(".schedStdnt").on('shown.bs.select', function (e) {
-    e.preventDefault();
+$(".schedStdnt").on('show.bs.select', function (e) {
+    // e.preventDefault();
     this.oldValue = this.value;
-    console.log("old=" + this.oldValue);
+    this.add(new Option('Text 1', 'Value1'));
+    this.add(new Option('Text 2', 'Value2'));
+    this.add(new Option('Text 3', 'Value3'));
+    $(this).selectpicker('refresh');
+    // console.log(this.options[2]);
+    // console.log("old=" + this.oldValue);
 });
 
+$(".schedStdnt").on('hidden.bs.select', function (e) {
+    $(this).children('option:not(:first)').remove();
+});
 
 $(".schedStdnt").on('changed.bs.select', function (e) {
     e.preventDefault();
-    console.log("changed schedule from " + this.oldValue + " to " + this.value);
+    // console.log("changed schedule from " + this.oldValue + " to " + this.value);
 });

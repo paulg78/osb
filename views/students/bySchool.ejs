@@ -90,18 +90,15 @@ function dateString(d) {
             <td><%= student.grade %></td>
             <td>
             <select class="selectpicker schedStdnt">
-                <option>
+                <option value=
+            <% if (student.slot != null) { %>
+                <%= student.slot.sdate.toISOString() %>
+            <% } %>
+                >
             <% if (student.slot != null) { %>
                 <%= dateString(student.slot.sdate) %>
             <% } %>
             </option>
-            <option>wed</option>
-            <optgroup label="thu">
-            <option>thu 9/14/18 10:00 AM</option>
-            <option>thu 9/14/18 11:00 AM</option>
-            <option>thu 9/14/18 12:00 AM</option>
-            </optgroup>
-            <option>fri 9/15/18 12:00 AM</option>
             </select>
             </td>
             <td>
