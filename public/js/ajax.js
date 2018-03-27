@@ -2,6 +2,24 @@
 
 /* global $ */
 /* global Option */
+function dateString(d) {
+    var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    var h = d.getHours();
+    var ap;
+    if (h > 12) {
+        h = h - 12;
+        ap = "PM";
+    }
+    else {
+        ap = "AM";
+    }
+    var m = d.getMinutes();
+    if (m == 0) {
+        m = "00";
+    }
+    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
+}
+
 $('#newStudentForm').submit(function (e) {
     e.preventDefault();
     var studentStr = $(this).serialize();
@@ -48,21 +66,42 @@ $(".delStudBtn").on('click', function (e) {
 });
 
 $(".schedStdnt").on('show.bs.select', function (e) {
-    // e.preventDefault();
+    e.preventDefault();
     this.oldValue = this.value;
+    var sp = this;
+    $.ajax({
+        url: "/slots/avail",
+        type: 'GET',
+        success: function (slots) {
+            if (slots) {
+                // console.log("ajax callback executed; slots[0].sdate=" + slots[0].sdate);
+                slots.forEach(function (slot) {
+                    // sp.add(new Option(dateString(slot.sdate), slot.sdate.toISOString()));
+                    sp.add(new Option(slot.sdate, slot.sdate));
+                });
+                sp.add(new Option('from server', 'val from server'));
+                $(this).selectpicker('refresh');
+            }
+            else {
+                console.log("returned false");
+            }
+        }
+    });
     this.add(new Option('Text 1', 'Value1'));
     this.add(new Option('Text 2', 'Value2'));
-    this.add(new Option('Text 3', 'Value3'));
+    this.add(new Option(new Date(), new Date()));
+    console.log("finished ajax call");
+
     $(this).selectpicker('refresh');
     // console.log(this.options[2]);
     // console.log("old=" + this.oldValue);
 });
 
 $(".schedStdnt").on('hidden.bs.select', function (e) {
-    $(this).children('option:not(:first)').remove();
+    // $(this).children('option:not(:first)').remove();
 });
 
 $(".schedStdnt").on('changed.bs.select', function (e) {
     e.preventDefault();
-    // console.log("changed schedule from " + this.oldValue + " to " + this.value);
+    console.log("changed schedule from " + this.oldValue + " to " + this.value);
 });

@@ -6,6 +6,25 @@ var middleware = require("../middleware");
 /* global logger */
 
 
+// Return list of available slots
+router.get("/avail", function (req, res) {
+    // var qry = "this.sdate > new Date('" + req.params.date + "') && this.count < this.max";
+    var qry = "this.count < this.max";
+    // logger.debug("* qry=" + qry);
+    Slot.find({ $where: qry }, { _id: 0, sdate: 1 }).hint("sdate_1")
+        .exec(function (err, slots) {
+            if (err) {
+                logger.error("error finding avail slots: " + err.message);
+                res.status(500).send(err.message);
+            }
+            else {
+                logger.debug("avail slots: " + slots);
+                res.json(slots);
+            }
+        });
+});
+
+
 // in slots, find and optionally fix counts that don't match actual number of students scheduled
 router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function (req, res) {
     if (res.locals.currentUser.role != 'role_wa') {
