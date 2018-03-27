@@ -12,6 +12,7 @@ router.get("/avail", function (req, res) {
     var qry = "this.count < this.max";
     // var qry = "this.count > 100";  // returns 0 slots
     // logger.debug("* qry=" + qry);
+    // Slot.find({ $where: qry }, { _id: 0, sdate: 1 }).hint("sdate_1").sort({ sdate: 1 })
     Slot.find({ $where: qry }, { _id: 0, sdate: 1 }).hint("sdate_1")
         .exec(function (err, slots) {
             if (err) {
