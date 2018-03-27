@@ -34,6 +34,10 @@ function missed(date) {
 
 function dateString(d) {
     var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000);
+}
+
+function timeString(d) {
     var h=d.getHours();
     var ap;
     if (h>12) {
@@ -47,10 +51,9 @@ function dateString(d) {
     if (m==0) {
         m="00";
     }
-    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
+    return h + ":" + m + " " + ap;
 }
 %>
-
     <h2><%=qrySchool.name + " -- Allotment: " + qrySchool.quota + ",  Remaining: "%><span id='remaining'><%= (qrySchool.quota-students.length) %></h2>
     <% if (qrySchool.quota-students.length > 0) { %>
         <div style="width: 100%; margin: 25px auto;">
@@ -72,13 +75,15 @@ function dateString(d) {
             <p></p>
     <% } %>
 
-     <table id="studentTable" class="table table-striped tablesorter">
+    <span class="hidden" id="slotsAvail"></span>
+    <table id="studentTable" class="table table-striped tablesorter">
          <thead>
              <tr>
              <th>First Name</th>
              <th>Last Name</th>
              <th>Grade</th>
-             <th class="sorter-false">Scheduled</th>
+             <th class="sorter-false">Date</th>
+             <th class="sorter-false">Time</th>
              <th>Served</th>
              </tr>
         </thead>
@@ -89,16 +94,29 @@ function dateString(d) {
             <td><%= student.lname %></td>
             <td><%= student.grade %></td>
             <td>
-            <select class="selectpicker schedStdnt">
+            <select class="selectpicker dateSched">
                 <option value=
-            <% if (student.slot != null) { %>
-                <%= student.slot.sdate.toISOString() %>
-            <% } %>
-                >
-            <% if (student.slot != null) { %>
-                <%= dateString(student.slot.sdate) %>
-            <% } %>
-            </option>
+                    <% if (student.slot != null) { %>
+                        <%= student.slot.sdate.toISOString() %>
+                    <% } %>
+                        >
+                    <% if (student.slot != null) { %>
+                        <%= dateString(student.slot.sdate) %>
+                    <% } %>
+                </option>
+            </select>
+            </td>
+            <td>
+            <select class="selectpicker timeSched">
+                <option value=
+                    <% if (student.slot != null) { %>
+                        <%= student.slot.sdate.getTime() %>
+                    <% } %>
+                        >
+                    <% if (student.slot != null) { %>
+                        <%= timeString(student.slot.sdate) %>
+                    <% } %>
+                </option>
             </select>
             </td>
             <td>
@@ -121,7 +139,6 @@ function dateString(d) {
         </tbody>
     </table>
 <script src="/js/ajax.js"></script>
-
 <script>
 
 $(document).ready(function () {
@@ -138,7 +155,10 @@ $(function(){
         widgets : [ "uitheme" ]
       });
 });
+
+getAvailSlots();
 });
 
 </script>
+
 <% include ../partials/footer %>

@@ -10,6 +10,7 @@ var middleware = require("../middleware");
 router.get("/avail", function (req, res) {
     // var qry = "this.sdate > new Date('" + req.params.date + "') && this.count < this.max";
     var qry = "this.count < this.max";
+    // var qry = "this.count > 100";  // returns 0 slots
     // logger.debug("* qry=" + qry);
     Slot.find({ $where: qry }, { _id: 0, sdate: 1 }).hint("sdate_1")
         .exec(function (err, slots) {
@@ -18,8 +19,8 @@ router.get("/avail", function (req, res) {
                 res.status(500).send(err.message);
             }
             else {
-                logger.debug("avail slots: " + slots);
-                res.json(slots);
+                // logger.debug("avail slots: " + slots);
+                res.json(JSON.stringify(slots));
             }
         });
 });

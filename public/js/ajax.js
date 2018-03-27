@@ -2,6 +2,7 @@
 
 /* global $ */
 /* global Option */
+
 function dateString(d) {
     var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     var h = d.getHours();
@@ -65,36 +66,60 @@ $(".delStudBtn").on('click', function (e) {
     }
 });
 
-$(".schedStdnt").on('show.bs.select', function (e) {
-    e.preventDefault();
-    this.oldValue = this.value;
-    var sp = this;
+// $("body").on('load', function (e) {
+//     // e.preventDefault();
+//     //  var sp = this;
+//     $.ajax({
+//         url: "/slots/avail",
+//         type: 'GET',
+//         success: function (slots) {
+//             if (slots) {
+//                 console.log("ajax callback executed; slots[0].sdate=" + slots[0].sdate);
+//                 // slots.forEach(function (slot) {
+//                 //     // sp.add(new Option(dateString(slot.sdate), slot.sdate.toISOString()));
+//                 //     sp.add(new Option(slot.sdate, slot.sdate));
+//                 // });
+//                 // sp.add(new Option('from server', 'val from server'));
+//                 // $(this).selectpicker('refresh');
+//             }
+//             else {
+//                 console.log("returned false");
+//             }
+//         }
+//     });
+//     console.log("finished ajax call");
+// });
+
+function getAvailSlots() {
+    // e.preventDefault();
+    //  var sp = this;
     $.ajax({
         url: "/slots/avail",
         type: 'GET',
         success: function (slots) {
-            if (slots) {
-                // console.log("ajax callback executed; slots[0].sdate=" + slots[0].sdate);
-                slots.forEach(function (slot) {
-                    // sp.add(new Option(dateString(slot.sdate), slot.sdate.toISOString()));
-                    sp.add(new Option(slot.sdate, slot.sdate));
-                });
-                sp.add(new Option('from server', 'val from server'));
-                $(this).selectpicker('refresh');
-            }
-            else {
-                console.log("returned false");
-            }
+            console.log("slots returned=" + slots + ".");
+            // console.log("ajax callback executed; slots[0].sdate=" + slots[0].sdate);
+            $("#slotsAvail").text(slots);
+            // slots.forEach(function (slot) {
+            //     // sp.add(new Option(dateString(slot.sdate), slot.sdate.toISOString()));
+            //     sp.add(new Option(slot.sdate, slot.sdate));
+            // });
+            // sp.add(new Option('from server', 'val from server'));
+            // $(this).selectpicker('refresh');
         }
     });
-    this.add(new Option('Text 1', 'Value1'));
-    this.add(new Option('Text 2', 'Value2'));
-    this.add(new Option(new Date(), new Date()));
-    console.log("finished ajax call");
+    // console.log("finished getAvailSlots");
+}
 
+$(".dateSched").on('show.bs.select', function (e) {
+    // var slots = JSON.parse($("#slotsAvail").text());
+    // slots.forEach(function (slot) {
+    //     $(this).add(new Option(slot.sdate));
+    // });
+    console.log("adding option");
+    $(this).add(new Option("another"));
     $(this).selectpicker('refresh');
     // console.log(this.options[2]);
-    // console.log("old=" + this.oldValue);
 });
 
 $(".schedStdnt").on('hidden.bs.select', function (e) {
