@@ -76,7 +76,7 @@ function getAvailSlots() {
         url: "/slots/avail",
         type: 'GET',
         success: function (slots) {
-            console.log("slots returned=" + slots + ".");
+            // console.log("slots returned=" + slots + ".");
             // console.log("ajax callback executed; slots[0].sdate=" + slots[0].sdate);
             $("#slotsAvail").text(slots);
         }
@@ -90,7 +90,7 @@ $(".dateSched").on('show.bs.select', function (e) {
     var prevmd = "";
     var sel = new Date(this.value);
     var selmd = sel.getMonth() + "-" + sel.getDate();
-    console.log("selmd=" + selmd);
+    // console.log("selmd=" + selmd);
     for (i = 0; i < slots.length; i++) {
         d = new Date(slots[i].sdate);
         md = d.getMonth() + "-" + d.getDate();
@@ -109,15 +109,23 @@ $(".dateSched").on('hidden.bs.select', function (e) {
 
 $(".timeSched").on('show.bs.select', function (e) {
     var slots = JSON.parse($("#slotsAvail").text());
-    var i;
+    console.log("selected date=" + $(this).parent().parent().prev().find(".dateSched")[1].value);
+
+    var i, d, md;
+    var sel = new Date($(this).parent().parent().prev().find(".dateSched")[1].value);
+    var selmd = sel.getMonth() + "-" + sel.getDate();
     for (i = 0; i < slots.length; i++) {
-        this.add(new Option(timeString(new Date(slots[i].sdate)), slots[i].sdate));
+        d = new Date(slots[i].sdate);
+        md = d.getMonth() + "-" + d.getDate();
+        if (md == selmd) {
+            this.add(new Option(timeString(new Date(slots[i].sdate)), slots[i].sdate));
+        }
     }
     $(this).selectpicker('refresh');
 });
 
 $(".timeSched").on('hidden.bs.select', function (e) {
-    // $(this).children('option:not(:first)').remove();
+    $(this).children('option:not(:first)').remove();
 });
 
 // $(".schedStdnt").on('changed.bs.select', function (e) {
