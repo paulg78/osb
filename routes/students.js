@@ -189,7 +189,8 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
 });
 
 // Find student and render form
-router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
+// router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
+router.get("/:id/edit", function (req, res) {
     Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, day: 1, slot: 1 })
         // .populate('day', { _id: 0, date: 1 })
         .populate('slot', { _id: 1, sdate: 1 })
@@ -215,13 +216,22 @@ router.put("/:id", function (req, res) {
         lname: req.body.lastName,
         grade: req.body.grade
     };
-    // logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
+    logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
 
     var result = studentValid(newData);
+    // verify that time is present if date is present
+    if (req.body.dateSched && !req.body.timeSched) {
+        result = "Date and Time are required to schedule a student.";
+    }
     if (result == "") {
         if (req.body.unschedule == "y") { // remove appointment from student
             newData.day = null;
             newData.slot = null;
+        }
+        else if (req.body.dateSched && req.body.timeSched) {
+            // schedule/reschedule student
+            // combine logic for unscheduling and scheduling
+
         }
         Student.findByIdAndUpdate(req.params.id, {
                 $set: newData
