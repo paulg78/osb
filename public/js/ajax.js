@@ -9,7 +9,7 @@ function dateString(d) {
 }
 
 function timeString(d) {
-    var h = d.getHours();
+    var h = d.getUTCHours();
     var ap;
     if (h > 12) {
         h = h - 12;
