@@ -269,6 +269,119 @@ router.put("/:id", function (req, res) {
     }
 });
 
+// Update student/slots in database
+router.put("/:id", function (req, res) {
+    var newData = {
+        fname: req.body.firstName,
+        lname: req.body.lastName,
+        grade: req.body.grade
+    };
+    logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
+
+    var result = studentValid(newData);
+    // verify that time is present if date is present
+    if (req.body.dateSched && !req.body.timeSched) {
+        result = "Date and Time are required to schedule a student.";
+    }
+    if (result == "") {
+        async.waterfall([
+            updateNewSlot,
+            findNewDay,
+            updateStudent,
+            updateOldSlot,
+
+            updateStudent,
+        ], function (err, avail) {
+            if (err) {
+                logger.error(err.message);
+                req.flash("error", "Changes not saved: " + err.message);
+                res.redirect("back");
+            }
+            else {
+                // logger.debug("del-sending json response");
+                res.json({ "avail": avail });
+                // logger.debug("del-json response sent");
+            }
+        });
+
+
+        if (req.body.unschedule == "y") { // remove appointment from student
+            newData.day = null;
+            newData.slot = null;
+        }
+        else if (req.body.dateSched && req.body.timeSched) {
+            // schedule/reschedule student
+            // combine logic for unscheduling and scheduling
+
+        }
+        Student.findByIdAndUpdate(req.params.id, {
+                $set: newData
+            }, {
+                projection: { _id: 1, slot: 1 },
+            },
+            function (err, student) {
+                if (err) {
+                    logger.error("edit student, saving student" + err.message);
+                    req.flash("error", err.message);
+                    res.redirect("back");
+                }
+                else {
+                    // logger.debug("student=" + student);
+                    if (req.body.unschedule == "y") { // remove student from slot
+                        Slot.findByIdAndUpdate(student.slot, {
+                                $inc: { count: -1 }
+                            },
+                            function (err) {
+                                if (err) {
+                                    logger.error("edit student, saving slot" + err.message);
+                                }
+                            });
+                    }
+                    // logger.debug("Updating student");
+                    req.flash("success", "Successfully Updated!");
+                    res.redirect("/students");
+                }
+            });
+    }
+    else {
+        // logger.debug("edit validation error");
+        req.flash("error", result);
+        res.redirect("back");
+    }
+
+    function updateNewSlot(callback) {
+        // logger.debug("in updateNewSlot");
+        if (req.body.unschedule != "y") { // Not removing student from sched, so their is a new slot
+
+        }
+    }
+
+    function findNewDay(callback) {
+        // logger.debug("in findNewDay");
+    }
+
+    function updateStudent(callback) {
+        // logger.debug("in updateStudent");
+    }
+
+    function updateOldSlot(callback) {
+        // logger.debug("in updateOldSlot");
+        if (req.body.unschedule == "y") { // remove appointment from student
+            newData.day = null;
+            newData.slot = null;
+            Slot.findByIdAndUpdate(student.slot, {
+                    $inc: { count: -1 }
+                },
+                function (err) {
+                    if (err) {
+                        logger.error("edit student, saving slot" + err.message);
+                    }
+                });
+        }
+    }
+
+});
+
 // Check In
 router.put("/:id/checkIn/:served", function (req, res) {
     // logger.debug("req.params.served=" + req.params.served);
