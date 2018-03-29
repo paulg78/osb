@@ -1,16 +1,4 @@
 <% include ../partials/header %>
-
-<!-- Bootstrap-select files -->
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/css/bootstrap-select.min.css">
-
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/bootstrap-select.min.js"></script>
-
-<!-- (Optional) Latest compiled and minified JavaScript translation files
-<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.4/js/i18n/defaults-*.min.js"></script>
--->
-
 <!-- tablesorter files -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/css/theme.bootstrap_3.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.min.js"></script>
@@ -34,10 +22,6 @@ function missed(date) {
 
 function dateString(d) {
     var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000);
-}
-
-function timeString(d) {
     var h=d.getHours();
     var ap;
     if (h>12) {
@@ -51,9 +35,10 @@ function timeString(d) {
     if (m==0) {
         m="00";
     }
-    return h + ":" + m + " " + ap;
+    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
 }
 %>
+
     <h2><%=qrySchool.name + " -- Allotment: " + qrySchool.quota + ",  Remaining: "%><span id='remaining'><%= (qrySchool.quota-students.length) %></h2>
     <% if (qrySchool.quota-students.length > 0) { %>
         <div style="width: 100%; margin: 25px auto;">
@@ -74,16 +59,13 @@ function timeString(d) {
             </form>
             <p></p>
     <% } %>
-
-    <span class="hidden" id="slotsAvail"></span>
-    <table id="studentTable" class="table table-striped tablesorter">
+     <table id="studentTable" class="table table-striped tablesorter">
          <thead>
              <tr>
              <th>First Name</th>
              <th>Last Name</th>
              <th>Grade</th>
-             <th class="sorter-false">Date</th>
-             <th class="sorter-false">Time</th>
+             <th class="sorter-shortDate dateFormat-ddmmyyyy">Scheduled</th>
              <th>Served</th>
              </tr>
         </thead>
@@ -93,32 +75,11 @@ function timeString(d) {
             <td><%= student.fname %></td>
             <td><%= student.lname %></td>
             <td><%= student.grade %></td>
-            <td>
-            <select class="selectpicker dateSched">
-                <option value=
-                    <% if (student.slot != null) { %>
-                        <%= student.slot.sdate.toISOString() %>
-                    <% } %>
-                        >
-                    <% if (student.slot != null) { %>
-                        <%= dateString(student.slot.sdate) %>
-                    <% } %>
-                </option>
-            </select>
-            </td>
-            <td>
-            <select class="selectpicker timeSched">
-                <option value=
-                    <% if (student.slot != null) { %>
-                        <%= student.slot.sdate.getTime() %>
-                    <% } %>
-                        >
-                    <% if (student.slot != null) { %>
-                        <%= timeString(student.slot.sdate) %>
-                    <% } %>
-                </option>
-            </select>
-            </td>
+            <% if (student.slot != null) { %>
+                <td><%= dateString(student.slot.sdate) %></td>
+            <% } else { %>
+                <td></td>
+                <% } %>
             <td>
                 <% if (student.served) { %>
                     <p class="bg-success">Yes</p>
@@ -139,15 +100,8 @@ function timeString(d) {
         </tbody>
     </table>
 <script src="/js/ajax.js"></script>
+
 <script>
-
-$(document).ready(function () {
-
-$('.selectpicker').selectpicker({
-  style: 'btn-info',
-  size: 20
-});
-
 $(function(){
   $("#studentTable").tablesorter(
       { theme: 'bootstrap',
@@ -155,10 +109,6 @@ $(function(){
         widgets : [ "uitheme" ]
       });
 });
-
-getAvailSlots();
-});
-
 </script>
 
 <% include ../partials/footer %>
