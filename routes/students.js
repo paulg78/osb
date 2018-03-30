@@ -210,7 +210,7 @@ router.get("/:id/edit", function (req, res) {
 });
 
 // Update student in database
-router.put("/:id", function (req, res) {
+router.put("/:id/old", function (req, res) {
     var newData = {
         fname: req.body.firstName,
         lname: req.body.lastName,
@@ -298,50 +298,10 @@ router.put("/:id", function (req, res) {
                 res.redirect("back");
             }
             else {
-                // logger.debug("del-sending json response");
-                res.json({ "avail": avail });
-                // logger.debug("del-json response sent");
+                req.flash("success", "Successfully Updated!");
+                res.redirect("/students");
             }
         });
-
-
-        if (req.body.unschedule == "y") { // remove appointment from student
-            newData.day = null;
-            newData.slot = null;
-        }
-        else if (req.body.dateSched && req.body.timeSched) {
-            // schedule/reschedule student
-            // combine logic for unscheduling and scheduling
-
-        }
-        Student.findByIdAndUpdate(req.params.id, {
-                $set: newData
-            }, {
-                projection: { _id: 1, slot: 1 },
-            },
-            function (err, student) {
-                if (err) {
-                    logger.error("edit student, saving student" + err.message);
-                    req.flash("error", err.message);
-                    res.redirect("back");
-                }
-                else {
-                    // logger.debug("student=" + student);
-                    if (req.body.unschedule == "y") { // remove student from slot
-                        Slot.findByIdAndUpdate(student.slot, {
-                                $inc: { count: -1 }
-                            },
-                            function (err) {
-                                if (err) {
-                                    logger.error("edit student, saving slot" + err.message);
-                                }
-                            });
-                    }
-                    // logger.debug("Updating student");
-                    req.flash("success", "Successfully Updated!");
-                    res.redirect("/students");
-                }
-            });
     }
     else {
         // logger.debug("edit validation error");
@@ -350,34 +310,74 @@ router.put("/:id", function (req, res) {
     }
 
     function updateNewSlot(callback) {
-        // logger.debug("in updateNewSlot");
-        if (req.body.unschedule != "y") { // Not removing student from sched, so their is a new slot
-
+        logger.debug("in updateNewSlot");
+        if (req.body.timeSched) { // there is a new slot
+            Slot.findOneAndUpdate({ sdate: new Date(req.body.timeSched) }, {
+                $inc: { count: 1 }
+            }, {
+                projection: { _id: 1, count: 1, max: 1 },
+                returnNewDocument: false // returns count before increment, true doesn't seem to work
+            }, function (err, slot) {
+                logger.debug("slot before update=" + slot);
+                if (err) {
+                    callback(err, null);
+                }
+                else {
+                    if (slot.count >= slot.max) { // slot is over-filled (count is one less than actual)
+                        // restore original since slot is full and student won't be added
+                        Slot.findByIdAndUpdate(slot._id, {
+                                $inc: { count: -1 }
+                            },
+                            function (err) {
+                                if (err) {
+                                    callback(err, null);
+                                }
+                                else {
+                                    callback({
+                                        message: "Selected slot (" +
+                                            new Date(req.body.timeSched).
+                                        toLocaleDateString("en-US", { year: '2-digit', month: '2-digit', day: 'numeric', hour: '2-digit', minute: '2-digit' }) +
+                                        ") is already full."
+                                    }, null);
+                                }
+                            });
+                    }
+                    else {
+                        callback(null, slot._id);
+                    }
+                }
+            });
+        }
+        else {
+            callback(null, null);
         }
     }
 
-    function findNewDay(callback) {
-        // logger.debug("in findNewDay");
+    function findNewDay(newSlotId, callback) {
+        logger.debug("in findNewDay with newSlotId=" + newSlotId);
+        callback(null);
     }
 
     function updateStudent(callback) {
-        // logger.debug("in updateStudent");
+        logger.debug("in updateStudent");
+        callback(null);
     }
 
     function updateOldSlot(callback) {
-        // logger.debug("in updateOldSlot");
-        if (req.body.unschedule == "y") { // remove appointment from student
-            newData.day = null;
-            newData.slot = null;
-            Slot.findByIdAndUpdate(student.slot, {
-                    $inc: { count: -1 }
-                },
-                function (err) {
-                    if (err) {
-                        logger.error("edit student, saving slot" + err.message);
-                    }
-                });
-        }
+        logger.debug("in updateOldSlot");
+        callback(null);
+        // if (req.body.unschedule == "y") { // remove appointment from student
+        //     newData.day = null;
+        //     newData.slot = null;
+        //     Slot.findByIdAndUpdate(student.slot, {
+        //             $inc: { count: -1 }
+        //         },
+        //         function (err) {
+        //             if (err) {
+        //                 logger.error("edit student, saving slot" + err.message);
+        //             }
+        //         });
+        // }
     }
 
 });
