@@ -210,65 +210,6 @@ router.get("/:id/edit", function (req, res) {
         });
 });
 
-// Update student in database
-router.put("/:id/old", function (req, res) {
-    var newData = {
-        fname: req.body.firstName,
-        lname: req.body.lastName,
-        grade: req.body.grade
-    };
-    logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
-
-    var result = studentValid(newData);
-    // verify that time is present if date is present
-    if (req.body.dateSched && !req.body.timeSched) {
-        result = "Date and Time are required to schedule a student.";
-    }
-    if (result == "") {
-        if (req.body.unschedule == "y") { // remove appointment from student
-            newData.day = null;
-            newData.slot = null;
-        }
-        else if (req.body.dateSched && req.body.timeSched) {
-            // schedule/reschedule student
-            // combine logic for unscheduling and scheduling
-
-        }
-        Student.findByIdAndUpdate(req.params.id, {
-                $set: newData
-            }, {
-                projection: { _id: 1, slot: 1 },
-            },
-            function (err, student) {
-                if (err) {
-                    logger.error("edit student, saving student" + err.message);
-                    req.flash("error", err.message);
-                    res.redirect("back");
-                }
-                else {
-                    // logger.debug("student=" + student);
-                    if (req.body.unschedule == "y") { // remove student from slot
-                        Slot.findByIdAndUpdate(student.slot, {
-                                $inc: { count: -1 }
-                            },
-                            function (err) {
-                                if (err) {
-                                    logger.error("edit student, saving slot" + err.message);
-                                }
-                            });
-                    }
-                    // logger.debug("Updating student");
-                    req.flash("success", "Successfully Updated!");
-                    res.redirect("/students");
-                }
-            });
-    }
-    else {
-        // logger.debug("edit validation error");
-        req.flash("error", result);
-        res.redirect("back");
-    }
-});
 
 // Update student/slots in database
 router.put("/:id", function (req, res) {
@@ -403,6 +344,9 @@ router.put("/:id", function (req, res) {
                 callback(null);
             });
         }
+        else {
+            callback(null);
+        }
     }
 
 });
@@ -449,12 +393,14 @@ router.delete("/:studentId", middleware.isLoggedIn, function (req, res) {
                         }
                     });
             }
+            // req.flash("success", "Deleted " + student.fullName);
             req.flash("success", "Deleted " + student.fullName);
+            res.redirect("/students");
         }
         else {
             req.flash("success", "Student deleted ");
+            res.redirect("/students");
         }
-        res.redirect("back");
     });
 });
 

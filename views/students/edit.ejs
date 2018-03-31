@@ -81,8 +81,10 @@ function timeString(d) {
                 </div>
             </form>
             <a href="/students">Cancel</a>
-            <a href="/students/<%=student._id%>?_method=DELETE">Delete Student</a>
         </div>
+        <form style="display: inline" action="/students/<%=student._id%>?_method=DELETE" method="POST">
+            <button id="delStudBtn" class="btn btn-xs btn-danger pull-right">Delete Student</button>
+        </form>
     </div>
     <span class="hidden" id="slotsAvail"></span>
 <script src="/scripts/editStudent.js"></script>

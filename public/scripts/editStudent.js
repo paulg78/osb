@@ -82,3 +82,9 @@ $("#unschedCB").on('change', function (e) {
         $("#schedForm").show();
     }
 });
+
+$("#delStudBtn").on('click', function (e) {
+    if (confirm("Ready to delete " + $("#fname").val() + " " + $("#lname").val() + ".  Click Cancel or OK.") != true) {
+        e.preventDefault();
+    }
+});

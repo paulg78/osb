@@ -90,9 +90,9 @@ function dateString(d) {
                 <% } %>
             </td>
             <td>
-             <form style="display: inline" action="/students/<%=student._id%>?_method=DELETE" method="POST">
+             <form style="display: inline">
                 <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-primary">Edit</a>
-                <button class="delStudBtn btn btn-xs btn-danger pull-right">Delete</button>
+                <a href="/students/<%=student._id%>/printPass" class="btn btn-xs btn-primary">Passport</a>
             </form>
             </td>
         </tr>
