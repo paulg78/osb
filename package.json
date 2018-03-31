@@ -13,25 +13,25 @@
   "author": "Paul Gilbert",
   "license": "ISC",
   "dependencies": {
-    "async": "^2.3.0",
+    "async": "^2.6.0",
     "bcrypt-nodejs": "0.0.3",
-    "body-parser": "^1.14.1",
+    "body-parser": "^1.18.2",
     "connect-flash": "^0.1.1",
-    "ejs": "^2.5.7",
-    "express": "^4.13.3",
-    "express-session": "^1.15.5",
+    "ejs": "^2.5.8",
+    "express": "^4.16.3",
+    "express-session": "^1.15.6",
     "mailgun-js": "^0.11.3",
-    "method-override": "^2.3.5",
-    "mongoose": "^4.11.5",
+    "method-override": "^2.3.10",
+    "mongoose": "^4.13.12",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
-    "passport-local-mongoose": "^4.0.0",
-    "request": "^2.65.0",
-    "winston": "^2.3.1"
+    "passport-local-mongoose": "^4.5.0",
+    "request": "^2.85.0",
+    "winston": "^2.4.1"
   },
   "devDependencies": {
     "babel-preset-es2015": "^6.22.0",
-    "gulp-babel": "^6.1.2",
-    "gulp-connect": "latest"
+    "gulp-babel": "^6.1.3",
+    "gulp-connect": "^5.5.0"
   }
 }

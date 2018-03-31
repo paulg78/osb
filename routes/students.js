@@ -3,6 +3,7 @@ var router = express.Router();
 var Student = require("../models/student");
 var School = require("../models/school");
 var Slot = require("../models/slot");
+var Day = require("../models/day");
 var middleware = require("../middleware");
 var shared = require("../shared");
 var async = require('async');
@@ -289,8 +290,6 @@ router.put("/:id", function (req, res) {
             findNewDay,
             updateStudent,
             updateOldSlot,
-
-            updateStudent,
         ], function (err, avail) {
             if (err) {
                 logger.error(err.message);
@@ -355,29 +354,55 @@ router.put("/:id", function (req, res) {
 
     function findNewDay(newSlotId, callback) {
         logger.debug("in findNewDay with newSlotId=" + newSlotId);
-        callback(null);
+        if (newSlotId) { // student has new slot so find corresponding day Id
+            Day.findOne({ slots: newSlotId }, { _id: 1 }, function (err, day) {
+                if (err) {
+                    callback(err, newSlotId, null);
+                }
+                else {
+                    logger.debug("day=" + day);
+                    callback(null, newSlotId, day._id);
+                }
+            });
+        }
+        else {
+            callback(null, newSlotId, null);
+        }
     }
 
-    function updateStudent(callback) {
-        logger.debug("in updateStudent");
-        callback(null);
+    function updateStudent(newSlotId, newDayId, callback) {
+        logger.debug("in updateStudent with newDayId=" + newDayId);
+        newData.slot = newSlotId;
+        newData.day = newDayId;
+        Student.findByIdAndUpdate(req.params.id, newData, {
+                projection: { slot: 1 },
+                returnNewDocument: false // returns student before update
+            },
+            function (err, student) {
+                if (err) {
+                    callback(err);
+                }
+                else {
+                    logger.debug("student=" + student);
+                    callback(null, student.slot);
+                }
+            });
     }
 
-    function updateOldSlot(callback) {
-        logger.debug("in updateOldSlot");
-        callback(null);
-        // if (req.body.unschedule == "y") { // remove appointment from student
-        //     newData.day = null;
-        //     newData.slot = null;
-        //     Slot.findByIdAndUpdate(student.slot, {
-        //             $inc: { count: -1 }
-        //         },
-        //         function (err) {
-        //             if (err) {
-        //                 logger.error("edit student, saving slot" + err.message);
-        //             }
-        //         });
-        // }
+    function updateOldSlot(oldSlotId, callback) {
+        logger.debug("in updateOldSlot with oldSlotId=" + oldSlotId);
+        if (oldSlotId) { // student was scheduled
+            Slot.findByIdAndUpdate(oldSlotId, {
+                $inc: { count: -1 }
+            }, {
+                projection: { _id: 1, count: 1, max: 1 },
+                returnNewDocument: false // returns count before increment, true doesn't seem to work
+            }, function (err, slot) {
+                logger.debug("slot before update=" + slot);
+                // can't handle error at this point
+                callback(null);
+            });
+        }
     }
 
 });
