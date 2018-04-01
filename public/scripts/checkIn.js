@@ -1,6 +1,5 @@
 /* global $ */
 
-// Remove student from schedule
 $(".checkIn").on('click', function (e) {
     var btn = $(this);
     // var studentId = btn.siblings("[name=studentId]").text();

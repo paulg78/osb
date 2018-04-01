@@ -18,10 +18,9 @@ function timeString(d) {
 }
 %>
 <div class="container">
-    <span class="hidden" id="dayId"><%= day._id %></span>
     <div class="row">
         <div class="col-sm-12">
-            <h2 style="text-align: center">Fitting Schedule <%= day.date %></h2>
+            <h2 style="text-align: center">Fitting Schedule: <%= day.date.toLocaleDateString("en-US", {weekday: 'long', year: '2-digit', month: '2-digit', day: 'numeric'}) %></h2>
             <div class="row" style="display:flex; flex-wrap: wrap;">
                 <% for (var i = 0, iLim = day.slots.length; i < iLim; i++){ %>
                     <div class="col-sm-3 solidborder">
@@ -45,9 +44,9 @@ function timeString(d) {
     </div>
     <div class="col-sm-12" style="margin: 10px auto;">
         <div class="text-center">
-        <a class="btn btn-info" href="/events/<%= eventId %>/days/<%= prevDayId %>"><span class="glyphicon glyphicon-chevron-left"></span></a>
+        <a class="btn btn-info" href="/days/<%= prevDayId %>"><span class="glyphicon glyphicon-chevron-left"></span></a>
         <a class="btn btn-info" href="/events">List days</a>
-        <a class="btn btn-info" href="/events/<%= eventId %>/days/<%= nextDayId %>"><span class="glyphicon glyphicon-chevron-right"></a>
+        <a class="btn btn-info" href="/days/<%= nextDayId %>"><span class="glyphicon glyphicon-chevron-right"></a>
         </div>
     </div>
 </div>

@@ -3,6 +3,7 @@ var router = express.Router();
 var Student = require("../models/student");
 var School = require("../models/school");
 var Slot = require("../models/slot");
+var Day = require("../models/day");
 var middleware = require("../middleware");
 var shared = require("../shared");
 var async = require('async');
@@ -19,16 +20,10 @@ router.get("/", middleware.isLoggedIn,
             // logger.debug("after next");
             Student.find()
                 .hint("fname_1_lname_1")
-                // .populate('day', { date: 1, _id: 0 })
-                // .populate('slot', { sdate: 1, time: 1, _id: 0 })
                 .populate('slot', { sdate: 1, _id: 0 })
-                // .sort({
-                //     fname: 1,
-                //     lname: 1
-                // })
                 .exec(function (err, queryResponse) {
                     if (err) {
-                        logger.error(err.errmsg);
+                        logger.error(err.message);
                         req.flash("error", "System Error: " + err.message);
                         res.redirect("back");
                     }
@@ -60,8 +55,6 @@ router.get("/", middleware.isLoggedIn,
                 Student.find({
                         school: res.locals.currentUser.school
                     }, { school: 0 })
-                    // .populate('day', { date: 1, _id: 0 })
-                    // .populate('slot', { sdate: 1, time: 1, _id: 0 })
                     .populate('slot', { sdate: 1, _id: 0 })
                     .sort({
                         fname: 1,
@@ -197,7 +190,8 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
 });
 
 // Find student and render form
-router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
+// router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
+router.get("/:id/edit", function (req, res) {
     Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, day: 1, slot: 1 })
         // .populate('day', { _id: 0, date: 1 })
         .populate('slot', { _id: 1, sdate: 1 })
@@ -216,55 +210,145 @@ router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
         });
 });
 
-// Update student in database
+
+// Update student/slots in database
 router.put("/:id", function (req, res) {
     var newData = {
         fname: req.body.firstName,
         lname: req.body.lastName,
         grade: req.body.grade
     };
-    // logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
+    logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
 
     var result = studentValid(newData);
+    // verify that time is present if date is present
+    if (req.body.dateSched && !req.body.timeSched) {
+        result = "Date and Time are required to schedule a student.";
+    }
     if (result == "") {
-        if (req.body.unschedule == "y") { // remove appointment from student
-            newData.day = null;
-            newData.slot = null;
-        }
-        Student.findByIdAndUpdate(req.params.id, {
-                $set: newData
-            }, {
-                projection: { _id: 1, slot: 1 },
-            },
-            function (err, student) {
-                if (err) {
-                    logger.error("edit student, saving student" + err.message);
-                    req.flash("error", err.message);
-                    res.redirect("back");
-                }
-                else {
-                    // logger.debug("student=" + student);
-                    if (req.body.unschedule == "y") { // remove student from slot
-                        Slot.findByIdAndUpdate(student.slot, {
-                                $inc: { count: -1 }
-                            },
-                            function (err) {
-                                if (err) {
-                                    logger.error("edit student, saving slot" + err.message);
-                                }
-                            });
-                    }
-                    // logger.debug("Updating student");
-                    req.flash("success", "Successfully Updated!");
-                    res.redirect("/students");
-                }
-            });
+        async.waterfall([
+            updateNewSlot,
+            findNewDay,
+            updateStudent,
+            updateOldSlot,
+        ], function (err, avail) {
+            if (err) {
+                logger.error(err.message);
+                req.flash("error", "Changes not saved: " + err.message);
+                res.redirect("back");
+            }
+            else {
+                req.flash("success", "Successfully Updated!");
+                res.redirect("/students");
+            }
+        });
     }
     else {
         // logger.debug("edit validation error");
         req.flash("error", result);
         res.redirect("back");
     }
+
+    function updateNewSlot(callback) {
+        logger.debug("in updateNewSlot");
+        if (req.body.timeSched) { // there is a new slot
+            Slot.findOneAndUpdate({ sdate: new Date(req.body.timeSched) }, {
+                $inc: { count: 1 }
+            }, {
+                projection: { _id: 1, count: 1, max: 1 },
+                returnNewDocument: false // returns count before increment, true doesn't seem to work
+            }, function (err, slot) {
+                logger.debug("slot before update=" + slot);
+                if (err) {
+                    callback(err, null);
+                }
+                else {
+                    if (slot.count >= slot.max) { // slot is over-filled (count is one less than actual)
+                        // restore original since slot is full and student won't be added
+                        Slot.findByIdAndUpdate(slot._id, {
+                                $inc: { count: -1 }
+                            },
+                            function (err) {
+                                if (err) {
+                                    callback(err, null);
+                                }
+                                else {
+                                    callback({
+                                        message: "Selected slot (" +
+                                            new Date(req.body.timeSched).
+                                        toLocaleDateString("en-US", { year: '2-digit', month: '2-digit', day: 'numeric', hour: '2-digit', minute: '2-digit' }) +
+                                        ") is already full."
+                                    }, null);
+                                }
+                            });
+                    }
+                    else {
+                        callback(null, slot._id);
+                    }
+                }
+            });
+        }
+        else {
+            callback(null, null);
+        }
+    }
+
+    function findNewDay(newSlotId, callback) {
+        logger.debug("in findNewDay with newSlotId=" + newSlotId);
+        if (newSlotId) { // student has new slot so find corresponding day Id
+            Day.findOne({ slots: newSlotId }, { _id: 1 }, function (err, day) {
+                if (err) {
+                    callback(err, newSlotId, null);
+                }
+                else {
+                    logger.debug("day=" + day);
+                    callback(null, newSlotId, day._id);
+                }
+            });
+        }
+        else {
+            callback(null, newSlotId, null);
+        }
+    }
+
+    function updateStudent(newSlotId, newDayId, callback) {
+        logger.debug("in updateStudent with newDayId=" + newDayId);
+        newData.slot = newSlotId;
+        newData.day = newDayId;
+        Student.findByIdAndUpdate(req.params.id, newData, {
+                projection: { slot: 1 },
+                returnNewDocument: false // returns student before update
+            },
+            function (err, student) {
+                if (err) {
+                    callback(err);
+                }
+                else {
+                    logger.debug("student=" + student);
+                    callback(null, student.slot);
+                }
+            });
+    }
+
+    function updateOldSlot(oldSlotId, callback) {
+        logger.debug("in updateOldSlot with oldSlotId=" + oldSlotId);
+        if (oldSlotId) { // student was scheduled
+            Slot.findByIdAndUpdate(oldSlotId, {
+                $inc: { count: -1 }
+            }, {
+                projection: { _id: 1, count: 1, max: 1 },
+                returnNewDocument: false // returns count before increment, true doesn't seem to work
+            }, function (err, slot) {
+                logger.debug("slot before update=" + slot);
+                // can't handle error at this point
+                callback(null);
+            });
+        }
+        else {
+            callback(null);
+        }
+    }
+
 });
 
 // Check In
@@ -309,12 +393,14 @@ router.delete("/:studentId", middleware.isLoggedIn, function (req, res) {
                         }
                     });
             }
+            // req.flash("success", "Deleted " + student.fullName);
             req.flash("success", "Deleted " + student.fullName);
+            res.redirect("/students");
         }
         else {
             req.flash("success", "Student deleted ");
+            res.redirect("/students");
         }
-        res.redirect("back");
     });
 });
 

@@ -2,7 +2,7 @@
 
 <%
 
-function dateString(d) {
+function dateTimeString(d) {
     var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
     var h=d.getHours();
     var ap;
@@ -18,6 +18,28 @@ function dateString(d) {
         m="00";
     }
     return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
+}
+
+// function dateString(d) {
+//     var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+//     return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000);
+// }
+
+function timeString(d) {
+    var h=d.getHours();
+    var ap;
+    if (h>12) {
+        h=h-12;
+        ap="PM";
+    }
+    else {
+        ap="AM";
+    }
+    var m = d.getMinutes();
+    if (m==0) {
+        m="00";
+    }
+    return h + ":" + m + " " + ap;
 }
 %>
 
@@ -39,18 +61,39 @@ function dateString(d) {
                 </div>
                 <% if(student.slot){ %>
                     <div class="form-group">
-                        <p style="font-size: 1.25em;">Scheduled for <%= dateString(student.slot.sdate) %></p>
+                        <p style="font-size: 1.25em;">Scheduled for <%= dateTimeString(student.slot.sdate) %></p>
                         <div class="checkbox">
-                              <label><input type="checkbox" name="unschedule" value="y"><span style="font-size: 1.25em;">Check box to unschedule Student</span></label>
+                              <label><input id="unschedCB" type="checkbox" name="unschedule" value="y"><span style="font-size: 1.25em;">Check box to unschedule Student</span></label>
                         </div>
                     </div>
                 <% } %>
+                <div id="schedForm" class="form-group">
+                    <label>Schedule student:</label>
+                    <select id="dateSched" name="dateSched">
+                        <option value="" selected>Select date</option>
+                    </select>
+                    <select id="timeSched" name="timeSched" disabled>
+                        <option value="" selected>Select time</option>
+                    </select>
+                </div>
                 <div class="form-group">
-                    <button class="btn btn-lg btn-primary btn-block">Save</button>
+                    <button onclick="this.disabled=true;this.value='saving';this.form.submit();" class="btn btn-lg btn-primary btn-block">Save</button>
                 </div>
             </form>
             <a href="/students">Cancel</a>
         </div>
+        <form style="display: inline" action="/students/<%=student._id%>?_method=DELETE" method="POST">
+            <button id="delStudBtn" class="btn btn-xs btn-danger pull-right">Delete Student</button>
+        </form>
     </div>
+    <span class="hidden" id="slotsAvail"></span>
+<script src="/scripts/editStudent.js"></script>
+<script>
+// $(document).ready(function () {
+
+getAvailDates();
+// });
+</script>
+
 <% include ../partials/footer %>
 

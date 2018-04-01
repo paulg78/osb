@@ -25,7 +25,7 @@ function toStr2(x) {
         return s;
     }
 }
-function dateString(dt) {
+function nextDate(dt) {
     // logger.debug("** first time slot dt=" + dt);
     // drop the time (so it will be start of day) and add a day (javascript will roll to next month as needed)
     var d = new Date(dt.getFullYear(), dt.getMonth(), dt.getDate());
@@ -43,12 +43,11 @@ function dateString(dt) {
 }
 %>
 <div class="container">
-    <span class="hidden" id="eventId"><%= eventId %></span>
     <span class="hidden" id="dayId"><%= day._id %></span>
     <span class="hidden" id="school"><%= currentUser.school %></span>
     <div class="row">
         <div class="col-sm-10">
-            <h2 style="text-align: center">Fitting Schedule <%= day.date %></h2>
+            <h2 style="text-align: center">Fitting Schedule: <%= day.date.toLocaleDateString("en-US", {weekday: 'long', year: '2-digit', month: '2-digit', day: 'numeric'}) %></h2>
             <div class="row" style="display:flex; flex-wrap: wrap;">
                 <% for (var i = 0, iLim = day.slots.length; i < iLim; i++){ %>
                     <div class="col-sm-3 solidborder">
@@ -81,17 +80,13 @@ function dateString(dt) {
             </div>
             <div class="col-sm-12" style="margin: 10px auto;">
                 <div class="text-center">
-                <% var url = "/events/" + eventId + "/days"; %>
                 <% if (prevDayId) { %>
-                <%     url = url + "/" + prevDayId + "/school" %>
+                       <a class="btn btn-info" href= <%= "/days/" + prevDayId + "/school" %> ><span class="glyphicon glyphicon-chevron-left"></span></a>
                 <%     } %>
-                 <a class="btn btn-info" href= <%= url %> ><span class="glyphicon glyphicon-chevron-left"></span></a>
-                 <a class="btn btn-info" href="/events">List days</a>
-                <% url = "/events/" + eventId + "/days"; %>
+                <a class="btn btn-info" href="/events">List days</a>
                 <% if (nextDayId) { %>
-                <%     url = url + "/" + nextDayId + "/school" %>
-                <a class="btn btn-info" href= <%= url %> ><span class="glyphicon glyphicon-chevron-right"></span></a>
-                 <a class="btn btn-info" href=<%="/events/" + eventId + "/nextAvail/" + dateString(day.slots[0].sdate)%>>Next Avail</a>
+                    <a class="btn btn-info" href= <%= "/days/" + nextDayId + "/school" %> ><span class="glyphicon glyphicon-chevron-right"></span></a>
+                    <a class="btn btn-info" href=<%="/days/nextAvail/" + nextDate(day.slots[0].sdate)%>>Next Avail</a>
                 <%     } %>
                 </div>
             </div>

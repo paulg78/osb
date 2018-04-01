@@ -18,7 +18,8 @@ $('#newStudentForm').submit(function (e) {
                 $('#addMsg').text(result.student.fname + " " + result.student.lname + " added.");
                 $('#newStudentForm').find('.form-control').val("");
                 $('#newStudentForm').find('.form-control').first().focus();
-            } else {
+            }
+            else {
                 if (result.msg != null) {
                     $('#addMsg').removeClass('failMsg successMsg');
                     $('#addMsg').addClass('failMsg');
@@ -36,11 +37,4 @@ $('#newStudentForm').submit(function (e) {
             $('#addMsg').text(err.message);
         }
     });
-});
-
-$(".delStudBtn").on('click', function (e) {
-    var tds = $(this).parent().parent().siblings();
-    if (confirm("Ready to delete " + tds[0].innerText + " " + tds[1].innerText + ".  Click Cancel or OK.") != true) {
-        e.preventDefault();
-    }
 });

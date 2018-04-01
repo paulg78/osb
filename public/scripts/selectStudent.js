@@ -17,7 +17,6 @@ $(".addStudBtn").on('click', function (e) {
     $(".addStudBtn").attr("disabled", true);
     // console.log("clicked add student");
 
-    var eventId = $("#eventId").text();
     var dayId = $("#dayId").text();
     var slotId = $(this).parent().siblings("[name='slotId']").text();
     var studentId = $('.active.unschedStud').children("[name=studentId]").text();
@@ -28,7 +27,7 @@ $(".addStudBtn").on('click', function (e) {
     var toList = $(this).parent().siblings(".list-group");
 
     $.ajax({
-        url: "/events/" + eventId + "/days/" + dayId + "/slots/" + slotId + "/students/" + studentId,
+        url: "/days/" + dayId + "/slots/" + slotId + "/students/" + studentId,
         type: 'PUT',
         success: function (result) {
             // console.log("updated database and ajax callback executed");
@@ -72,7 +71,6 @@ $(".remStudBtn").on('click', function (e) {
     // console.log("clicked remove student");
     // hide all unschedule buttons
     $(".remStudBtn").hide();
-    var eventId = $("#eventId").text();
     var dayId = $("#dayId").text();
     var slotId = $(this).parent().siblings("[name='slotId']").text();
     var studentId = $('.active.schedStud').children("[name=studentId]").text();
@@ -84,7 +82,7 @@ $(".remStudBtn").on('click', function (e) {
     var toList = $('.unschedList');
 
     $.ajax({
-        url: "/events/" + eventId + "/days/" + dayId + "/slots/" + slotId + "/students/" + studentId,
+        url: "/days/" + dayId + "/slots/" + slotId + "/students/" + studentId,
         type: 'DELETE',
         success: function (result) {
             // console.log("updated database and ajax callback executed");
