@@ -11,10 +11,6 @@ var studentSchema = new mongoose.Schema({
         type: String
     },
     school: String,
-    day: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Day'
-    },
     slot: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Slot'

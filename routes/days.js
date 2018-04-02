@@ -198,7 +198,6 @@ var getPrevNextIds = function (req, res, next) {
 };
 
 
-
 // SHOW SCHEDULE All Students - shows schedule for one day
 router.get("/:dayId", middleware.isLoggedIn, getPrevNextIds, function (req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
@@ -216,7 +215,7 @@ router.get("/:dayId", middleware.isLoggedIn, getPrevNextIds, function (req, res)
                 // logger.debug("foundDay=" + JSON.stringify(foundDay));
                 // logger.debug("foundDay.slots[2]=" + foundDay.slots[2]);
                 // find the students scheduled for this day
-                Student.find({ day: req.params.dayId }, 'fname lname grade slot')
+                Student.find({ slot: { $in: foundDay.slots } }, { _id: 0, fname: 1, lname: 1, grade: 1, slot: 1 })
                     .sort({
                         fname: 1,
                         lname: 1

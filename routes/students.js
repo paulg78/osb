@@ -5,7 +5,6 @@ var School = require("../models/school");
 var Slot = require("../models/slot");
 var Day = require("../models/day");
 var middleware = require("../middleware");
-var shared = require("../shared");
 var async = require('async');
 /* global logger */
 
@@ -228,7 +227,6 @@ router.put("/:id", function (req, res) {
     if (result == "") {
         async.waterfall([
             updateNewSlot,
-            findNewDay,
             updateStudent,
             updateOldSlot,
         ], function (err, avail) {
@@ -293,28 +291,9 @@ router.put("/:id", function (req, res) {
         }
     }
 
-    function findNewDay(newSlotId, callback) {
-        logger.debug("in findNewDay with newSlotId=" + newSlotId);
-        if (newSlotId) { // student has new slot so find corresponding day Id
-            Day.findOne({ slots: newSlotId }, { _id: 1 }, function (err, day) {
-                if (err) {
-                    callback(err, newSlotId, null);
-                }
-                else {
-                    logger.debug("day=" + day);
-                    callback(null, newSlotId, day._id);
-                }
-            });
-        }
-        else {
-            callback(null, newSlotId, null);
-        }
-    }
-
-    function updateStudent(newSlotId, newDayId, callback) {
-        logger.debug("in updateStudent with newDayId=" + newDayId);
+    function updateStudent(newSlotId, callback) {
+        logger.debug("in updateStudent with newSlotId=" + newSlotId);
         newData.slot = newSlotId;
-        newData.day = newDayId;
         Student.findByIdAndUpdate(req.params.id, newData, {
                 projection: { slot: 1 },
                 returnNewDocument: false // returns student before update
