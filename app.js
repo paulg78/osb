@@ -5,7 +5,6 @@ var express = require("express"),
   passport = require("passport"),
   flash = require("connect-flash"),
   User = require("./models/user"),
-  Event = require("./models/event"),
   methodOverride = require("method-override");
 
 const winston = require('winston');
@@ -46,7 +45,6 @@ var LocalStrategy = require('passport-local').Strategy;
 var
   studentRoutes = require("./routes/students"),
   schoolRoutes = require("./routes/schools"),
-  eventRoutes = require("./routes/events"),
   dayRoutes = require("./routes/days"),
   slotRoutes = require("./routes/slots"),
   indexRoutes = require("./routes/index"),
@@ -60,12 +58,12 @@ mongoose.connect(process.env.DATABASEURL, {
 
 // redirect http to https
 // var forceSsl = function (req, res, next) {
-    //   if (req.headers['x-forwarded-proto'] !== 'https') {
-    //     return res.redirect(['https://', req.get('Host'), req.url].join(''));
-    //   }
-    //   return next();
-    // };
-    // app.use(forceSsl);
+//   if (req.headers['x-forwarded-proto'] !== 'https') {
+//     return res.redirect(['https://', req.get('Host'), req.url].join(''));
+//   }
+//   return next();
+// };
+// app.use(forceSsl);
 
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({
@@ -123,36 +121,10 @@ app.use(function (req, res, next) {
   next();
 });
 
-// logger.debug("EVENTNAME=" + process.env.EVENTNAME);
-
-// global.currEvent = null;
-// Event.findOne({ name: process.env.EVENTNAME })
-//   .populate({
-//     path: 'days',
-//     model: 'Day',
-//     select: 'date'
-//   })
-//   .exec(function (err, configEvent) {
-//     if (err) {
-//       logger.error(err);
-//     }
-//     else {
-//       if (configEvent == null) {
-//         console.log("Configured event not found");
-//       }
-//       else {
-//         // logger.debug("configEvent=" + configEvent);
-//         global.currEvent = configEvent;
-//       }
-//     }
-//   });
-
-
 app.use("/", indexRoutes);
 app.use("/users", userRoutes);
 app.use("/students", studentRoutes);
 app.use("/schools", schoolRoutes);
-app.use("/events", eventRoutes);
 app.use("/days", dayRoutes);
 app.use("/slots", slotRoutes);
 

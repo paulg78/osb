@@ -2,7 +2,6 @@ var express = require("express");
 var router = express.Router();
 var passport = require("passport");
 var User = require("../models/user");
-var Event = require("../models/event");
 var async = require('async');
 var crypto = require('crypto');
 var Mailgun = require('mailgun-js');
@@ -37,8 +36,13 @@ router.post('/login', function (req, res, next) {
 
     req.logIn(user, function (err) {
       if (err) return next(err);
-
-      return res.redirect('/events');
+      // console.log("logged in user=" + user);
+      if (user.role == 'role_sc') {
+        return res.redirect('/students');
+      }
+      else {
+        return res.redirect('/days');
+      }
     });
   })(req, res, next);
 });

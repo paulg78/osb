@@ -1,6 +1,6 @@
 <% include ../partials/header %>
 
-<h1>Days in Event <%= global.evnt.name %></h1>
+<h1>Days in  <%= new Date().getFullYear() %></h1>
 
 <div class="container">
   <table class="dayList">
@@ -11,7 +11,7 @@
                     <a href=<%="/days/nextAvail/" + todayStr%> class="btn btn-xs btn-primary role_al role_wa role_sc">Schedule</a>
                 </td>
             </tr>
-            <% global.evnt.days.forEach(function(day){ %>
+            <% global.days.forEach(function(day){ %>
                 <tr>
                     <td class="dayList"> <%= day.date.toLocaleDateString("en-US", {weekday: 'long', year: '2-digit', month: '2-digit', day: 'numeric'}) %> &nbsp;</td>
                     <td>
