@@ -12,12 +12,12 @@ router.get("/uploadSchedule", middleware.isLoggedIn, function (req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
-    res.render("events/uploadSchedule");
+    res.render("days/uploadSchedule");
 });
 
 // !!! This needs to be modified and tested; needs to populate the sdate field in slot
 // called from uploadSchedule; updates database with days and slots (schedule of fittings)
-router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, res) {
+router.post("/createSchedule", middleware.isLoggedIn, function (req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
@@ -82,10 +82,10 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
             logger.error("Error creating schedule: " + err.message);
             req.flash("error", "Schedule upload failed: " + err.message);
         }
-        res.redirect("/events");
+        res.redirect("/days");
     });
 
-    function saveDays(ev, callback) {
+    function saveDays(callback) {
         logger.info("starting saveDays");
         logger.info("numRows=" + numRows);
         var row = 0;
@@ -101,16 +101,16 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
                     date: scheduleArray[row][0],
                     slots: []
                 };
-                saveSlots(row, day, function (err1) {
+                saveSlots(row, day, function (slotErr) {
                     var err = null;
-                    // save day and get day ID
-                    Day.create(day, function (err2, newDay) {
-                        if (err1) {
-                            err = err1;
+                    // save day
+                    Day.create(day, function (dayErr, newDay) {
+                        if (slotErr) {
+                            err = slotErr;
                         }
                         else {
-                            if (err2) {
-                                err = err2;
+                            if (dayErr) {
+                                err = dayErr;
                             }
                             else {
                                 logger.info("created day=" + newDay.date);
@@ -123,7 +123,7 @@ router.post("/:eventId/createSchedule", middleware.isLoggedIn, function (req, re
                 });
             },
             function (err) {
-                callback(err, ev);
+                callback(err);
             }
         );
     }
@@ -157,9 +157,9 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
                 }
                 else {
                     global.days = days;
-                    global.days.forEach(function (day) {
-                        logger.debug("day=" + day);
-                    });
+                    // global.days.forEach(function (day) {
+                    //     logger.debug("day=" + day);
+                    // });
                     res.render("days/index", {
                         todayStr: todayStr
                     });
