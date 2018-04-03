@@ -135,9 +135,8 @@ function toStr2(x) {
 //INDEX - List days
 router.get("/", middleware.isLoggedIn, function (req, res) {
     var today = new Date();
-    // logger.debug("today=" + today);
     var todayStr = today.getFullYear().toString() + "-" + toStr2(today.getMonth() + 1) + "-" + toStr2(today.getDate());
-    // logger.debug("currEvent=" + currEvent);
+    logger.debug("todayStr=" + todayStr);
     if (global.days == null) {
         Day.find({ $query: {}, $orderby: { date: 1 } }, { date: 1 })
             .exec(function (err, days) {

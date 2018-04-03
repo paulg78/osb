@@ -8,9 +8,8 @@ var middleware = require("../middleware");
 
 // Return list of available slots
 router.get("/avail", function (req, res) {
-    var today = new Date();
-    var todayStr = today.getFullYear().toString() + "-" + (today.getMonth() + 1).toString() + "-" + today.getDate().toString();
-    var qry = "this.sdate > new Date('" + todayStr + "') && this.count < this.max";
+    logger.debug("today=" + new Date());
+    var qry = "this.sdate > new Date(" + new Date().getTime() + ") && this.count < this.max";
     // var qry = "this.count < this.max";
     logger.debug("avail slots qry=" + qry);
     // Slot.find({ $where: qry }, { _id: 0, sdate: 1 }).hint("sdate_1").sort({ sdate: 1 })
@@ -21,7 +20,7 @@ router.get("/avail", function (req, res) {
                 res.status(500).send(err.message);
             }
             else {
-                // logger.debug("avail slots: " + slots);
+                logger.debug("avail slots: " + slots);
                 res.json(JSON.stringify(slots));
             }
         });
