@@ -15,7 +15,6 @@ router.get("/uploadSchedule", middleware.isLoggedIn, function (req, res) {
     res.render("days/uploadSchedule");
 });
 
-// !!! This needs to be modified and tested; needs to populate the sdate field in slot
 // called from uploadSchedule; updates database with days and slots (schedule of fittings)
 router.post("/createSchedule", middleware.isLoggedIn, function (req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
@@ -74,59 +73,50 @@ router.post("/createSchedule", middleware.isLoggedIn, function (req, res) {
         );
     }
 
-    logger.info("Going over the waterfall !");
-    async.waterfall([
-        saveDays
-    ], function (err, result) {
-        if (err) {
-            logger.error("Error creating schedule: " + err.message);
-            req.flash("error", "Schedule upload failed: " + err.message);
-        }
-        res.redirect("/days");
-    });
-
-    function saveDays(callback) {
-        logger.info("starting saveDays");
-        logger.info("numRows=" + numRows);
-        var row = 0;
-        var col;
-        async.whilst(
-            function () {
-                return row < numRows;
-            },
-            function (dayCallback) {
-                logger.info("async day iteratee called");
-                logger.info("row=" + row);
-                var day = {
-                    date: scheduleArray[row][0],
-                    slots: []
-                };
-                saveSlots(row, day, function (slotErr) {
-                    var err = null;
+    logger.info("starting saveDays loop");
+    logger.info("numRows=" + numRows);
+    var row = 0;
+    async.whilst(
+        function () {
+            return row < numRows;
+        },
+        function (dayCallback) {
+            logger.info("async day iteratee called");
+            logger.info("row=" + row);
+            var day = {
+                date: scheduleArray[row][0],
+                slots: []
+            };
+            saveSlots(row, day, function (slotErr) {
+                if (slotErr) {
+                    dayCallback(slotErr);
+                }
+                else
                     // save day
                     Day.create(day, function (dayErr, newDay) {
-                        if (slotErr) {
-                            err = slotErr;
+                        if (dayErr) {
+                            dayCallback(dayErr);
                         }
                         else {
-                            if (dayErr) {
-                                err = dayErr;
-                            }
-                            else {
-                                logger.info("created day=" + newDay.date);
-                            }
+                            logger.info("created day=" + newDay.date);
+                            row += 2;
+                            logger.info("calling dayCallback with row=" + row);
+                            dayCallback(null);
                         }
-                        row += 2;
-                        logger.info("calling dayCallback with row=" + row);
-                        dayCallback(err);
                     });
-                });
-            },
-            function (err) {
-                callback(err);
+            });
+        },
+        function (err) {
+            if (err) {
+                logger.error("Error creating schedule: " + err.message);
+                req.flash("error", "Schedule upload failed: " + err.message);
             }
-        );
-    }
+            // clear global days to trigger new database lookup
+            global.days = null;
+            logger.debug("Finished schedule upload");
+            res.redirect("/days");
+        }
+    );
 });
 
 
