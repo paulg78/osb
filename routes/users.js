@@ -22,7 +22,7 @@ router.use(middleware.isLoggedIn, function (req, res, next) {
 //INDEX - show all users
 router.get("/", function (req, res) {
 
-    User.find({}, { name: 1, username: 1, role: 1, school: 1 }).sort({
+    User.find({}, { name: 1, email: 1, username: 1, role: 1, school: 1, PIN: 1 }).sort({
         name: 1
     }).exec(function (err, allUsers) {
         if (err) {
@@ -45,7 +45,9 @@ router.post("/", function (req, res) {
         username: shared.myTrim(req.body.username.toLowerCase()),
         name: shared.myTrim(req.body.name),
         role: shared.myTrim(req.body.role),
-        school: shared.myTrim(req.body.school)
+        school: shared.myTrim(req.body.school),
+        PIN: shared.myTrim(req.body.PIN),
+        email: shared.myTrim(req.body.email)
     };
 
     // Create a new user and save to DB
@@ -91,7 +93,9 @@ router.put("/:id", function (req, res) {
         username: shared.myTrim(req.body.username),
         name: shared.myTrim(req.body.name),
         role: shared.myTrim(req.body.role),
-        school: shared.myTrim(req.body.school)
+        school: shared.myTrim(req.body.school),
+        PIN: shared.myTrim(req.body.PIN),
+        email: shared.myTrim(req.body.email)
     };
 
     User.findByIdAndUpdate(req.params.id, {

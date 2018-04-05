@@ -1,30 +1,34 @@
-<% include ../partials/header %> 
+<% include ../partials/header %>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/css/theme.bootstrap_3.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.widgets.min.js"></script>
- 
-     <header>
+
+    <header>
         <h1>
             <span>Users</span>
             <a class="btn btn-primary btn-sm pull-right" href="/users/new">Add New User</a>
-         </h1>
+        </h1>
     </header>
     <table id="userTable" class="table table-striped tablesorter">
         <thead>
-             <tr>
-                 <th>Name</th>               
-                 <th>UserName</th>
-                 <th>Role</th>
-                 <th>School</th>         
-             </tr>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>School</th>
+                <th>UserName</th>
+                <th>PIN</th>
+                <th>Role</th>
+            </tr>
         </thead>
-        <tbody>     
+        <tbody>
             <% users.forEach(function(user){ %>
                 <tr>
                     <td><%= user.name %></td>
-                    <td><%= user.username %></td>
-                    <td><%= user.role %></td>
+                    <td><%= user.email %></td>
                     <td><%= user.school %></td>
+                    <td><%= user.username %></td>
+                    <td><%= user.PIN %></td>
+                    <td><%= user.role %></td>
                     <td>
                         <form style="display: inline" action="/users/<%=user._id%>?_method=DELETE" method="POST">
                             <a href="/users/<%=user._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
