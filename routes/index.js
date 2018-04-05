@@ -24,6 +24,7 @@ router.get("/help", function (req, res) {
 });
 
 router.post('/login', function (req, res, next) {
+    logger.debug("at login, req.body=" + req.body.username + "-" + req.body.password);
     passport.authenticate('local', function (err, user, info) {
         if (err) {
             req.flash('error', err.message);
@@ -36,7 +37,7 @@ router.post('/login', function (req, res, next) {
 
         req.logIn(user, function (err) {
             if (err) return next(err);
-            // console.log("logged in user=" + user);
+            console.log("logged in user=" + user);
             if (user.role == 'role_sc') {
                 return res.redirect('/students');
             }
@@ -65,7 +66,7 @@ router.post('/requestpwreset', function (req, res) {
     User.findOne({
         email: req.body.email.toLowerCase(),
         PIN: req.body.PIN
-    }, { _id: 0, username: 1, school: 1 }, function (err, user) {
+    }, { username: 1, school: 1 }, function (err, user) {
         if (err) {
             req.flash('error', "System error on user lookup " + req.body.email + "-" + req.body.PIN);
             logger.error("System error on user lookup " + req.body.email + "-" + req.body.PIN);
@@ -132,6 +133,7 @@ router.post('/resetpw/:username', function (req, res) {
         }
         user.username = req.body.username;
         user.password = req.body.password;
+        logger.debug("user.password before save=" + user.password);
 
         user.save(function (err) {
             if (err) {
@@ -147,6 +149,7 @@ router.post('/resetpw/:username', function (req, res) {
                 }
             }
             else {
+                logger.debug("user.password after save=" + user.password);
                 req.flash('success', 'Success! Your new username/password has been saved.');
                 res.redirect('/login');
             }

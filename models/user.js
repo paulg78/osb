@@ -34,7 +34,7 @@ var UserSchema = new mongoose.Schema({
 UserSchema.pre('save', function (next) {
   var user = this;
   var SALT_FACTOR = 5;
-
+  logger.debug("in UserSchema pre save");
   if (!user.isModified('password')) return next();
 
   bcrypt.genSalt(SALT_FACTOR, function (err, salt) {
@@ -50,7 +50,7 @@ UserSchema.pre('save', function (next) {
 
 UserSchema.methods.comparePassword = function (candidatePassword, cb) {
   bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
-    // logger.debug("in compare");
+    logger.debug("in comparePassword, isMatch=" + isMatch);
     if (err) return cb(err);
     cb(null, isMatch);
   });

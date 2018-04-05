@@ -90,8 +90,7 @@ router.get("/:id/edit", function (req, res) {
 // Update user in database
 router.put("/:id", function (req, res) {
     var newData = {
-        username: shared.myTrim(req.body.username),
-        name: shared.myTrim(req.body.name),
+        username: shared.myTrim(req.body.username.toLowerCase()),
         role: shared.myTrim(req.body.role),
         school: shared.myTrim(req.body.school),
         PIN: shared.myTrim(req.body.PIN),
