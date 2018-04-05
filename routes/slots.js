@@ -8,8 +8,9 @@ var middleware = require("../middleware");
 
 // Return list of available slots
 router.get("/avail", function (req, res) {
-    logger.debug("today=" + new Date());
-    var qry = "this.sdate > new Date(" + new Date().getTime() + ") && this.count < this.max";
+    // logger.debug("today=" + new Date());
+    // var qry = "this.sdate > new Date(" + new Date().getTime() + ") && this.count < this.max";
+    var qry = "this.sdate > Date.now() && this.count < this.max";
     // var qry = "this.count < this.max";
     logger.debug("avail slots qry=" + qry);
     // Slot.find({ $where: qry }, { _id: 0, sdate: 1 }).hint("sdate_1").sort({ sdate: 1 })

@@ -1,13 +1,17 @@
 <% include ./partials/header %>
 <div class="container">
     <div class="row">
-        <h2 style="text-align: center">Create Password</h1>
+        <h2 style="text-align: center">Request Username/Password Change</h1>
         <div style="width: 50%; margin: 25px auto;">
             <form action="/requestpwreset" method="post">
                 <div class="form-group">
-                    <h4>Username:</h4>
-                    <input class="form-control" type="text" name="username" aria-describedby="helpUname">
-                    <span id="helpUname" class="help-block">If you support a single school, your Username is the email address provided to the Assistance League. If you support multiple schools, you have a separate Username for each school you support. Username may be an email address followed by a suffix that indicates a school. Please contact the Assistance League if you have questions about your username(s).</span>
+                    <h4>PIN:</h4>
+                    <input class="form-control" type="text" name="PIN" aria-describedby="helpPIN">
+                    <span id="helpPIN" class="help-block">Enter the PIN you received in email from the Assistance League.</span>
+                    <p></p>
+                    <h4>Email address:</h4>
+                    <input class="form-control" type="text" name="email" aria-describedby="helpEmail">
+                    <span id="helpEmail" class="help-block">Enter the email address you are using with Operation School Bell. This should be the email address to which your PIN was sent. Please contact the Assistance League if you have trouble registering.</span>
                     <p></p>
                     <button style="margin-top: 30px;" class="btn btn-lg btn-primary btn-block">Submit</button>
                 </div>
@@ -16,4 +20,3 @@
     </div>
 </div>
 <% include ./partials/footer %>
-

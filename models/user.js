@@ -4,7 +4,7 @@ var bcrypt = require('bcrypt-nodejs');
 /* global logger */
 
 var UserSchema = new mongoose.Schema({
-  username: { // email address
+  username: { // users create this value so have to verify uniqueness
     type: String,
     required: true,
     unique: true
@@ -12,8 +12,12 @@ var UserSchema = new mongoose.Schema({
   password: {
     type: String
   },
-  resetPasswordToken: String,
-  resetPasswordExpires: Date,
+  email: String, // email address
+  PIN: { // used with email address for username/pw reset
+    type: String,
+    required: true,
+    unique: true
+  },
   role: {
     type: String,
     required: true
