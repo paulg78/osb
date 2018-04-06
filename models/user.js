@@ -14,7 +14,7 @@ var UserSchema = new mongoose.Schema({
   },
   email: String, // email address
   PIN: { // used with email address for username/pw reset
-    type: String,
+    type: Number,
     required: true,
     unique: true
   },

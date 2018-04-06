@@ -5,6 +5,8 @@ var middleware = require("../middleware");
 var request = require("request");
 var shared = require("../shared");
 var async = require('async');
+var fs = require('fs');
+
 /* global logger */
 
 // All user routes start here; blocks user actions by role_sc
@@ -46,7 +48,7 @@ router.post("/", function (req, res) {
         name: shared.myTrim(req.body.name),
         role: shared.myTrim(req.body.role),
         school: shared.myTrim(req.body.school),
-        PIN: shared.myTrim(req.body.PIN),
+        PIN: parseInt(shared.myTrim(req.body.PIN), 10),
         email: shared.myTrim(req.body.email)
     };
 
@@ -87,13 +89,14 @@ router.get("/:id/edit", function (req, res) {
     });
 });
 
+
 // Update user in database
 router.put("/:id", function (req, res) {
     var newData = {
         username: shared.myTrim(req.body.username.toLowerCase()),
         role: shared.myTrim(req.body.role),
         school: shared.myTrim(req.body.school),
-        PIN: shared.myTrim(req.body.PIN),
+        PIN: parseInt(shared.myTrim(req.body.PIN), 10),
         email: shared.myTrim(req.body.email)
     };
 
@@ -137,69 +140,100 @@ router.get("/uploadUsers", function (req, res) {
 
 // upload users from CSV file -- updated db
 router.post("/createUsers", function (req, res) {
-
     var users = JSON.parse(req.body.usersString);
     var numUsers = users.length;
     var row = 1; // skip column heading
     var sc1col = 7; // column of first school counselor
     var col = sc1col;
+    var pin;
+    const fname = 'userupload.txt';
+
+    function nextPIN(pin) {
+        return pin + 1 + Math.floor(Math.random() * 25); // adds between 1 and 25
+    }
+
     logger.info("Starting User upload");
-
-    async.whilst(
-        function () {
-            return row < numUsers;
-        },
-        function (userCallback) {
-            // logger.debug("async user iteratee called");
-            // logger.debug("row=" + row + ", col=" + col);
-            var user = {
-                name: shared.myTrim(users[row][col]),
-                username: shared.myTrim(users[row][col + 1]),
-                role: "role_sc",
-                school: shared.myTrim(users[row][0])
-            };
-            if (user.name != undefined && user.name.length > 0 &&
-                user.username != undefined && user.username.length > 0) {
-                user.username = user.username.toLowerCase();
-                User.create(user, function (err) {
-                    if (err) {
-                        if (err.message.indexOf("E11000") < 0) {
-                            logger.error("row=" + (row + 1) + ", Error, user=" + user.name + ", " + err.message);
-                        }
-                        else { // duplicate key error
-                            // logger.debug("row=" + (row + 1) + ", " + user.username + " already in DB");
-                        }
-
-                    }
-                    else {
-                        logger.info("row=" + (row + 1) + ", created user=" + user.name + ", username=" + user.username);
-                    }
-                    col += 2; // move to next counselor
-                    // logger.debug("calling userCallback with row=" + row);
-                    userCallback(null); // don't stop for errors
-                });
-            }
-            else {
-                if (col == sc1col) {
-                    logger.info("row=" + (row + 1) + " missing data, user=" + user.name + ", username=" + user.username);
-                }
-                row++;
-                col = sc1col;
-                userCallback(null); // don't stop for errors
-            }
-        },
-        function (err) {
-            if (err) {
-                logger.error("error while creating users--shouldn't happen since errors are just logged in console.");
-                req.flash("error", "error while uploading users");
-            }
-            else {
-                req.flash("success", "Users uploaded!");
-            }
-            logger.info("User upload complete");
-            res.redirect("/users");
+    fs.appendFile(fname, new Date() + "\r\n", function (err) {
+        if (err) {
+            logger.error("Error on first write to file " + fname);
         }
-    );
+        else {
+            logger.debug("Started writing user log");
+        }
+    });
+    User.find({}, { _id: 0, PIN: 1 }).sort({ PIN: -1 }).limit(1)
+        .exec(function (err, maxPinUser) {
+            if (err) {
+                logger.error(err);
+                res.redirect("/users");
+            }
+            else {
+                logger.debug("maxPinUser[0]=" + maxPinUser[0]);
+                pin = nextPIN(maxPinUser[0].PIN);
+                logger.debug("first pin=" + pin);
+
+                async.whilst(function () {
+                        return row < numUsers;
+                    },
+                    function (userCallback) {
+                        logger.debug("async user iteratee called");
+                        logger.debug("row=" + row + ", col=" + col, " pin=" + pin);
+                        var user = {
+                            name: shared.myTrim(users[row][col]),
+                            email: shared.myTrim(users[row][col + 1]),
+                            role: "role_sc",
+                            school: shared.myTrim(users[row][0]),
+                            username: pin.toString(),
+                            PIN: pin
+                        };
+                        if (user.name != undefined && user.name.length > 0 &&
+                            user.email != undefined && user.email.length > 0) {
+                            user.email = user.email.toLowerCase();
+                            User.create(user, function (err) {
+                                if (err) {
+                                    if (err.message.indexOf("E11000") < 0) {
+                                        logger.error("row=" + (row + 1) + ", Error, user=" + user.email + ", " + err.message);
+                                    }
+                                    else { // duplicate key error
+                                        logger.debug("row=" + (row + 1) + ", " + user.email + " already in DB");
+                                    }
+                                }
+                                else {
+                                    logger.info("row=" + (row + 1) + ", created user=" + user.name + ", email=" + user.email);
+                                    pin = nextPIN(pin);
+                                    fs.appendFile(fname, user.username + ", " + user.email + ", " + user.school + "\r\n", function (err) {
+                                        if (err) {
+                                            logger.error("Error: " + user.email + ", msg=" + err.message);
+                                        }
+                                    });
+                                }
+                                col += 2; // move to next counselor
+                                logger.debug("calling userCallback with row=" + row);
+                                userCallback(null); // don't stop for errors
+                            });
+                        }
+                        else {
+                            if (col == sc1col) {
+                                logger.info("row=" + (row + 1) + " missing data, user=" + user.name + ", email=" + user.email);
+                            }
+                            row++;
+                            col = sc1col;
+                            userCallback(null); // don't stop for errors
+                        }
+                    },
+                    function (err) {
+                        if (err) {
+                            logger.error("error while creating users--shouldn't happen since errors are just logged in console.");
+                            req.flash("error", "error while uploading users");
+                        }
+                        else {
+                            req.flash("success", "Users uploaded!");
+                        }
+                        logger.info("User upload complete");
+                        res.redirect("/users");
+                    });
+            }
+        });
 });
 
 module.exports = router;
