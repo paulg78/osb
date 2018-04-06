@@ -195,7 +195,7 @@ router.post("/createUsers", function (req, res) {
                                         logger.error("row=" + (row + 1) + ", Error, user=" + user.email + ", " + err.message);
                                     }
                                     else { // duplicate key error
-                                        logger.debug("row=" + (row + 1) + ", " + user.email + " already in DB");
+                                        logger.debug("row=" + (row + 1) + ", " + user.email + ", " + user.school + ": " + err.message);
                                     }
                                 }
                                 else {
