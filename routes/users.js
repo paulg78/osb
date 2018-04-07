@@ -178,11 +178,6 @@ router.post("/uploadUsers2", function (req, res) {
 
     // sort user updates by email/school to match User query order
     userUpdates.sort(function (a, b) {
-        // var x = a.email + a.school;
-        // var y = b.email + b.school;
-        // if (x < y) { return -1; }
-        // if (x > y) { return 1; }
-        // return 0;
         if (a.email < b.email) {
             return -1;
         }
@@ -208,16 +203,16 @@ router.post("/uploadUsers2", function (req, res) {
                 return res.redirect("back");
             }
 
+            // compare arrays to determine action and populate updates array
             var updates = []; // users to create, update or delete
-            // compare arrays to determine action and populate delete, create, update arrays
             var r1 = 0;
             var r2 = 0;
             while (r1 < usersFound.length && r2 < userUpdates.length) {
                 logger.debug("comparing: " + usersFound[r1].email + usersFound[r1].school + "--" + userUpdates[r2].email + userUpdates[r2].school);
                 if (usersFound[r1].email == userUpdates[r2].email && usersFound[r1].school == userUpdates[r2].school) { // updated user already in db
                     if (usersFound[r1].name != userUpdates[r2].name) { // name update
-                        usersFound[r1].action = 'U';
-                        updates.push(usersFound[r1]);
+                        userUpdates[r2].action = 'U';
+                        updates.push(userUpdates[r2]);
                     }
                     r1++;
                     r2++;
@@ -245,7 +240,7 @@ router.post("/uploadUsers2", function (req, res) {
                 updates.push(userUpdates[r2++]);
             }
 
-            global.updates = updates;
+            global.upd = updates;
             res.render("users/uploadUserPlan", {
                 users: updates
             });
@@ -255,120 +250,119 @@ router.post("/uploadUsers2", function (req, res) {
 
 // upload users from CSV file -- update db
 router.post("/createUsers", function (req, res) {
-    logger.debug("req.body.userUpdatePlan=" + req.body.userUpdatePlan);
-    var users = JSON.parse(req.body.userUpdatePlan);
-    logger.debug("users:");
-    for (var i = 0; i < users.length; i++) {
-        logger.debug("i=" + i + ":" + users[i].name + ", " +
-            users[i].email + ", " +
-            users[i].school + ", " +
-            users[i].action);
-    }
-    logger.debug("global.updates:");
-    for (var i = 0; i < global.updates.length; i++) {
-        logger.debug("i=" + i + ":" + global.updates[i]);
-    }
-    for (var i = 0; i < global.updates.length; i++) {
-        logger.debug("i=" + i + ":" + global.updates[i].name + ", " +
-            global.updates[i].email + ", " +
-            global.updates[i].school + ", " +
-            global.updates[i].action);
-    }
-    // logger.debug("users=" + users);
-    res.redirect("/users");
-    // var numUsers = users.length;
-    // var row = 1; // skip column heading
-    // var sc1col = 7; // column of first school counselor
-    // var col = sc1col;
-    // var pin;
-    // const fname = 'userupload.txt';
-
-    // function nextPIN(pin) {
-    //     return pin + 1 + Math.floor(Math.random() * 25); // adds between 1 and 25
+    // logger.debug("global.upd:");
+    // for (var i = 0; i < global.upd.length; i++) {
+    //     logger.debug("i=" + i + ":" + global.upd[i].name + ", " +
+    //         global.upd[i].email + ", " +
+    //         global.upd[i].school + ", " +
+    //         global.upd[i].action);
     // }
 
-    // logger.info("Starting User upload");
-    // fs.appendFile(fname, new Date() + "\r\n", function (err) {
-    //     if (err) {
-    //         logger.error("Error on first write to file " + fname);
-    //     }
-    //     else {
-    //         logger.debug("Started writing user log");
-    //     }
-    // });
-    // User.find({}, { _id: 0, PIN: 1 }).sort({ PIN: -1 }).limit(1)
-    //     .exec(function (err, maxPinUser) {
-    //         if (err) {
-    //             logger.error(err);
-    //             res.redirect("/users");
-    //         }
-    //         else {
-    //             logger.debug("maxPinUser[0]=" + maxPinUser[0]);
-    //             pin = nextPIN(maxPinUser[0].PIN);
-    //             logger.debug("first pin=" + pin);
+    var pin;
+    const fname = 'userupload.txt';
 
-    //             async.whilst(function () {
-    //                     return row < numUsers;
-    //                 },
-    //                 function (userCallback) {
-    //                     logger.debug("async user iteratee called");
-    //                     logger.debug("row=" + row + ", col=" + col, " pin=" + pin);
-    //                     var user = {
-    //                         name: shared.myTrim(users[row][col]),
-    //                         email: shared.myTrim(users[row][col + 1]),
-    //                         role: "role_sc",
-    //                         school: shared.myTrim(users[row][0]),
-    //                         username: pin.toString(),
-    //                         PIN: pin
-    //                     };
-    //                     if (user.name != undefined && user.name.length > 0 &&
-    //                         user.email != undefined && user.email.length > 0) {
-    //                         user.email = user.email.toLowerCase();
-    //                         User.create(user, function (err) {
-    //                             if (err) {
-    //                                 if (err.message.indexOf("E11000") < 0) {
-    //                                     logger.error("row=" + (row + 1) + ", Error, user=" + user.email + ", " + err.message);
-    //                                 }
-    //                                 else { // duplicate key error
-    //                                     logger.debug("row=" + (row + 1) + ", " + user.email + ", " + user.school + ": " + err.message);
-    //                                 }
-    //                             }
-    //                             else {
-    //                                 logger.info("row=" + (row + 1) + ", created user=" + user.name + ", email=" + user.email);
-    //                                 pin = nextPIN(pin);
-    //                                 fs.appendFile(fname, user.username + ", " + user.email + ", " + user.school + "\r\n", function (err) {
-    //                                     if (err) {
-    //                                         logger.error("Error: " + user.email + ", msg=" + err.message);
-    //                                     }
-    //                                 });
-    //                             }
-    //                             col += 2; // move to next counselor
-    //                             logger.debug("calling userCallback with row=" + row);
-    //                             userCallback(null); // don't stop for errors
-    //                         });
-    //                     }
-    //                     else {
-    //                         if (col == sc1col) {
-    //                             logger.info("row=" + (row + 1) + " missing data, user=" + user.name + ", email=" + user.email);
-    //                         }
-    //                         row++;
-    //                         col = sc1col;
-    //                         userCallback(null); // don't stop for errors
-    //                     }
-    //                 },
-    //                 function (err) {
-    //                     if (err) {
-    //                         logger.error("error while creating users--shouldn't happen since errors are just logged in console.");
-    //                         req.flash("error", "error while uploading users");
-    //                     }
-    //                     else {
-    //                         req.flash("success", "Users uploaded!");
-    //                     }
-    //                     logger.info("User upload complete");
-    //                     res.redirect("/users");
-    //                 });
-    //         }
-    //     });
+    function nextPIN(pin) {
+        return pin + 1 + Math.floor(Math.random() * 25); // adds between 1 and 25
+    }
+
+    logger.info("Starting User updates");
+    fs.appendFile(fname, new Date() + "\r\n", function (err) {
+        if (err) {
+            logger.error("Error on first write to file " + fname);
+        }
+        else {
+            logger.debug("Started writing user log");
+        }
+    });
+    User.find({}, { _id: 0, PIN: 1 }).sort({ PIN: -1 }).limit(1)
+        .exec(function (err, maxPinUser) {
+            if (err) {
+                logger.error(err);
+                res.redirect("/users");
+            }
+            else {
+                logger.debug("maxPinUser[0]=" + maxPinUser[0]);
+                pin = nextPIN(maxPinUser[0].PIN);
+                logger.debug("first pin=" + pin);
+                var i = 0;
+                var numUpdates = global.upd.length;
+                async.whilst(function () {
+                        return i < numUpdates;
+                    },
+                    function (userCallback) {
+                        // logger.debug("async user iteratee called");
+                        logger.info("i=" + i + ": " + global.upd[i].name + ", " +
+                            global.upd[i].email + ", " +
+                            global.upd[i].school + ", " +
+                            global.upd[i].action);
+                        switch (global.upd[i].action) {
+                        case "C":
+                            var user = {
+                                name: global.upd[i].name,
+                                email: global.upd[i].email,
+                                role: "role_sc",
+                                school: global.upd[i].school,
+                                username: pin.toString(),
+                                PIN: pin
+                            };
+                            User.create(user, function (err) {
+                                if (err) {
+                                    logger.error("error creating user:" + err.message);
+                                }
+                                else {
+                                    pin = nextPIN(pin);
+                                    fs.appendFile(fname, user.username + ", " + user.name + ", " + user.email + ", " + user.school + "\r\n", function (err) {
+                                        if (err) {
+                                            logger.error("Error: " + user.email + ", msg=" + err.message);
+                                        }
+                                    });
+                                }
+                                i++; // move to next update
+                                userCallback(null); // don't stop for errors
+                            });
+                            break;
+                        case "U":
+                            // var user = {
+                            //     name: global.upd[i].name,
+                            // };
+                            User.findOneAndUpdate({ email: global.upd[i].email, school: global.upd[i].school }, {
+                                $set: { name: global.upd[i].name }
+                            }, function (err) {
+                                if (err) {
+                                    logger.error("error updating user:" + err.message);
+                                }
+                                i++; // move to next update
+                                userCallback(null); // don't stop for errors
+                            });
+                            break;
+                        case "D":
+                            User.findOneAndRemove({ email: global.upd[i].email, school: global.upd[i].school }, function (err) {
+                                if (err) {
+                                    logger.error("error deleting user:" + err.message);
+                                }
+                                i++; // move to next update
+                                userCallback(null); // don't stop for errors
+                            });
+                            break;
+                        default:
+                            logger.error("invalid action=" + global.upd[i].action);
+                            i++; // move to next update
+                            userCallback(null); // don't stop for errors
+                        }
+                    },
+                    function (err) {
+                        if (err) {
+                            logger.error("error while creating users--shouldn't happen since errors are just logged in console.");
+                            req.flash("error", "error while uploading users");
+                        }
+                        else {
+                            req.flash("success", "Users uploaded!");
+                        }
+                        logger.info("User upload complete");
+                        res.redirect("/users");
+                    });
+            }
+        });
 });
 
 module.exports = router;

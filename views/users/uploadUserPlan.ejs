@@ -29,16 +29,13 @@
             <% }); %>
         </tbody>
     </table>
-    <span id="userPlan" class="hidden"><%- JSON.stringify(users) %></span>
-
     <form action="/users/createUsers" method="POST">
         <div class="form-group">
-            <input type="hidden" id="userInput" name="userUpdatePlan"%> />
             <button type=submit class="btn btn-lg btn-primary">Submit!</button>
+            <a href="/users">Cancel</a>
         </div>
     </form>
 <script>
-// console.log("script running");
 $(function(){
   $("#userTable").tablesorter(
       { theme: 'bootstrap',
@@ -46,9 +43,6 @@ $(function(){
         widgets : [ "uitheme" ]
       });
 });
-    $(document).ready(function() {
-        $("#userInput").val($("#userPlan")[0].innerText);
-    });
 </script>
 
 <% include ../partials/footer %>

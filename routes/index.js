@@ -2,9 +2,9 @@ var express = require("express");
 var router = express.Router();
 var passport = require("passport");
 var User = require("../models/user");
-var async = require('async');
-var crypto = require('crypto');
-var Mailgun = require('mailgun-js');
+// var async = require('async');
+// var crypto = require('crypto');
+// var Mailgun = require('mailgun-js');
 /* global logger */
 
 //root route
@@ -14,7 +14,7 @@ router.get("/", function (req, res) {
 
 //show login form
 router.get("/login", function (req, res) {
-    logger.debug("back to login");
+    // logger.debug("back to login");
     res.render("login");
 });
 
@@ -24,7 +24,7 @@ router.get("/help", function (req, res) {
 });
 
 router.post('/login', function (req, res, next) {
-    logger.debug("at login, req.body=" + req.body.username + "-" + req.body.password);
+    // logger.debug("at login, req.body=" + req.body.username + "-" + req.body.password);
     passport.authenticate('local', function (err, user, info) {
         if (err) {
             req.flash('error', err.message);
@@ -37,7 +37,7 @@ router.post('/login', function (req, res, next) {
 
         req.logIn(user, function (err) {
             if (err) return next(err);
-            logger.debug("logged in user=" + user);
+            // logger.debug("logged in user=" + user);
             if (user.role == 'role_sc') {
                 return res.redirect('/students');
             }
@@ -54,14 +54,14 @@ router.get("/logout", function (req, res) {
     res.redirect("/");
 });
 
-// show reset password form
+// show request username/password reset password form
 router.get('/requestpwreset', function (req, res) {
     res.render('requestpwreset', {
         user: req.user
     });
 });
 
-// reset password
+// show username/password reset form
 router.post('/requestpwreset', function (req, res) {
     User.findOne({
         email: req.body.email.toLowerCase(),
@@ -77,7 +77,7 @@ router.post('/requestpwreset', function (req, res) {
             return res.redirect('/requestpwreset');
         }
         else {
-            logger.debug("in requestpwreset user=" + user);
+            // logger.debug("in requestpwreset user=" + user);
             res.render('resetpw', {
                 username: user.username,
                 school: user.school
@@ -87,7 +87,8 @@ router.post('/requestpwreset', function (req, res) {
 });
 
 
-// show password reset form (with school for counselors)
+// show username/password reset form (with school for counselors)
+// used to re-render reset form with an error message
 router.get('/resetpw/:username/:school', function (req, res) {
     res.render('resetpw', {
         username: req.params.username,
@@ -96,7 +97,8 @@ router.get('/resetpw/:username/:school', function (req, res) {
 });
 
 
-// show password reset form (without school for non-counselor roles)
+// show username/password reset form (without school for non-counselor roles)
+// used to re-render reset form with an error message
 router.get('/resetpw/:username', function (req, res) {
     res.render('resetpw', {
         username: req.params.username,
@@ -107,10 +109,10 @@ router.get('/resetpw/:username', function (req, res) {
 
 // reset password
 router.post('/resetpw/:username', function (req, res) {
-    logger.debug("req.body.password=" + req.body.password);
-    logger.debug("req.body.confirm=" + req.body.confirm);
-    logger.debug("req.body.username=" + req.body.username);
-    logger.debug("req.params.username=" + req.params.username);
+    // logger.debug("req.body.password=" + req.body.password);
+    // logger.debug("req.body.confirm=" + req.body.confirm);
+    // logger.debug("req.body.username=" + req.body.username);
+    // logger.debug("req.params.username=" + req.params.username);
 
     User.findOne({
         username: req.params.username
@@ -125,19 +127,25 @@ router.post('/resetpw/:username', function (req, res) {
             req.flash('error', 'System error: User not found.');
             return res.redirect('/requestpwreset');
         }
-        logger.debug("in resetpw, user=" + user);
-        if (req.body.password != req.body.confirm) {
-            req.flash('error', "Password confirmation doesn't match first password entered.");
-            logger.debug("password mismatch");
+        // logger.debug("in resetpw, user=" + user);
+        // disallow new numeric username to avoid dup usernames when uploading new users, which are
+        // created with username = a numeric PIN
+        if (req.body.username != user.username && !isNaN(req.body.username)) { // user is changing username to a number
+            req.flash('error', "Sorry, a new username cannot be numeric. A new username must contain at least one non-digit character.");
             return res.redirect("/resetpw/" + req.params.username + "/" + user.school);
         }
-        user.username = req.body.username;
+
+        if (req.body.password != req.body.confirm) {
+            req.flash('error', "Password confirmation doesn't match first password entered.");
+            return res.redirect("/resetpw/" + req.params.username + "/" + user.school);
+        }
+        user.username = req.body.username.toLowerCase();
         user.password = req.body.password;
-        logger.debug("user.password before save=" + user.password);
+        // logger.debug("user.password before save=" + user.password);
 
         user.save(function (err) {
             if (err) {
-                logger.debug("user save error=" + err.message);
+                // logger.debug("user save error=" + err.message);
                 if (err.message.indexOf("E11000") >= 0) { // duplicate key error
                     req.flash('error', "Sorry, that username is already in use. Please make up another one.");
                     return res.redirect("/resetpw/" + req.params.username + "/" + user.school);
@@ -149,7 +157,7 @@ router.post('/resetpw/:username', function (req, res) {
                 }
             }
             else {
-                logger.debug("user.password after save=" + user.password);
+                // logger.debug("user.password after save=" + user.password);
                 req.flash('success', 'Success! Your new username/password has been saved.');
                 res.redirect('/login');
             }
