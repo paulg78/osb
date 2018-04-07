@@ -245,6 +245,7 @@ router.post("/uploadUsers2", function (req, res) {
                 updates.push(userUpdates[r2++]);
             }
 
+            global.updates = updates;
             res.render("users/uploadUserPlan", {
                 users: updates
             });
@@ -256,6 +257,7 @@ router.post("/uploadUsers2", function (req, res) {
 router.post("/createUsers", function (req, res) {
     logger.debug("req.body.userUpdatePlan=" + req.body.userUpdatePlan);
     var users = JSON.parse(req.body.userUpdatePlan);
+    logger.debug("global.updates=" + global.updates);
     logger.debug("users=" + users);
     res.redirect("back");
     // var numUsers = users.length;
