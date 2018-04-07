@@ -257,9 +257,25 @@ router.post("/uploadUsers2", function (req, res) {
 router.post("/createUsers", function (req, res) {
     logger.debug("req.body.userUpdatePlan=" + req.body.userUpdatePlan);
     var users = JSON.parse(req.body.userUpdatePlan);
-    logger.debug("global.updates=" + global.updates);
-    logger.debug("users=" + users);
-    res.redirect("back");
+    logger.debug("users:");
+    for (var i = 0; i < users.length; i++) {
+        logger.debug("i=" + i + ":" + users[i].name + ", " +
+            users[i].email + ", " +
+            users[i].school + ", " +
+            users[i].action);
+    }
+    logger.debug("global.updates:");
+    for (var i = 0; i < global.updates.length; i++) {
+        logger.debug("i=" + i + ":" + global.updates[i]);
+    }
+    for (var i = 0; i < global.updates.length; i++) {
+        logger.debug("i=" + i + ":" + global.updates[i].name + ", " +
+            global.updates[i].email + ", " +
+            global.updates[i].school + ", " +
+            global.updates[i].action);
+    }
+    // logger.debug("users=" + users);
+    res.redirect("/users");
     // var numUsers = users.length;
     // var row = 1; // skip column heading
     // var sc1col = 7; // column of first school counselor
