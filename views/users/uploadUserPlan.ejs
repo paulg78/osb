@@ -1,0 +1,54 @@
+<% include ../partials/header %>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/css/theme.bootstrap_3.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.widgets.min.js"></script>
+
+    <header>
+        <h1>
+            <span>User Update Plan</span>
+        </h1>
+    </header>
+
+    <table id="userTable" class="table table-striped tablesorter">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>School</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach(function(user){ %>
+                <tr>
+                    <td><%= user.name %></td>
+                    <td><%= user.email %></td>
+                    <td><%= user.school %></td>
+                    <td><%= user.action %></td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+    <span id="userPlan" class="hidden"><%- JSON.stringify(users) %></span>
+
+    <form action="/users/createUsers" method="POST">
+        <div class="form-group">
+            <input type="hidden" id="userInput" name="userUpdatePlan"%> />
+            <button type=submit class="btn btn-lg btn-primary">Submit!</button>
+        </div>
+    </form>
+<script>
+// console.log("script running");
+$(function(){
+  $("#userTable").tablesorter(
+      { theme: 'bootstrap',
+        headerTemplate : '{content} {icon}',
+        widgets : [ "uitheme" ]
+      });
+});
+    $(document).ready(function() {
+        $("#userInput").val($("#userPlan")[0].innerText);
+    });
+</script>
+
+<% include ../partials/footer %>
