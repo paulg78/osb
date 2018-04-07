@@ -1,7 +1,7 @@
 <% include ../partials/header %>
     <div class="row">
         <h1 style="text-align: center">Upload Users</h1>
-        <div style="width: 30%; margin: 25px auto;">      
+        <div style="width: 30%; margin: 25px auto;">
         <div id="dvImportSegments" class="fileupload ">
             <fieldset>
                 <legend>Select .csv File</legend>
@@ -11,17 +11,17 @@
         </div>
     </div>
 
-    <form action="/users/createUsers" method="POST">
+    <form action="/users/uploadUsers2" method="POST">
         <div class="form-group">
             <input type="hidden" id="csvString" name="usersString">
             <button type=submit class="btn btn-lg btn-primary hidden">Submit!</button>
         </div>
         <table id="csvTable" name="users"></table>
     </form>
-    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/0.8.3/jquery.csv.min.js"></script>
-    <script src="/scripts/uploadCSV.js"></script>    
-    <script>  
+    <script src="/scripts/uploadCSV.js"></script>
+    <script>
         $(document).ready(function() {
         // The event listener for the file upload
         console.log("setting file upload listener");

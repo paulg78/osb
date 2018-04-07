@@ -133,107 +133,224 @@ router.delete("/:userId", middleware.isLoggedIn, function (req, res) {
     });
 });
 
+
 // upload users from CSV file -- show form
 router.get("/uploadUsers", function (req, res) {
     res.render("users/uploadUsers");
 });
 
-// upload users from CSV file -- updated db
-router.post("/createUsers", function (req, res) {
+
+// upload users from CSV file -- determine changes
+// Only uploads school counselors; assumes all valid counselors are in the update file
+// (create user, delete user, or update user's name)
+router.post("/uploadUsers2", function (req, res) {
+    logger.info("Starting User upload--determine changes");
     var users = JSON.parse(req.body.usersString);
-    var numUsers = users.length;
-    var row = 1; // skip column heading
+    var numRows = users.length;
     var sc1col = 7; // column of first school counselor
     var col = sc1col;
-    var pin;
-    const fname = 'userupload.txt';
 
-    function nextPIN(pin) {
-        return pin + 1 + Math.floor(Math.random() * 25); // adds between 1 and 25
-    }
-
-    logger.info("Starting User upload");
-    fs.appendFile(fname, new Date() + "\r\n", function (err) {
-        if (err) {
-            logger.error("Error on first write to file " + fname);
+    // populate userUpdates array with name, email, school
+    var row = 1; // skip column heading
+    var userUpdates = [];
+    while (row < numRows) {
+        logger.debug("row=" + row + ", col=" + col);
+        var user = {
+            name: shared.myTrim(users[row][col]),
+            email: shared.myTrim(users[row][col + 1]),
+            school: shared.myTrim(users[row][0])
+        };
+        if (user.name != undefined && user.name.length > 0 &&
+            user.email != undefined && user.email.length > 0) {
+            user.email = user.email.toLowerCase();
+            userUpdates.push(user);
+            logger.info("row=" + (row + 1) + ", user update=" + user.name + ", email=" + user.email);
+            col += 2; // move to next counselor
         }
         else {
-            logger.debug("Started writing user log");
+            if (col == sc1col) {
+                logger.info("row=" + (row + 1) + " missing data, user=" + user.name + ", email=" + user.email);
+            }
+            row++;
+            col = sc1col;
         }
+    }
+
+    // sort user updates by email/school to match User query order
+    userUpdates.sort(function (a, b) {
+        // var x = a.email + a.school;
+        // var y = b.email + b.school;
+        // if (x < y) { return -1; }
+        // if (x > y) { return 1; }
+        // return 0;
+        if (a.email < b.email) {
+            return -1;
+        }
+        if (a.email > b.email) {
+            return 1;
+        }
+        if (a.school < b.school) {
+            return -1;
+        }
+        if (a.school > b.school) {
+            return 1;
+        }
+        return 0;
     });
-    User.find({}, { _id: 0, PIN: 1 }).sort({ PIN: -1 }).limit(1)
-        .exec(function (err, maxPinUser) {
+
+
+    // find existing users
+    User.find({ role: "role_sc" }, { _id: 0, name: 1, email: 1, school: 1 }).sort({ email: 1, school: 1 })
+        .exec(function (err, usersFound) {
             if (err) {
                 logger.error(err);
-                res.redirect("/users");
+                req.flash("error", "error finding existing users");
+                return res.redirect("back");
             }
-            else {
-                logger.debug("maxPinUser[0]=" + maxPinUser[0]);
-                pin = nextPIN(maxPinUser[0].PIN);
-                logger.debug("first pin=" + pin);
 
-                async.whilst(function () {
-                        return row < numUsers;
-                    },
-                    function (userCallback) {
-                        logger.debug("async user iteratee called");
-                        logger.debug("row=" + row + ", col=" + col, " pin=" + pin);
-                        var user = {
-                            name: shared.myTrim(users[row][col]),
-                            email: shared.myTrim(users[row][col + 1]),
-                            role: "role_sc",
-                            school: shared.myTrim(users[row][0]),
-                            username: pin.toString(),
-                            PIN: pin
-                        };
-                        if (user.name != undefined && user.name.length > 0 &&
-                            user.email != undefined && user.email.length > 0) {
-                            user.email = user.email.toLowerCase();
-                            User.create(user, function (err) {
-                                if (err) {
-                                    if (err.message.indexOf("E11000") < 0) {
-                                        logger.error("row=" + (row + 1) + ", Error, user=" + user.email + ", " + err.message);
-                                    }
-                                    else { // duplicate key error
-                                        logger.debug("row=" + (row + 1) + ", " + user.email + ", " + user.school + ": " + err.message);
-                                    }
-                                }
-                                else {
-                                    logger.info("row=" + (row + 1) + ", created user=" + user.name + ", email=" + user.email);
-                                    pin = nextPIN(pin);
-                                    fs.appendFile(fname, user.username + ", " + user.email + ", " + user.school + "\r\n", function (err) {
-                                        if (err) {
-                                            logger.error("Error: " + user.email + ", msg=" + err.message);
-                                        }
-                                    });
-                                }
-                                col += 2; // move to next counselor
-                                logger.debug("calling userCallback with row=" + row);
-                                userCallback(null); // don't stop for errors
-                            });
-                        }
-                        else {
-                            if (col == sc1col) {
-                                logger.info("row=" + (row + 1) + " missing data, user=" + user.name + ", email=" + user.email);
-                            }
-                            row++;
-                            col = sc1col;
-                            userCallback(null); // don't stop for errors
-                        }
-                    },
-                    function (err) {
-                        if (err) {
-                            logger.error("error while creating users--shouldn't happen since errors are just logged in console.");
-                            req.flash("error", "error while uploading users");
-                        }
-                        else {
-                            req.flash("success", "Users uploaded!");
-                        }
-                        logger.info("User upload complete");
-                        res.redirect("/users");
-                    });
+            var updates = []; // users to create, update or delete
+            // compare arrays to determine action and populate delete, create, update arrays
+            var r1 = 0;
+            var r2 = 0;
+            while (r1 < usersFound.length && r2 < userUpdates.length) {
+                logger.debug("comparing: " + usersFound[r1].email + usersFound[r1].school + "--" + userUpdates[r2].email + userUpdates[r2].school);
+                if (usersFound[r1].email == userUpdates[r2].email && usersFound[r1].school == userUpdates[r2].school) { // updated user already in db
+                    if (usersFound[r1].name != userUpdates[r2].name) { // name update
+                        usersFound[r1].action = 'U';
+                        updates.push(usersFound[r1]);
+                    }
+                    r1++;
+                    r2++;
+                }
+                else if (usersFound[r1].email + usersFound[r1].school < userUpdates[r2].email + userUpdates[r2].school) { // delete user who is not in updates
+                    usersFound[r1].action = 'D';
+                    updates.push(usersFound[r1++]);
+                }
+                else { // add user
+                    userUpdates[r2].action = 'C';
+                    updates.push(userUpdates[r2++]);
+                }
             }
+            // Reached end of one array; process users on the rest of the other array
+            // delete remaining users not in the update list, if any
+            while (r1 < usersFound.length) {
+                logger.debug("comparing: " + usersFound[r1].email + usersFound[r1].school + "--no match in update array");
+                usersFound[r1].action = 'D';
+                updates.push(usersFound[r1++]);
+            }
+            // create remaining users on update list, if any
+            while (r2 < userUpdates.length) {
+                logger.debug("comparing: " + "no match with existing users" + "--" + userUpdates[r2].email + userUpdates[r2].school);
+                userUpdates[r2].action = 'C';
+                updates.push(userUpdates[r2++]);
+            }
+
+            res.render("users/uploadUserPlan", {
+                users: updates
+            });
         });
+});
+
+
+// upload users from CSV file -- update db
+router.post("/createUsers", function (req, res) {
+    logger.debug("req.body.userUpdatePlan=" + req.body.userUpdatePlan);
+    var users = JSON.parse(req.body.userUpdatePlan);
+    logger.debug("users=" + users);
+    res.redirect("back");
+    // var numUsers = users.length;
+    // var row = 1; // skip column heading
+    // var sc1col = 7; // column of first school counselor
+    // var col = sc1col;
+    // var pin;
+    // const fname = 'userupload.txt';
+
+    // function nextPIN(pin) {
+    //     return pin + 1 + Math.floor(Math.random() * 25); // adds between 1 and 25
+    // }
+
+    // logger.info("Starting User upload");
+    // fs.appendFile(fname, new Date() + "\r\n", function (err) {
+    //     if (err) {
+    //         logger.error("Error on first write to file " + fname);
+    //     }
+    //     else {
+    //         logger.debug("Started writing user log");
+    //     }
+    // });
+    // User.find({}, { _id: 0, PIN: 1 }).sort({ PIN: -1 }).limit(1)
+    //     .exec(function (err, maxPinUser) {
+    //         if (err) {
+    //             logger.error(err);
+    //             res.redirect("/users");
+    //         }
+    //         else {
+    //             logger.debug("maxPinUser[0]=" + maxPinUser[0]);
+    //             pin = nextPIN(maxPinUser[0].PIN);
+    //             logger.debug("first pin=" + pin);
+
+    //             async.whilst(function () {
+    //                     return row < numUsers;
+    //                 },
+    //                 function (userCallback) {
+    //                     logger.debug("async user iteratee called");
+    //                     logger.debug("row=" + row + ", col=" + col, " pin=" + pin);
+    //                     var user = {
+    //                         name: shared.myTrim(users[row][col]),
+    //                         email: shared.myTrim(users[row][col + 1]),
+    //                         role: "role_sc",
+    //                         school: shared.myTrim(users[row][0]),
+    //                         username: pin.toString(),
+    //                         PIN: pin
+    //                     };
+    //                     if (user.name != undefined && user.name.length > 0 &&
+    //                         user.email != undefined && user.email.length > 0) {
+    //                         user.email = user.email.toLowerCase();
+    //                         User.create(user, function (err) {
+    //                             if (err) {
+    //                                 if (err.message.indexOf("E11000") < 0) {
+    //                                     logger.error("row=" + (row + 1) + ", Error, user=" + user.email + ", " + err.message);
+    //                                 }
+    //                                 else { // duplicate key error
+    //                                     logger.debug("row=" + (row + 1) + ", " + user.email + ", " + user.school + ": " + err.message);
+    //                                 }
+    //                             }
+    //                             else {
+    //                                 logger.info("row=" + (row + 1) + ", created user=" + user.name + ", email=" + user.email);
+    //                                 pin = nextPIN(pin);
+    //                                 fs.appendFile(fname, user.username + ", " + user.email + ", " + user.school + "\r\n", function (err) {
+    //                                     if (err) {
+    //                                         logger.error("Error: " + user.email + ", msg=" + err.message);
+    //                                     }
+    //                                 });
+    //                             }
+    //                             col += 2; // move to next counselor
+    //                             logger.debug("calling userCallback with row=" + row);
+    //                             userCallback(null); // don't stop for errors
+    //                         });
+    //                     }
+    //                     else {
+    //                         if (col == sc1col) {
+    //                             logger.info("row=" + (row + 1) + " missing data, user=" + user.name + ", email=" + user.email);
+    //                         }
+    //                         row++;
+    //                         col = sc1col;
+    //                         userCallback(null); // don't stop for errors
+    //                     }
+    //                 },
+    //                 function (err) {
+    //                     if (err) {
+    //                         logger.error("error while creating users--shouldn't happen since errors are just logged in console.");
+    //                         req.flash("error", "error while uploading users");
+    //                     }
+    //                     else {
+    //                         req.flash("success", "Users uploaded!");
+    //                     }
+    //                     logger.info("User upload complete");
+    //                     res.redirect("/users");
+    //                 });
+    //         }
+    //     });
 });
 
 module.exports = router;

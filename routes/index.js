@@ -37,7 +37,7 @@ router.post('/login', function (req, res, next) {
 
         req.logIn(user, function (err) {
             if (err) return next(err);
-            console.log("logged in user=" + user);
+            logger.debug("logged in user=" + user);
             if (user.role == 'role_sc') {
                 return res.redirect('/students');
             }
