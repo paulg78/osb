@@ -6,7 +6,9 @@
     <header>
         <h1>
             <span>Users</span>
-            <a class="btn btn-primary btn-sm pull-right" href="/users/new">Add New User</a>
+            <% if(currentUser.role == "role_wa"){ %>
+                <a class="btn btn-primary btn-sm pull-right" href="/users/new">Add New User</a>
+            <% }; %>
         </h1>
     </header>
     <table id="userTable" class="table table-striped tablesorter">
@@ -29,12 +31,14 @@
                     <td><%= user.username %></td>
                     <td><%= user.PIN %></td>
                     <td><%= user.role %></td>
-                    <td>
-                        <form style="display: inline" action="/users/<%=user._id%>?_method=DELETE" method="POST">
-                            <a href="/users/<%=user._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
-                            <button class="delUserBtn btn btn-xs btn-danger">DELETE</button>
-                        </form>
-                    </td>
+                    <% if(currentUser.role == "role_wa"){ %>
+                        <td>
+                            <form style="display: inline" action="/users/<%=user._id%>?_method=DELETE" method="POST">
+                                <a href="/users/<%=user._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
+                                <button class="delUserBtn btn btn-xs btn-danger">DELETE</button>
+                            </form>
+                        </td>
+                    <% }; %>
                 </tr>
             <% }); %>
         </tbody>
