@@ -4,25 +4,35 @@
         <div style="width: 30%; margin: 25px auto;">
             <form action="/users" method="POST">
                 <div class="form-group">
-                    <input class="form-control" type="text" name="username" placeholder="username">
-                    <p>to use email registration, username must be email address or email address followed by a suffix</p>
+                    <label>Full Name:</label>
+                    <input class="form-control" type="text" name="name">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="name" placeholder="full name">
+                    <label>Email Address:</label>
+                    <input class="form-control" type="email" name="email">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="role" placeholder="role">
-                    <p>role values: role_sc (school counselor), role_al (Assistance League), role_wa (website admin)</p>
+                    <label>School:</label>
+                    <input class="form-control" type="text" name="school">
+                    <p>For counselor, must exactly match a school name in the database. Blank for other roles.</p>
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="school" placeholder="school">
-                    <p>Leave school blank for AL and WA roles.</p>
+                    <label>Username:</label>
+                    <input class="form-control" type="text" name="username">
+                    <p>Initial value is PIN (stored as a string). Can be changed to a non-numeric value.</p>
                 </div>
                 <div class="form-group">
-                    Email Address: <input class="form-control" type="email" name="email" placeholder="email address">
+                    <label>Role:</label>
+                    <select name="role">
+                        <option value="role_sc" selected>school counselor</option>
+                        <option value="role_al">Assistance League</option>
+                        <option class="role_wa" value="role_wa">Website administrator</option>
+                    </select>
                 </div>
                 <div class="form-group">
-                    PIN: <input class="form-control" type="text" name="PIN" placeholder="PIN">
+                    <label>PIN:</label>
+                    <input class="form-control" type="text" name="PIN">
+                    <p>Unique number assigned when user is created. Used to create/reset username/password.</p>
                 </div>
                 <div class="form-group">
                     <button type=submit class="btn btn-lg btn-primary btn-block">Submit!</button>

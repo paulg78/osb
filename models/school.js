@@ -1,7 +1,11 @@
 var mongoose = require("mongoose");
 
 var schoolSchema = new mongoose.Schema({
-    name: String,
+    name: {
+        type: String,
+        required: true,
+        unique: true
+    },
     quota: Number,
     district: String
 });

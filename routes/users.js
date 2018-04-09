@@ -93,12 +93,15 @@ router.get("/:id/edit", function (req, res) {
 // Update user in database
 router.put("/:id", function (req, res) {
     var newData = {
-        username: shared.myTrim(req.body.username.toLowerCase()),
-        role: shared.myTrim(req.body.role),
-        school: shared.myTrim(req.body.school),
-        PIN: parseInt(shared.myTrim(req.body.PIN), 10),
+        name: shared.myTrim(req.body.name),
+        role: req.body.role,
         email: shared.myTrim(req.body.email)
     };
+    if (res.locals.currentUser.role == "role_wa") { // only admin can update key fields
+        newData.username = shared.myTrim(req.body.username.toLowerCase());
+        newData.PIN = parseInt(shared.myTrim(req.body.PIN), 10);
+        newData.school = shared.myTrim(req.body.school);
+    }
 
     User.findByIdAndUpdate(req.params.id, {
         $set: newData
@@ -109,9 +112,7 @@ router.put("/:id", function (req, res) {
             res.redirect("back");
         }
         else {
-            logger.info("Updating user");
             req.flash("success", "Successfully Updated!");
-            // res.redirect("/users/" + user._id);
             res.redirect("/users");
         }
     });
