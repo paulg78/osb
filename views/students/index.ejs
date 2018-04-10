@@ -58,7 +58,7 @@ function timeString(d) {
              <th>Grade</th>
              <th class="sorter-shortDate dateFormat-ddmmyyyy filter-select" data-placeholder="All Dates">Scheduled</th>
              <th>Time</th>
-             <th>Served</th>
+             <th class="filter-select">Served</th>
              </tr>
         </thead>
     <tbody id='studentList'>
@@ -81,9 +81,9 @@ function timeString(d) {
                 <% } else { %>
                 <button type="button" class="btn btn-xs btn-default checkIn">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
                 <% } %>
-                <span class="hidden" type="text" name="studentId"><%= student._id %></span>
                 <span class="hidden" name="served"><%= student.servedyn %></span>
             </td>
+            <td hidden><span class="hidden" type="text" name="studentId"><%= student._id %></span></td>
         </tr>
     <% }); %>
     </tbody>

@@ -9,7 +9,7 @@ $(".checkIn").on('click', function (e) {
     // console.log("served=" + served);
 
     $.ajax({
-        url: "/students/" + btn.siblings("[name=studentId]").text() + "/checkIn/" + srv.text(),
+        url: "/students/" + btn.parent().next().find("[name=studentId]").text() + "/checkIn/" + srv.text(),
         type: 'PUT',
         success: function (result) {
             // console.log("updated database and ajax callback executed, result=" + result);
