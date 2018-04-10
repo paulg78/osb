@@ -330,7 +330,7 @@ router.put("/:id", function (req, res) {
 // Check In
 router.put("/:id/checkIn/:served", function (req, res) {
     // logger.debug("req.params.served=" + req.params.served);
-    var newVal = req.params.served == "false";
+    var newVal = req.params.served == "no";
     Student.findByIdAndUpdate(req.params.id, {
         $set: {
             served: newVal

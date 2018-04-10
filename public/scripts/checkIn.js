@@ -17,13 +17,13 @@ $(".checkIn").on('click', function (e) {
                 btn.html('<span class="glyphicon glyphicon-ok"></span>');
                 btn.removeClass("btn-default");
                 btn.addClass("btn-success");
-                srv.html("true");
+                srv.html("yes");
             }
             else {
                 btn.html('&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;');
                 btn.removeClass("btn-primary btn-success");
                 btn.addClass("btn-default");
-                srv.html("false");
+                srv.html("no");
             }
         }
     });

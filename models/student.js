@@ -24,4 +24,13 @@ studentSchema.virtual('fullName').get(function () {
     return this.fname + ' ' + this.lname;
 });
 
+studentSchema.virtual('servedyn').get(function () {
+    if (this.served) {
+        return "yes";
+    }
+    else {
+        return "no";
+    }
+});
+
 module.exports = mongoose.model("Student", studentSchema);
