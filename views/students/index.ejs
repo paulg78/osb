@@ -5,8 +5,30 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.widgets.min.js"></script>
 
 <%
+// function dateString(d) {
+//     var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+//     var h=d.getHours();
+//     var ap;
+//     if (h>12) {
+//         h=h-12;
+//         ap="PM";
+//     }
+//     else {
+//         ap="AM";
+//     }
+//     var m = d.getMinutes();
+//     if (m==0) {
+//         m="00";
+//     }
+//     return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
+// }
+
 function dateString(d) {
     var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000);
+}
+
+function timeString(d) {
     var h=d.getHours();
     var ap;
     if (h>12) {
@@ -20,7 +42,7 @@ function dateString(d) {
     if (m==0) {
         m="00";
     }
-    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
+    return h + ":" + m + " " + ap;
 }
 %>
      <header>
@@ -30,24 +52,27 @@ function dateString(d) {
      <table id="studentTable" class="table table-striped tablesorter">
          <thead>
              <tr>
-             <th>First Name</th>
              <th>Last Name</th>
-             <th>School</th>
+             <th>First Name</th>
+             <th class="filter-select" data-placeholder="All Schools">School</th>
              <th>Grade</th>
-             <th class="sorter-shortDate dateFormat-ddmmyyyy">Scheduled</th>
+             <th class="sorter-shortDate dateFormat-ddmmyyyy filter-select" data-placeholder="All Dates">Scheduled</th>
+             <th>Time</th>
              <th>Served</th>
              </tr>
         </thead>
     <tbody id='studentList'>
      <% students.forEach(function(student){ %>
         <tr>
-            <td><%= student.fname %></td>
             <td><%= student.lname %></td>
+            <td><%= student.fname %></td>
             <td><%= student.school %></td>
             <td><%= student.grade %></td>
             <% if (student.slot != null) { %>
                 <td><%= dateString(student.slot.sdate) %></td>
+                <td><%= timeString(student.slot.sdate) %></td>
             <% } else { %>
+                <td></td>
                 <td></td>
                 <% } %>
             <td>
@@ -131,7 +156,7 @@ $(function(){
       // if true, filters are collapsed initially, but can be revealed by hovering over the grey bar immediately
       // below the header row. Additionally, tabbing through the document will open the filter row when an input gets focus
       // in v2.26.6, this option will also accept a function
-      filter_hideFilters : true,
+      filter_hideFilters : false,
 
       // Set this option to false to make the searches case sensitive
       filter_ignoreCase : true,
