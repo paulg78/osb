@@ -17,7 +17,7 @@ router.get("/", middleware.isLoggedIn,
         else { // list all students
             // logger.debug("after next");
             Student.find()
-                .hint("fname_1_lname_1")
+                .sort({ "lname": 1, "fname": 1 })
                 .populate('slot', { sdate: 1, _id: 0 })
                 .exec(function (err, queryResponse) {
                     if (err) {

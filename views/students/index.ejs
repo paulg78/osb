@@ -5,30 +5,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.widgets.min.js"></script>
 
 <%
-// function dateString(d) {
-//     var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-//     var h=d.getHours();
-//     var ap;
-//     if (h>12) {
-//         h=h-12;
-//         ap="PM";
-//     }
-//     else {
-//         ap="AM";
-//     }
-//     var m = d.getMinutes();
-//     if (m==0) {
-//         m="00";
-//     }
-//     return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
-// }
-
 function dateString(d) {
     var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000);
-}
-
-function timeString(d) {
     var h=d.getHours();
     var ap;
     if (h>12) {
@@ -42,7 +20,7 @@ function timeString(d) {
     if (m==0) {
         m="00";
     }
-    return h + ":" + m + " " + ap;
+    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
 }
 %>
      <header>
@@ -56,8 +34,7 @@ function timeString(d) {
              <th>First Name</th>
              <th class="filter-select" data-placeholder="All Schools">School</th>
              <th>Grade</th>
-             <th class="sorter-shortDate dateFormat-ddmmyyyy filter-select" data-placeholder="All Dates">Scheduled</th>
-             <th>Time</th>
+             <th class="sorter-shortDate dateFormat-ddmmyyyy">Scheduled</th>
              <th class="filter-select">Served</th>
              </tr>
         </thead>
@@ -70,9 +47,7 @@ function timeString(d) {
             <td><%= student.grade %></td>
             <% if (student.slot != null) { %>
                 <td><%= dateString(student.slot.sdate) %></td>
-                <td><%= timeString(student.slot.sdate) %></td>
             <% } else { %>
-                <td></td>
                 <td></td>
                 <% } %>
             <td>
