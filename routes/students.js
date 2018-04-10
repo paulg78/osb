@@ -189,7 +189,7 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
 // Find student and render form
 // router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
 router.get("/:id/edit", function (req, res) {
-    Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, slot: 1 })
+    Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, slot: 1, served: 1 })
         .populate('slot', { _id: 1, sdate: 1 })
         .exec(function (err, foundStudent) {
             if (err) {
