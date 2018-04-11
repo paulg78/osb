@@ -20,11 +20,6 @@ function dateTimeString(d) {
     return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
 }
 
-// function dateString(d) {
-//     var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-//     return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000);
-// }
-
 function timeString(d) {
     var h=d.getHours();
     var ap;
@@ -57,7 +52,12 @@ function timeString(d) {
                 </div>
                 <div class="form-group">
                     <label for="grade">Grade (K or 1-12)*:</label>
-                    <input class="form-control" id="grade" type="text" name="grade" value="<%= student.grade %>">
+                    <select id="gradeSelect" name="grade">
+                        <option value="K">K</option>
+                        <% for (var i=1; i<13; i++) { %>
+                            <option value=<%= i %> ><%= i %></option>
+                           <% } %>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label>Served:</label>
