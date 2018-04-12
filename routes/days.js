@@ -135,7 +135,7 @@ function toStr2(x) {
 router.get("/", middleware.isLoggedIn, function (req, res) {
     var today = new Date();
     var todayStr = today.getFullYear().toString() + "-" + toStr2(today.getMonth() + 1) + "-" + toStr2(today.getDate());
-    logger.debug("todayStr=" + todayStr);
+    // logger.debug("todayStr=" + todayStr);
     if (global.days == null) {
         Day.find({ $query: {}, $orderby: { date: 1 } }, { date: 1 })
             .exec(function (err, days) {

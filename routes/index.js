@@ -31,7 +31,7 @@ router.post('/login', function (req, res, next) {
             return res.redirect('/login');
         }
         else if (!user) {
-            req.flash('error', 'User Id or password not valid.');
+            req.flash('error', 'Username or password not valid.');
             return res.redirect('/login');
         }
 

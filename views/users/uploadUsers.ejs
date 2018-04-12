@@ -1,21 +1,25 @@
 <% include ../partials/header %>
     <div class="row">
-        <h1 style="text-align: center">Upload Users</h1>
         <div style="width: 30%; margin: 25px auto;">
-        <div id="dvImportSegments" class="fileupload ">
-            <fieldset>
-                <legend>Select .csv File</legend>
-                <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
-            </fieldset>
-        </div>
+            <h1 style="text-align: center">Upload Users</h1>
+            <p>Upload users will add new users, update names of existing users
+            and delete users, as needed, to make the database match the spreadsheet.</p>
+            <div id="dvImportSegments" class="fileupload ">
+                <fieldset>
+                    <legend>Select the .csv File exported from the OSB Data spreadsheet:</legend>
+                    <input type="file" name="File Upload" id="txtFileUpload" accept=".csv" />
+                </fieldset>
+            </div>
+            <p></p>
+            <p></p>
+            <a href="/users" class="btn btn-md btn-primary">Cancel</a>
         </div>
     </div>
 
     <form action="/users/uploadUsers2" method="POST">
         <div class="form-group">
             <input type="hidden" id="csvString" name="usersString">
-            <button type=submit class="btn btn-lg btn-primary hidden">Submit!</button>
-            <a href="/users">Cancel</a>
+            <button type=submit class="btn btn-lg btn-primary hidden">Determine database changes needed</button>
         </div>
         <table id="csvTable" name="users"></table>
     </form>
