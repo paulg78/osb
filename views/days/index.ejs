@@ -1,5 +1,17 @@
 <% include ../partials/header %>
 
+<%
+function toStr2(x) {
+    var s = x.toString();
+    if (s.length < 2) {
+        return "0" + s;
+    }
+    else {
+        return s;
+    }
+}
+%>
+
 <h1>Days in  <%= new Date().getFullYear() %></h1>
 
 <div class="container">
@@ -13,14 +25,20 @@
             </tr>
             <% global.days.forEach(function(day){ %>
                 <tr>
-                    <td class="dayList"> <%= day.date.toLocaleDateString("en-US", {weekday: 'long', year: '2-digit', month: '2-digit', day: 'numeric'}) %> &nbsp;</td>
-                    <td>
-                        <% if(currentUser.role == "role_sc"){ %>
-                            <a href="/days/<%=day._id%>/school" class="btn btn-xs btn-primary role_sc">Schedule</a>
-                        <% } else { %>
-                            <a href="/days/<%=day._id%>" class="btn btn-xs btn-primary role_al role_wa">Schedule</a>
-                        <% } %>
-                    </td>
+                    <% var d=day.date; %>
+                    <td class="dayList"> <%= d.toLocaleDateString("en-US", {weekday: 'short', year: '2-digit', month: '2-digit', day: 'numeric'}) %> &nbsp;</td>
+                    <% if(currentUser.role == "role_sc"){ %>
+                        <td>
+                            <a href="/days/<%=day._id%>/school" class="btn btn-xs btn-primary">Schedule</a>
+                        </td>
+                    <% } else { %>
+                        <td>
+                            <form style="display: inline">
+                                <a href="/students/<%=d.getFullYear() + "-" + toStr2(d.getMonth()+1) + "-" + toStr2(d.getDate())%>" class="btn btn-xs btn-primary">Students Scheduled</a>
+                                <a href="/days/<%=day._id%>" class="btn btn-xs btn-primary">Schedule</a>
+                            </form>
+                        </td>
+                    <% } %>
                 </tr>
             <% }); %>
        </tbody>

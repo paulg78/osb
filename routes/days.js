@@ -120,7 +120,6 @@ router.post("/createSchedule", middleware.isLoggedIn, function (req, res) {
 });
 
 
-
 function toStr2(x) {
     var s = x.toString();
     if (s.length < 2) {
@@ -147,7 +146,7 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
                 else {
                     global.days = days;
                     // global.days.forEach(function (day) {
-                    //     logger.debug("day=" + day);
+                    // logger.debug("day=" + day);
                     // });
                     res.render("days/index", {
                         todayStr: todayStr
@@ -253,8 +252,11 @@ router.get("/:dayId", middleware.isLoggedIn, getPrevNextIds, function (req, res)
 
 // Show SCHEDULE for next available day (one with open slots)
 router.get("/nextAvail/:date", middleware.isLoggedIn, function (req, res) {
+    function mmdd(d) {
+        return toStr2(d.getMonth()) + toStr2(d.getDate());
+    }
     var qry = "this.sdate > new Date('" + req.params.date + "') && this.count < this.max";
-    // logger.debug("* qry=" + qry);
+    logger.debug("* qry=" + qry);
     Slot.find({ $where: qry }, { sdate: 1 }).limit(1).hint("sdate_1")
         .exec(function (err, slots) {
             if (err) {
@@ -269,13 +271,17 @@ router.get("/nextAvail/:date", middleware.isLoggedIn, function (req, res) {
                     res.redirect("back");
                 }
                 else {
-                    // logger.debug("slots[0]=" + slots[0]);
+                    logger.debug("slots[0]=" + slots[0]);
                     // get day Id for slot found
-                    var slotMMDD = slots[0].sdate.getMonth() + slots[0].sdate.getDate();
+
+                    // var slotMMDD = toStr2(slots[0].sdate.getMonth()) + toStr2(slots[0].sdate.getDate());
+                    var slotMMDD = mmdd(slots[0].sdate);
+                    logger.debug("slotMMDD=" + slotMMDD);
                     for (var i = 0, iLen = global.days.length; i < iLen; i++) {
-                        // logger.debug("i=" + i + ", iLen=" + iLen + ", global.days[i]._id=" + global.days[i]._id);
-                        if (slotMMDD == global.days[i].date.getMonth() + global.days[i].date.getDate()) {
-                            // logger.debug("global.days[i]=" + global.days[i]);
+                        logger.debug("i=" + i + ", global.days[i].date=" + global.days[i].date + ", mmdd=" + mmdd(global.days[i].date));
+                        // if (slotMMDD == toStr2(global.days[i].date.getMonth()) + toStr2(global.days[i].date.getDate())) {
+                        if (slotMMDD == mmdd(global.days[i].date)) {
+                            logger.debug("global.days[i]=" + global.days[i]);
                             break;
                         }
                     }

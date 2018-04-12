@@ -1,5 +1,6 @@
 var express = require("express");
 var router = express.Router();
+var Day = require("../models/day");
 var Student = require("../models/student");
 var School = require("../models/school");
 var Slot = require("../models/slot");
@@ -28,7 +29,8 @@ router.get("/", middleware.isLoggedIn,
                     else {
                         // logger.debug("queryResponse=" + queryResponse);
                         res.render("students/index", {
-                            students: queryResponse
+                            students: queryResponse,
+                            h1suffix: ""
                         });
                     }
                 });
@@ -84,6 +86,43 @@ router.get("/", middleware.isLoggedIn,
             });
     }
 );
+
+router.get("/:dateSched", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("back");
+    }
+    // logger.debug("req.params.dateSched=" + req.params.dateSched);
+    Day.findOne({ date: new Date(req.params.dateSched) }, { _id: 0 })
+        .populate('slots', { _id: 1 })
+        .exec(function (err, foundDay) {
+            if (err) {
+                logger.error(err);
+                req.flash("error", "System error:" + err.message);
+                return res.redirect("back");
+            }
+            else {
+                // logger.debug("foundDay=" + foundDay);
+                // logger.debug("foundDay=" + JSON.stringify(foundDay));
+                // logger.debug("foundDay.slots[2]=" + foundDay.slots[2]);
+                // find the students scheduled for this day
+                Student.find({ slot: { $in: foundDay.slots } })
+                    .populate('slot', { sdate: 1, _id: 0 })
+                    .exec(
+                        function (err, queryResponse) {
+                            if (err) {
+                                logger.error(err);
+                            }
+                            else {
+                                // logger.debug("queryResponse=" + queryResponse);
+                                res.render("students/index", {
+                                    students: queryResponse,
+                                    h1suffix: "Scheduled for " + foundDay.date.toLocaleDateString("en-US", { weekday: 'long', year: '2-digit', month: '2-digit', day: 'numeric' })
+                                });
+                            }
+                        });
+            }
+        });
+});
 
 function firstLetterUpCase(val) {
     if (val == null) {
