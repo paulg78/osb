@@ -90,9 +90,11 @@ function dateString(d) {
                 <% } %>
             </td>
             <td>
-             <form style="display: inline">
+            <form style="display: inline">
                 <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-primary">Edit</a>
-                <a href="/students/<%=student._id%>/printPass" class="btn btn-xs btn-primary">Passport</a>
+                <% if (!student.served && student.slot != null) { %>
+                    <a href="/students/<%=student._id%>/printPass" class="btn btn-xs btn-primary">Passport</a>
+                <% } %>
             </form>
             </td>
         </tr>

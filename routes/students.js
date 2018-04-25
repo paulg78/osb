@@ -225,7 +225,7 @@ router.post("/", middleware.isLoggedIn, function (req, res) {
     }
 });
 
-// Find student and render form
+// Find student and render edit form
 router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
     Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, slot: 1, served: 1 })
         .populate('slot', { _id: 1, sdate: 1 })
@@ -238,6 +238,29 @@ router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
                     return res.redirect("back");
                 }
                 res.render("students/edit", {
+                    student: foundStudent
+                });
+            }
+        });
+});
+
+// Find student and render passport form
+router.get("/:id/printPass", middleware.isLoggedIn, function (req, res) {
+    Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, slot: 1, served: 1 })
+        .populate('slot', { _id: 1, sdate: 1 })
+        .exec(function (err, foundStudent) {
+            if (err) {
+                logger.error(err);
+            }
+            else {
+                if (foundStudent == null) {
+                    return res.redirect("/students");
+                }
+                // don't show passport for students already served or not scheduled
+                if (foundStudent.served || foundStudent.slot == null) {
+                    return res.redirect("/students");
+                }
+                res.render("students/printPass", {
                     student: foundStudent
                 });
             }

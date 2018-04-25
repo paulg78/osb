@@ -17,12 +17,11 @@ $('#newStudentForm').submit(function (e) {
                 <td>${result.student.lname}</td>
                 <td>${result.student.grade}</td>
                 <td></td>
-                <td></td>
+                <td>no</td>
                 <td>
-                 <form style="display: inline" action="/students/${result.student._id}?_method=DELETE" method="POST">
-                    <a href="/students/${result.student._id}/edit" class="btn btn-xs btn-primary">Edit</a>
-                    <button class="delStudBtn btn btn-xs btn-danger pull-right">Delete</button>
-                </form>
+                    <form style="display: inline">
+                        <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-primary">Edit</a>
+                    </form>
                 </td>
             </tr>
                 `
