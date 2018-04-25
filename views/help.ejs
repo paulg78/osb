@@ -1,82 +1,92 @@
 <% include ./partials/header %>
 <h2>Menu Options</h2>
 <h3 style="padding-left: 30px;">Before Login (Top Right)</h3>
-<p style="padding-left: 60px;"><strong>Login</strong> -- Goes to the Login Page. (You must register a username before you can login.)</p>
-<p style="padding-left: 60px;"><strong>Register or reset password</strong> -- Goes to the Create Password Page.</p>
-<h3 style="padding-left: 30px;">After Login (Top Left and Right)</h3>
-<p style="padding-left: 60px;"><strong>Days</strong> -- Goes to the Days in Event Page.</p>
-<p style="padding-left: 60px;"><strong>Students</strong> -- Goes to the Students Page.</p>
-<p style="padding-left: 60px;"><strong>Logout</strong> -- Goes to the Operation School Bell Initial Page.</p>
-<h2>Create Password Page (used to register or to reset password)</h2>
-<p style="padding-left: 30px;">Enter Username and press enter/return or click
+<p style="padding-left: 60px;"><strong>Login</strong> -- Your initial username is the PIN you received from the Assistance League. You must set a password before you can login. If you like, you may change your username.</p>
+<p style="padding-left: 60px;"><strong>Set or Reset Username/Password</strong> -- You can set your initial password and change your username/password using the PIN and email address you received from the Assistance League. Enter your PIN and email address. Then press enter/return or click
     <button class="btn btn-xs btn-primary">Submit</button>.
-    &nbsp;&nbsp;Enter and confirm your password on the next page.</p>
-<p style="padding-left: 30px;"><strong>Username(s): </strong>If you support a single school, your Username is the email address provided to the Assistance League. If you support multiple schools, you have a separate Username for each school you support. Username may be an email address followed by a suffix that indicates a school. Please contact the Assistance League if you have questions about your username(s).</p>
-<h2>Days in Event Page</h2>
-<p style="padding-left: 30px;">Lists the days scheduled for Operation School Bell.</p>
-<p style="padding-left: 30px;">
-    <button class="btn btn-xs btn-primary">Schedule</button>
-     &nbsp;-- goes to Fitting Schedule Page for a specific day. The schedule button for </strong><strong style="background-color: #dff0d8;">Next Available Day</strong> goes to the first day that has available openings and is on or after the current date.</strong>
-</p>
+    &nbsp;On the next page, you will have the option to change your username and password.</p>
+<h3 style="padding-left: 30px;">After Login (Top Left and Right)</h3>
+<div class="role_al role_wa">
+    <p style="padding-left: 60px;"><strong>*Upload Schools</strong> -- Upload schools from a .csv file exported from the OSB Data spreadsheet.</p>
+    <p style="padding-left: 60px;"><strong>*Upload Users</strong> -- Upload users from a .csv file exported from the OSB Data spreadsheet.</p>
+    <p style="padding-left: 60px;"><strong>*Schools</strong> -- Goes to Schools page. See detailed help below.</p>
+    <p style="padding-left: 60px;"><strong>*Users</strong> -- Goes to Users Page. See detailed help below. </p>
+    <p style="padding-left: 60px;"><strong>*Days</strong> -- Goes to Days in Year page. See detailed help below.</p>
+    <p style="padding-left: 60px;"><span style="background-color: yellow;"><strong>*</strong> menu options above are for AL users only.</span></p>
+</div>
+<p style="padding-left: 60px;"><strong>Students</strong> -- Lists all students entered for your school. From this page, you can add students, schedule them, and print passports (see detailed help for the Students Page below).<span class="role_al role_wa" style="background-color: yellow">For Assistance League, this menu option lists all students in the database. Assistance League users can can view and check in students but cannot edit or delete students.</span></p>
+<p style="padding-left: 60px;"><strong>Logout</strong> -- Signs you out and goes to the Operation School Bell Initial Page.</p>
 
-<h2>Fitting Schedule Page</h2>
-<p style="padding-left: 30px;">The number in parenthesis after each time indicates how many openings are still available at that time. A time with remaining openings will have a green box with a plus sign for adding students to the schedule. The number in parenthesis after each student name indicates grade level.</p>
-<h3 style="padding-left: 30px;">Add Student to Schedule</h3>
-<ol style="margin: 0px 40px;">
-    <li>Click on an unscheduled student on the right.</li>
-    <li>Click on
-        <button style="background-color: green; font-weight: bold; font-size: 1.25em;">+</button>
-    to add student to a fitting time.</li>
-</ol>
-<h3 style="padding-left: 30px;">Remove Student from Schedule</h3>
-<ol start="1" style="margin: 0px 40px;">
-    <li>Click on a student in a fitting time.</li>
-    <li>Click on
-    <button style="color: red; font-weight: bold; font-size: 1.25em; border-width: 1px; border-color: red;">-</button>
-    to remove student from the schedule. Student will be moved to the end of the unscheduled list.</li>
-</ol>
-<p></p>
-<p></p>
-<p>
-    <button style="margin-left: 30px;" class="btn btn-xs btn-info">
-        <span class="glyphicon glyphicon-chevron-left"></span>
-    </button>&nbsp;-- Go to previous day
-</p>
-<p>
-    <button style="margin-left: 30px;" class="btn btn-xs btn-info">List days</button>
-    &nbsp;-- Goes back to day list
-</p>
-<p>
-    <button style="margin-left: 30px;" class="btn btn-xs btn-info">
-        <span class="glyphicon glyphicon-chevron-right"></span>
-    </button>&nbsp;-- Go to next day
-</p>
+<div class="role_al role_wa">
+    <h2>Schools Page</h2>
+    <p style="padding-left: 30px;">Lists all schools in the database.</p>
+    <p style="padding-left: 30px;"><strong>Sort --&nbsp;</strong>Click column heading to sort; each click toggles between ascending and descending order. To sort on multiple columns, click a column and then shift click on another column.</p>
+        <button style="margin-left: 30px;" class="btn btn-xs btn-info">Edit</button> -- can only edit allotment. Changing a school name would cause database inconsistency.
+    <h2>Users Page</h2>
+    <p style="padding-left: 30px;">Lists all users in the database.</p>
+    <p style="padding-left: 30px;"><strong>Sort --&nbsp;</strong>Click column heading to sort; each click toggles between ascending and descending order. To sort on multiple columns, click a column and then shift click on another column.</p>
+    <p style="padding-left: 30px;"><strong>Filter --&nbsp;</strong>Click the grey bar under the heading; select from a dropdown for school or role. Type in boxes to filter by other fields.</p>
+    <h2>Days in Year Page</h2>
+    <p style="padding-left: 30px;">Lists the scheduled shopping days.</p>
+    <p style="padding-left: 30px;">
+        <button class="btn btn-xs btn-primary">Schedule</button>
+         &nbsp;-- goes to Fitting Schedule Page for a specific day. The schedule button for </strong><strong style="background-color: #dff0d8;">Next Available Day</strong> goes to the first day on or after the current date that has available openings.</strong>
+    </p>
+    <p style="padding-left: 30px;">
+        <button class="btn btn-xs btn-primary">Students Scheduled</button>
+         &nbsp;-- goes to Students Page filtered for a specific day.
+    </p>
 
+    <h2>Fitting Schedule Page</h2>
+    <p style="padding-left: 30px;">The number in parenthesis after each time indicates how many openings are still available at that time. The number in parenthesis after each student name indicates grade level.</p>
+    <p></p>
+    <p></p>
+    <p>
+        <button style="margin-left: 30px;" class="btn btn-xs btn-info">
+            <span class="glyphicon glyphicon-chevron-left"></span>
+        </button>&nbsp;-- Go to previous day
+    </p>
+    <p>
+        <button style="margin-left: 30px;" class="btn btn-xs btn-info">List days</button>
+        &nbsp;-- Goes back to day list
+    </p>
+    <p>
+        <button style="margin-left: 30px;" class="btn btn-xs btn-info">
+            <span class="glyphicon glyphicon-chevron-right"></span>
+        </button>&nbsp;-- Go to next day
+    </p>
+</div>
 <h2>Students Page</h2>
-<p style="padding-left: 30px;">The heading shows the number of fittings allocated to your school and the number of additional students you can enter within your allotment.</p>
-<h3 style="padding-left: 30px;">Add Student to Roster</h3>
+<p style="padding-left: 30px;">The heading shows the number of fittings allotted to your school and the number of additional students you can enter within your allotment.</p>
+<p class="role_al role_wa" style="padding-left: 30px;"><span style="background-color: yellow;">Allotments are shown on the students page only for school counselors. AL users can see allotments on the schools page.</span></p>
+<h3 style="padding-left: 30px;">Add Student</h3>
 <ol start="1" style="margin: 0px 40px;">
     <li>Fill in data; first name, last name, and grade (K or 1-12) are required.</li>
-    <li>Press enter/return or click Save to add student to the database. The new student is added to the end of the list; the list will be in the correct sequence when the page is refreshed or re-sorted.</li>
+    <li>Press enter/return or click Save to add student to the database. The new student is added to the end of the list and will be placed in the correct sequence when the page is refreshed or re-sorted.</li>
 </ol>
 <p></p>
-<p>
-    <button style="margin-left: 30px;" class="btn btn-xs btn-primary">Edit</button>
-     &nbsp;-- goes to the Edit Student Page. You can edit name and grade and remove a student's scheduled appointment.
+<p style="margin-left: 30px;">
+    <button class="btn btn-xs btn-primary">Edit</button>
+     &nbsp;-- goes to the Edit Student Page where you can schedule a student for a fitting, edit name and grade, or delete a student.
 </p>
 <p>
-    <button style="margin-left: 30px;" class="btn btn-xs btn-danger">Delete</button>
-     &nbsp;-- presents confirmation dialog box and deletes student if confirmed.
+    <button style="margin-left: 30px;" class="btn btn-xs btn-primary">Passport</button>
+     &nbsp;-- goes to the Passport Print page; Each student needs a passport to shop.
 </p>
 <p style="padding-left: 30px;"><strong>Sort --&nbsp;</strong>Click column heading to sort; each click toggles between ascending and descending order. To sort on multiple columns, click a column and then shift click on another column.</p>
+<p class="role_al role_wa" style="padding-left: 30px;"><span style="background-color: yellow;"><strong>Filter (Assistance League only) --&nbsp;</strong>Click the grey bar under the heading; select from a dropdown for school or served. Type in boxes to filter by other fields.</span></p>
 <p style="padding-left: 30px;"><strong>Served Column --&nbsp;</strong>The Assistance League will update this field, usually by the end of each day during Operation School Bell. Values:</p>
 <p style="padding-left: 50px;"><span class="bg-success">Yes</span>: Student received clothing.</p>
 <p style="padding-left: 50px;">no: Student has not yet received clothing.</p>
 <p style="padding-left: 50px;"><span class="bg-danger">NO</span>: Student has not received clothing and the scheduled date has passed.</p>
 <h2>Edit Student Page</h2>
-<p>Make changes and press enter/return or click&nbsp;
+<p>You can change name and grade. If a student has not yet been served, you can schedule or reschedule their fitting. When you are finished making changes, press enter/return or click&nbsp;
     <button class="btn btn-xs btn-primary">Save</button>
      &nbsp;to update student in the database.
+</p>
+<p>
+    <button style="margin-left: 30px;" class="btn btn-xs btn-danger">Delete Student</button>
+     &nbsp;-- presents confirmation dialog box and deletes student if confirmed.
 </p>
 <h2>Questions or Feedback</h2>
     <h4>Send Email to admin@schoolbell.us</h4>

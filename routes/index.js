@@ -63,6 +63,10 @@ router.get('/requestpwreset', function (req, res) {
 
 // show username/password reset form
 router.post('/requestpwreset', function (req, res) {
+    if (isNaN(req.body.PIN)) { // user entered non-numeric PIN
+        req.flash('error', "A valid PIN contains only digits; PIN entered was " + req.body.PIN);
+        return res.redirect('/requestpwreset');
+    }
     User.findOne({
         email: req.body.email.toLowerCase(),
         PIN: req.body.PIN
@@ -73,7 +77,7 @@ router.post('/requestpwreset', function (req, res) {
             return res.redirect('/requestpwreset');
         }
         if (user == null) {
-            req.flash('error', "No account exists with Email address " + req.body.email + " and PIN " + req.body.PIN);
+            req.flash('error', "No account found for PIN " + req.body.PIN + ", email address " + req.body.email);
             return res.redirect('/requestpwreset');
         }
         else {
@@ -107,7 +111,7 @@ router.get('/resetpw/:username', function (req, res) {
 });
 
 
-// reset password
+// reset username/password
 router.post('/resetpw/:username', function (req, res) {
     // logger.debug("req.body.password=" + req.body.password);
     // logger.debug("req.body.confirm=" + req.body.confirm);

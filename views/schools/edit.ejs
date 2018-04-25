@@ -2,16 +2,15 @@
     <div class="row">
         <h1 style="text-align: center">Edit School Quota</h1>
         <div style="width: 30%; margin: 25px auto;">
-           <form action="/schools/<%=school._id%>?_method=PUT" method="POST">            
+            <form action="/schools/<%=school._id%>?_method=PUT" method="POST">
                 <h2><%= school.name %></h2>
                 <div class="form-group">
-                    Student Quota:<input class="form-control" type="text" name="quota" value=<%= school.quota %>>
+                    <label>Student Quota:</label>
+                    <input class="form-control" type="text" name="quota" value=<%= school.quota %>>
                 </div>
-                    <button type=submit class="btn btn-lg btn-primary btn-block">Submit!</button>
-                </div>
+                <button type=submit class="btn btn-lg btn-primary btn-block">Submit</button>
+                <a href="/schools">Cancel</a>
             </form>
-            <a href="/schools">Cancel</a>
         </div>
     </div>
 <% include ../partials/footer %>
-

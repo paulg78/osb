@@ -5,7 +5,7 @@
     <header>
         <h1>
             <span>Schools</span>
-            <a class="btn btn-primary btn-sm pull-right" href="/schools/new">Add New School</a>
+            <a class="btn btn-primary btn-sm pull-right role_wa" href="/schools/new">Add New School</a>
          </h1>
     </header>
     <table id="schoolTable" class="table table-striped tablesorter">
@@ -30,7 +30,7 @@
                 <td><%= school.servedCount %></td>
                 <td>
                     <form style="display: inline" action="/schools/<%=school._id%>?_method=DELETE" method="POST">
-                        <a href="/schools/<%=school._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
+                        <a href="/schools/<%=school._id%>/edit" class="btn btn-xs btn-info">Edit</a>
                         <button class="hidden" class="btn btn-xs btn-danger">DELETE</button>
                 </form>
                 </td>

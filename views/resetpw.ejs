@@ -1,21 +1,24 @@
 <% include ./partials/header %>
 <div class="container">
     <div class="row">
-        <h2 style="text-align: center">Create or Change Username and/or Password</h1>
+        <h2 style="text-align: center">Set Username/Password</h1>
         <% if (school) {%>
-            <h3 style="text-align: center">for school <span style="color:blue;"></spanstyle><%= school %></span></h2>
+            <h3 style="text-align: center">for School <span style="color:blue;"></spanstyle><%= school %></span></h2>
             <% } %>
         <div style="width: 30%; margin: 25px auto;">
             <form action="/resetpw/<%=username%>" method="post">
-                <h4>Username</h4>
                 <div class="form-group">
+                    <h4>Username:</h4>
                     <input class="form-control" type="text" name="username" value="<%= username %>">
+                    <span id="Username" class="help-block">Your initial username is the PIN you received from
+                    the Assistance League. If you like, you may change your username to a unique value that is not all digits.
+                    </span>
                 </div>
-                <p></p>
-                <h4 style="text-align: center">Please enter new password twice.</h4>
+                <h4>Please enter new password:</h4>
                 <div class="form-group">
                     <input class="form-control" type="password" name="password" placeholder="new password">
                 </div>
+                <h4>Please enter new password again:</h4>
                 <div class="form-group">
                     <input class="form-control" type="password" name="confirm" placeholder="confirm password">
                 </div>
