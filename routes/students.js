@@ -30,6 +30,7 @@ router.get("/", middleware.isLoggedIn,
                         // logger.debug("queryResponse=" + queryResponse);
                         res.render("students/index", {
                             students: queryResponse,
+                            hideFilter: false,
                             h1suffix: ""
                         });
                     }
@@ -116,6 +117,7 @@ router.get("/:dateSched", middleware.isLoggedIn, function (req, res) {
                                 // logger.debug("queryResponse=" + queryResponse);
                                 res.render("students/index", {
                                     students: queryResponse,
+                                    hideFilter: true,
                                     h1suffix: "Scheduled for " + foundDay.date.toLocaleDateString("en-US", { weekday: 'long', year: '2-digit', month: '2-digit', day: 'numeric' })
                                 });
                             }

@@ -42,7 +42,7 @@ function dateString(d) {
     <h2><%=qrySchool.name + " -- Allotment: " + qrySchool.quota + ",  Remaining: "%><span id='remaining'><%= (qrySchool.quota-students.length) %></h2>
     <% if (qrySchool.quota-students.length > 0) { %>
         <div style="width: 100%; margin: 25px auto;">
-            <form action="/students" method="POST" class="form-inline" id=newStudentForm>
+            <form action="/students" method="POST" class="form-inline hidden-print" id=newStudentForm>
                 <h3>Add Student&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="addMsg"></span></h3>
                 <div class="form-group">
                     <input class="form-control" type="text" name="firstName" placeholder="first name*">
@@ -89,7 +89,7 @@ function dateString(d) {
                         <p>no</p>
                 <% } %>
             </td>
-            <td>
+            <td class="hidden-print">
             <form style="display: inline">
                 <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-primary">Edit</a>
                 <% if (!student.served && student.slot != null) { %>

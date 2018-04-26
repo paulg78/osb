@@ -31,8 +31,16 @@ function dateTimeString(d) {
             <p></p>
             <p style="font-size: 1.25em;">Scheduled for <%= dateTimeString(student.slot.sdate) %></p>
             <p></p>
+            <p></p>
+            <button class="btn btn-md btn-primary hidden-print" onclick="myFunction()">Print Passport</button>
         </div>
     </div>
+
+<script>
+function myFunction() {
+    window.print();
+}
+</script>
 
 <% include ../partials/footer %>
 
