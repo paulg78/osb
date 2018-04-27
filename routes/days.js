@@ -133,6 +133,9 @@ function toStr2(x) {
 
 //INDEX - List days
 router.get("/", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("back");
+    }
     var today = new Date();
     var todayStr = today.getFullYear().toString() + "-" + toStr2(today.getMonth() + 1) + "-" + toStr2(today.getDate());
     // logger.debug("todayStr=" + todayStr);
@@ -287,12 +290,7 @@ router.get("/nextAvail/:date", middleware.isLoggedIn, function (req, res) {
                     }
                     if (i < iLen) {
                         // logger.debug("day=" + day);
-                        if (res.locals.currentUser.role == 'role_sc') {
-                            res.redirect("/days/" + global.days[i]._id + "/school");
-                        }
-                        else {
-                            res.redirect("/days/" + global.days[i]._id);
-                        }
+                        res.redirect("/days/" + global.days[i]._id);
                     }
                     else {
                         logger.error("nextavail; day not found");
