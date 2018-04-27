@@ -3,7 +3,8 @@
   "description": "Operation School Bell",
   "version": "1.0.0",
   "engines": {
-    "node": "8.2.1"
+    "node": "8.2.1",
+    "npm": "6.0.x"
   },
   "main": "app.js",
   "scripts": {
