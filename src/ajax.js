@@ -20,7 +20,7 @@ $('#newStudentForm').submit(function (e) {
                 <td>no</td>
                 <td>
                     <form style="display: inline">
-                        <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-primary">Edit</a>
+                        <a href="/students/${result.student._id}/edit" class="btn btn-xs btn-primary">Edit</a>
                     </form>
                 </td>
             </tr>

@@ -280,23 +280,19 @@ router.put("/:id", function (req, res) {
     logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
 
     var result = studentValid(newData);
-    // verify that time is present if date is present
-    if (req.body.dateSched && !req.body.timeSched) {
-        result = "Date and Time are required to schedule a student.";
-    }
     if (result == "") {
         async.waterfall([
             updateNewSlot,
             updateStudent,
             updateOldSlot,
-        ], function (err, avail) {
+        ], function (err) {
             if (err) {
                 logger.error(err.message);
                 req.flash("error", "Changes not saved: " + err.message);
                 res.redirect("back");
             }
             else {
-                req.flash("success", "Successfully Updated!");
+                req.flash("success", "Successfully Updated " + newData.fname + " " + newData.lname + ".");
                 res.redirect("/students");
             }
         });

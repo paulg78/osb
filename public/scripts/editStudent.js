@@ -88,3 +88,20 @@ $("#delStudBtn").on('click', function (e) {
         e.preventDefault();
     }
 });
+
+$("#saveStudBtn").on('click', function (e) {
+    this.disabled = true;
+    if ($("#fname").val().trim() == "" || $("#lname").val().trim() == "") {
+        alert("First and last name are required fields");
+        e.preventDefault();
+        this.disabled = false;
+    }
+    else if ($("#dateSched").val() != "" && $("#timeSched").val() == "") {
+        alert("Date and Time are required to schedule a student.");
+        e.preventDefault();
+        this.disabled = false;
+    }
+    else {
+        this.form.submit();
+    }
+});
