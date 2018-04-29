@@ -142,16 +142,8 @@ function firstLetterUpCase(val) {
 function studentValid(student) {
     student.fname = firstLetterUpCase(student.fname);
     student.lname = firstLetterUpCase(student.lname);
-    student.grade = student.grade.toString().trim().toUpperCase();
-    if (student.fname == "" || student.lname == "" || student.grade == "") {
+    if (student.fname == "" || student.lname == "" || student.grade == undefined) {
         return "first name, last name, and grade are required fields";
-    }
-    var len = student.grade.length;
-    if ((len == 1 && (student.grade < "1" || student.grade > "9") && student.grade != "K") ||
-        (len == 2 && (student.grade < "10" || student.grade > "12")) ||
-        (len < 1) || (len > 2)
-    ) {
-        return "grade must be K or a number from 1 to 12";
     }
     return "";
 }
