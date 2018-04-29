@@ -45,13 +45,19 @@ function dateString(d) {
             <form action="/students" method="POST" class="form-inline hidden-print" id=newStudentForm>
                 <h3>Add Student&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="addMsg"></span></h3>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="firstName" placeholder="first name*">
+                    <input id="fname" class="form-control" type="text" name="firstName" placeholder="first name*">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="lastName" placeholder="last name*">
+                    <input id="lname" class="form-control" type="text" name="lastName" placeholder="last name*">
                 </div>
                 <div class="form-group">
-                    <input class="form-control" type="text" name="grade" placeholder="grade (K or 1-12)*">
+                    <select id="gradeSelect" class="form-control" name="grade">
+                        <option disabled="disabled" selected="selected" value="">grade* (K-12)</option>
+                        <option value="K">K</option>
+                        <% for (var i=1; i<13; i++) { %>
+                            <option value=<%=i%>><%=i%></option>
+                           <% } %>
+                    </select>
                 </div>
                 <div class="form-group">
                     <button type=submit class="btn btn-md btn-primary btn-block">Save</button>
@@ -104,6 +110,19 @@ function dateString(d) {
 <script src="/js/ajax.js"></script>
 
 <script>
+$(document).ready(function() {
+    $('#gradeSelect').css('color','gray');
+    $('#gradeSelect').change(function() {
+        $('#gradeSelect').css('color','black');
+    });
+    $('#fname').change(function() {
+        $('#fname').css('color','black');
+    });
+    $('#lname').change(function() {
+        $('#lname').css('color','black');
+    });
+});
+
 $(function(){
   $("#studentTable").tablesorter(
       { theme: 'bootstrap',
