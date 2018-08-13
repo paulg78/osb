@@ -52,9 +52,7 @@ var
 
 logger.debug("process.env.DATABASEURL=" + process.env.DATABASEURL);
 
-mongoose.connect(process.env.DATABASEURL, {
-  useMongoClient: true,
-});
+mongoose.connect(process.env.DATABASEURL, {});
 
 // redirect http to https
 // var forceSsl = function (req, res, next) {

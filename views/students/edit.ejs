@@ -73,10 +73,10 @@ function dateTimeString(d) {
                 </div>
                 <% } %>
                 <div class="form-group">
-                    <button id="saveStudBtn" class="btn btn-lg btn-primary btn-block">Save</button>
+                    <button id="saveStudBtn" class="btn btn-lg btn-primary btn-block">Save changes</button>
                 </div>
             </form>
-            <a href="/students">Cancel</a>
+            <a href="/students">Cancel edit</a>
             <% if (!student.served) { %>
                 <form style="display: inline" action="/students/<%=student._id%>?_method=DELETE" method="POST">
                     <button id="delStudBtn" class="btn btn-xs btn-danger pull-right">Delete Student</button>
