@@ -50,9 +50,10 @@ var
   indexRoutes = require("./routes/index"),
   userRoutes = require("./routes/users");
 
+console.log("process.env.DATABASEURL=" + process.env.DATABASEURL);
 logger.debug("process.env.DATABASEURL=" + process.env.DATABASEURL);
 
-mongoose.connect(process.env.DATABASEURL, {});
+mongoose.connect(process.env.DATABASEURL, { useNewUrlParser: true });
 
 // redirect http to https
 // var forceSsl = function (req, res, next) {
