@@ -21,23 +21,46 @@ function dateTimeString(d) {
 }
 
 %>
+	<img src="../../../stylesheets/alLogo.png">
 
     <div class="row">
-        <h1 style="text-align: center">Passport for <%= student.fname + " " + student.lname %></h1>
+        <h1 style="text-align: center">School Bell Passport for <%= student.fname + " " + student.lname %></h1>
         <div style="width: 50%; margin: 25px auto;">
             <p>First Name: <%= student.fname %></p>
             <p>Last Name: <%= student.lname %></p>
             <p>Grade: <%= student.grade %></p>
+            <p>School: <%= student.school %></p>
+            <p>Counselor: <%= currentUser.name %></p>
             <p></p>
             <p style="font-size: 1.25em;">Scheduled for <%= dateTimeString(student.slot.sdate) %></p>
             <p></p>
             <p></p>
+            <p id="parentShopText" class="hidden hidden-print">* School counselor recommends parent be permitted to shop without the student. *</p>
+            <div class="form-group hidden-print">
+                <div class="checkbox">
+                    <label><input id="parentShopCB" type="checkbox" name="parentShopOK" value="n">
+                        <span style="font-size: 1.25em;">Special case: Allow parent to shop for the student. Normally the student should shop.</span>
+                    </label>
+                </div>
+            </div>
             <button class="btn btn-md btn-primary hidden-print" onclick="myFunction()">Print Passport</button>
             <a class="hidden-print" href="/students">Go back to student list</a>
         </div>
     </div>
 
 <script>
+$("#parentShopCB").on('change', function (e) {
+    console.log("parent shop CB changed to " + this.checked);
+    if (this.checked) {
+        $("#parentShopText").removeClass("hidden");
+        $("#parentShopText").removeClass("hidden-print");
+    }
+    else {
+        $("#parentShopText").addClass("hidden");
+        $("#parentShopText").addClass("hidden-print");
+    }
+});
+
 function myFunction() {
     window.print();
 }
