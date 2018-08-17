@@ -9,9 +9,9 @@ function browserSupportFileUpload() {
     return isCompatible;
 }
 
-// This function populates a table with Id=csvTable with data from 
+// This function populates a table with Id=csvTable with data from
 //      a 2D array imported from a .csv file (for display on the form)
-//  The function also populates an element with Id=csvString with a string 
+//  The function also populates an element with Id=csvString with a string
 //      representation of that same data
 function getData(event) {
     upload(event, function (data) {
@@ -45,7 +45,7 @@ function upload(evt, callbackfunction) {
             var csvData = event.target.result;
             data = $.csv.toArrays(csvData);
             if (data && data.length > 0) {
-                alert('Imported -' + data.length + '- rows successfully!');
+                // alert('Imported -' + data.length + '- rows successfully!');
                 callbackfunction(data);
             }
             else {
