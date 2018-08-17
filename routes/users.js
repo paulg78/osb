@@ -1,6 +1,7 @@
 var express = require("express");
 var router = express.Router();
 var User = require("../models/user");
+var UserUpdate = require("../models/userUpdate");
 var middleware = require("../middleware");
 var request = require("request");
 var shared = require("../shared");
@@ -261,6 +262,12 @@ router.post("/createUsers", function (req, res) {
 
     var pin;
     const fname = 'userupload.txt';
+    var userUpdate = {
+        updateDate: new Date(),
+        creates: [],
+        updates: [],
+        deletes: []
+    }
 
     function nextPIN(pin) {
         return pin + 1 + Math.floor(Math.random() * 25); // adds between 1 and 25
@@ -318,6 +325,7 @@ router.post("/createUsers", function (req, res) {
                                         }
                                     });
                                 }
+                                userUpdate.creates.push(user.name + "," + user.email + "," + user.school + ",user," + user.PIN);
                                 i++; // move to next update
                                 userCallback(null); // don't stop for errors
                             });
@@ -359,6 +367,12 @@ router.post("/createUsers", function (req, res) {
                         else {
                             req.flash("success", "Users uploaded!");
                         }
+                        UserUpdate.create(userUpdate, function (err) {
+                            if (err) {
+                                logger.error("error creating userUpdate:" + err.message);
+                            }
+                            else {}
+                        });
                         logger.info("User upload complete");
                         res.redirect("/users");
                     });
