@@ -3,10 +3,8 @@ var router = express.Router();
 var User = require("../models/user");
 var UserUpdate = require("../models/userUpdate");
 var middleware = require("../middleware");
-var request = require("request");
 var shared = require("../shared");
 var async = require('async');
-var fs = require('fs');
 
 /* global logger */
 
@@ -76,7 +74,7 @@ router.get("/new", function (req, res) {
     res.render("users/new");
 });
 
-// Find user and render new user form
+// Find user and render edit user form
 router.get("/:id/edit", function (req, res) {
     User.findById(req.params.id, function (err, foundUser) {
         if (err) {
@@ -265,23 +263,14 @@ router.post("/createUsers", function (req, res) {
     var userUpdate = {
         updateDate: new Date(),
         creates: "Name,Email Address,School,role,PIN\r\n",
-        updates: [],
-        deletes: []
-    }
+        deletes: "Name,Email Address,School,role,PIN\r\n"
+    };
 
     function nextPIN(pin) {
         return pin + 1 + Math.floor(Math.random() * 25); // adds between 1 and 25
     }
 
     logger.info("Starting User updates");
-    fs.appendFile(fname, new Date() + "\r\n", function (err) {
-        if (err) {
-            logger.error("Error on first write to file " + fname);
-        }
-        else {
-            logger.debug("Started writing user log");
-        }
-    });
     User.find({}, { _id: 0, PIN: 1 }).sort({ PIN: -1 }).limit(1)
         .exec(function (err, maxPinUser) {
             if (err) {
@@ -319,11 +308,6 @@ router.post("/createUsers", function (req, res) {
                                 }
                                 else {
                                     pin = nextPIN(pin);
-                                    fs.appendFile(fname, user.username + ", " + user.name + ", " + user.email + ", " + user.school + "\r\n", function (err) {
-                                        if (err) {
-                                            logger.error("Error: " + user.email + ", msg=" + err.message);
-                                        }
-                                    });
                                 }
                                 userUpdate.creates += user.name + "," + user.email + "," + user.school + ",user," + user.PIN + "\r\n";
                                 i++; // move to next update
@@ -331,24 +315,29 @@ router.post("/createUsers", function (req, res) {
                             });
                             break;
                         case "U":
-                            // var user = {
-                            //     name: global.upd[i].name,
-                            // };
                             User.findOneAndUpdate({ email: global.upd[i].email, school: global.upd[i].school }, {
                                 $set: { name: global.upd[i].name }
-                            }, function (err) {
+                            }, {
+                                projection: { "_id": 0, "email": 1, "school": 1, "PIN": 1 }
+                            }, function (err, user) {
                                 if (err) {
                                     logger.error("error updating user:" + err.message);
                                 }
+                                logger.debug("user=" + user);
+                                userUpdate.creates += global.upd[i].name + "," + user.email + "," + user.school + ",user," + user.PIN + "\r\n";
                                 i++; // move to next update
                                 userCallback(null); // don't stop for errors
                             });
                             break;
                         case "D":
-                            User.findOneAndRemove({ email: global.upd[i].email, school: global.upd[i].school }, function (err) {
+                            User.findOneAndRemove({ email: global.upd[i].email, school: global.upd[i].school }, {
+                                projection: { "_id": 0, "name": 1, "PIN": 1 }
+                            }, function (err, user) {
                                 if (err) {
                                     logger.error("error deleting user:" + err.message);
                                 }
+                                logger.debug("user=" + user);
+                                userUpdate.deletes += user.name + "," + global.upd[i].email + "," + global.upd[i].school + ",user," + user.PIN + "\r\n";
                                 i++; // move to next update
                                 userCallback(null); // don't stop for errors
                             });
