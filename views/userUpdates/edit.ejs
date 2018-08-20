@@ -1,0 +1,50 @@
+<% include ../partials/header %>
+
+<%
+
+function dateTimeString(d) {
+    var h=d.getHours();
+    var m = d.getMinutes();
+
+    return (d.getFullYear() - 2000) + "-" + (d.getMonth() + 1) + "-" + d.getDate() + "-" + h + "-" + m;
+}
+
+%>
+
+    <div class="row">
+        <h1 style="text-align: center">User Update <span id="dateTimeStr"><%= dateTimeString(update.updateDate) %></span></h1>
+        <div style="width: 100%; margin: 25px auto;">
+        <label>User Creates:</label>
+        <textarea id="createList" rows="25" cols="120"><%= update.creates %></textarea>
+        <input type="button" id="dwn-btn" value="Download creates"/>
+        <a href="/userUpdates">Cancel</a>
+    </div>
+
+<script>
+$(document).ready(function () {
+    function download(filename, text) {
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+        element.setAttribute('download', filename);
+
+        element.style.display = 'none';
+        document.body.appendChild(element);
+
+        element.click();
+
+        document.body.removeChild(element);
+    }
+
+    // Start file download.
+    document.getElementById("dwn-btn").addEventListener("click", function(){
+        // Generate download of hello.txt file with some content
+        var text = document.getElementById("createList").value;
+        var filename = "creates-" + document.getElementById("dateTimeStr").innerText + ".csv";
+
+        download(filename, text);
+    }, false);
+    });
+</script>
+
+<% include ../partials/footer %>
+

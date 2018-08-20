@@ -1,6 +1,6 @@
 var express = require("express");
 var router = express.Router();
-var User = require("../models/user");
+// var User = require("../models/user");
 var UserUpdate = require("../models/userUpdate");
 var middleware = require("../middleware");
 var request = require("request");
@@ -22,19 +22,19 @@ router.use(middleware.isLoggedIn, function (req, res, next) {
     }
 });
 
-//INDEX - show all users
+//INDEX - show all userUpdates
 router.get("/", function (req, res) {
 
-    User.find({}, { name: 1, email: 1, username: 1, role: 1, school: 1, PIN: 1 }).sort({
-        name: 1
-    }).exec(function (err, allUsers) {
+    UserUpdate.find({}, { updateDate: 1 }).sort({
+        updateDate: 1
+    }).exec(function (err, updates) {
         if (err) {
             logger.error(err);
         }
         else {
-            // logger.debug("allUsers=" + allUsers);
-            res.render("users/index", {
-                users: allUsers
+            // logger.debug("updates=" + updates);
+            res.render("userUpdates/index", {
+                updates: updates
             });
         }
     });
@@ -78,13 +78,13 @@ router.get("/new", function (req, res) {
 
 // Find user and render new user form
 router.get("/:id/edit", function (req, res) {
-    User.findById(req.params.id, function (err, foundUser) {
+    UserUpdate.findById(req.params.id, function (err, foundUpdate) {
         if (err) {
             logger.error(err);
         }
         else {
-            res.render("users/edit", {
-                user: foundUser
+            res.render("userUpdates/edit", {
+                update: foundUpdate
             });
         }
     });
@@ -264,7 +264,7 @@ router.post("/createUsers", function (req, res) {
     const fname = 'userupload.txt';
     var userUpdate = {
         updateDate: new Date(),
-        creates: "Name,Email Address,School,role,PIN\r\n",
+        creates: "",
         updates: [],
         deletes: []
     }

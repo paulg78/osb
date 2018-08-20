@@ -1,0 +1,37 @@
+<% include ../partials/header %>
+
+    <header>
+        <h1>
+            <span>User Updates</span>
+        </h1>
+    </header>
+    <table id="userTable" class="table">
+        <thead>
+            <tr>
+                <th>Update Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% updates.forEach(function(update){ %>
+                <tr>
+                    <td><%= update.updateDate %></td>
+                    <td>
+                        <a href="/userUpdates/<%=update._id%>/edit" class="btn btn-xs btn-info">EDIT</a>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+<script>
+
+// $(".delUserBtn").on('click', function (e) {
+//     // if (confirm("Ready to delete " + student.fullName + ". Click cancel or OK.") == true
+//     var tds = $(this).parent().parent().siblings();
+//     if (confirm("Ready to delete " + tds[0].innerText + ".  Click Cancel or OK.") != true) {
+//         e.preventDefault();
+//     }
+// });
+</script>
+
+<% include ../partials/footer %>
