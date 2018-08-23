@@ -124,7 +124,7 @@ router.post('/resetpw/:username', function (req, res) {
             return res.redirect('/requestpwreset');
         }
         if (!user) {
-            logger.error("User not found in resetpw: " + err.message);
+            logger.error("User not found in resetpw; username: " + req.params.username);
             req.flash('error', 'System error: User not found.');
             return res.redirect('/requestpwreset');
         }

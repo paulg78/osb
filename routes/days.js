@@ -241,7 +241,6 @@ router.get("/:dayId", middleware.isLoggedIn, getPrevNextIds, function (req, res)
                                 }
                                 // logger.debug("foundDay with students=" + JSON.stringify(foundDay));
                                 // logger.debug("sched=" + JSON.stringify(sched));
-                                // res.redirect("/events/" + req.params.eventId + "/days");
                                 res.render("days/schedule", {
                                     day: foundDay,
                                     sched: sched
