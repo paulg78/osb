@@ -74,12 +74,6 @@ app.use(express.static(__dirname + "/public"));
 app.use(methodOverride('_method'));
 app.use(flash());
 
-app.use(require("express-session")({
-  secret: process.env.SESSIONSECRET,
-  resave: false,
-  saveUninitialized: false
-}));
-
 var session = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
 
