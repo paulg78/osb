@@ -80,6 +80,7 @@ router.post('/requestpwreset', function (req, res) {
         else {
             // logger.debug("in requestpwreset user=" + user);
             res.render('resetpw', {
+                PIN: req.body.PIN,
                 username: user.username,
                 school: user.school
             });
@@ -90,8 +91,9 @@ router.post('/requestpwreset', function (req, res) {
 
 // show username/password reset form (with school for counselors)
 // used to re-render reset form with an error message
-router.get('/resetpw/:username/:school', function (req, res) {
+router.get('/resetpw/:PIN/:username/:school', function (req, res) {
     res.render('resetpw', {
+        PIN: req.params.PIN,
         username: req.params.username,
         school: req.params.school
     });
@@ -100,8 +102,9 @@ router.get('/resetpw/:username/:school', function (req, res) {
 
 // show username/password reset form (without school for non-counselor roles)
 // used to re-render reset form with an error message
-router.get('/resetpw/:username', function (req, res) {
+router.get('/resetpw/:PIN/:username', function (req, res) {
     res.render('resetpw', {
+        PIN: req.params.PIN,
         username: req.params.username,
         school: null
     });
@@ -109,36 +112,38 @@ router.get('/resetpw/:username', function (req, res) {
 
 
 // reset username/password
-router.post('/resetpw/:username', function (req, res) {
-    // logger.debug("req.body.password=" + req.body.password);
-    // logger.debug("req.body.confirm=" + req.body.confirm);
-    // logger.debug("req.body.username=" + req.body.username);
-    // logger.debug("req.params.username=" + req.params.username);
+router.post('/resetpw/:PIN', function (req, res) {
+    logger.debug("req.body.password=" + req.body.password);
+    logger.debug("req.body.confirm=" + req.body.confirm);
+    logger.debug("req.body.username=" + req.body.username);
+    logger.debug("req.params.PIN=" + req.params.PIN);
 
     User.findOne({
-        username: req.params.username
+        PIN: parseInt(req.params.PIN, 10)
     }, { username: 1, school: 1 }, function (err, user) {
         if (err) {
             logger.error("System error finding user in resetpw: " + err.message);
-            req.flash('error', 'System error on finding user.');
+            req.flash('error', 'System error finding user; PIN: ' + req.params.PIN);
             return res.redirect('/requestpwreset');
         }
         if (!user) {
-            logger.error("User not found in resetpw; username: " + req.params.username);
-            req.flash('error', 'System error: User not found.');
+            logger.error("System error: User not found in resetpw; PIN: " + req.params.PIN);
+            req.flash('error', 'User not found with PIN: ' + req.params.PIN);
             return res.redirect('/requestpwreset');
         }
+
         // logger.debug("in resetpw, user=" + user);
         // disallow new numeric username to avoid dup usernames when uploading new users, which are
         // created with username = a numeric PIN
         if (req.body.username != user.username && !isNaN(req.body.username)) { // user is changing username to a number
             req.flash('error', "Sorry, a new username cannot be numeric. A new username must contain at least one non-digit character.");
-            return res.redirect("/resetpw/" + req.params.username + "/" + user.school);
+            return res.redirect("/resetpw/" + req.params.PIN + "/" + user.username + "/" + user.school);
         }
 
         if (req.body.password != req.body.confirm) {
+            logger.debug("password mismatch");
             req.flash('error', "Password confirmation doesn't match first password entered.");
-            return res.redirect("/resetpw/" + req.params.username + "/" + user.school);
+            return res.redirect("/resetpw/" + req.params.PIN + "/" + user.username + "/" + user.school);
         }
         user.username = req.body.username.toLowerCase();
         user.password = req.body.password;

@@ -323,7 +323,7 @@ router.put("/:id", function (req, res) {
                                         message: "Selected slot (" +
                                             new Date(req.body.timeSched).
                                         toLocaleDateString("en-US", { year: '2-digit', month: '2-digit', day: 'numeric', hour: '2-digit', minute: '2-digit' }) +
-                                        ") is already full."
+                                        ") filled before you saved changes."
                                     }, null);
                                 }
                             });

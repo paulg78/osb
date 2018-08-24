@@ -6,7 +6,8 @@
             <h3 style="text-align: center">for School <span style="color:blue;"></spanstyle><%= school %></span></h2>
             <% } %>
         <div style="width: 30%; margin: 25px auto;">
-            <form action="/resetpw/<%=username%>" method="post">
+            <p>PIN: <%= PIN %></p>
+            <form action="/resetpw/<%=PIN%>" method="post">
                 <div class="form-group">
                     <h4>Username:</h4>
                     <input class="form-control" type="text" name="username" value="<%= username %>">
