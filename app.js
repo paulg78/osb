@@ -79,7 +79,10 @@ var MongoDBStore = require('connect-mongodb-session')(session);
 
 app.use(session({
   secret: process.env.SESSIONSECRET,
-  store: new MongoDBStore({ mongooseConnection: mongoose.connection }),
+  store: new MongoDBStore({
+    uri: process.env.DATABASEURL,
+    collection: 'mySessions'
+  }),
   resave: false,
   saveUninitialized: false
 }));
