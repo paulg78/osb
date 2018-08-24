@@ -74,13 +74,23 @@ app.use(express.static(__dirname + "/public"));
 app.use(methodOverride('_method'));
 app.use(flash());
 
-// PASSPORT CONFIGURATION
 app.use(require("express-session")({
   secret: process.env.SESSIONSECRET,
   resave: false,
   saveUninitialized: false
 }));
 
+var session = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(session);
+
+app.use(session({
+  secret: process.env.SESSIONSECRET,
+  store: new MongoDBStore({ mongooseConnection: mongoose.connection }),
+  resave: false,
+  saveUninitialized: false
+}));
+
+// PASSPORT CONFIGURATION
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(function (username, password, done) {
