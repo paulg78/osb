@@ -8,33 +8,13 @@ var express = require("express"),
   methodOverride = require("method-override");
 
 const winston = require('winston');
-// const fs = require('fs');
 
-// const logDir = 'log';
-// // Create the log directory if it does not exist
-// if (!fs.existsSync(logDir)) {
-//   fs.mkdirSync(logDir);
-// }
-
-// const tsFormat = () => (new Date()).toLocaleDateString('en-US', {
-//   year: '2-digit',
-//   month: 'numeric',
-//   day: 'numeric'
-// }) + '-' + (new Date()).toLocaleTimeString('en-US', {
-//   timeZone: "America/Denver",
-//   hour12: false
-// });
 global.logger = new(winston.Logger)({
   transports: [
     new(winston.transports.Console)({
       level: process.env.APPLOGLEVEL,
       colorize: false
     })
-    // new(winston.transports.File)({
-    //   filename: `${logDir}/results.log`,
-    //   timestamp: tsFormat,
-    //   level: process.env.CONLOGLEVEL
-    // })
   ]
 });
 /* global logger */
@@ -77,14 +57,30 @@ app.use(flash());
 var session = require('express-session');
 var MongoDBStore = require('connect-mongodb-session')(session);
 
+var store = new MongoDBStore({
+  uri: process.env.DATABASEURL,
+  collection: 'mySessions'
+});
+
+store.on('connected', function () {
+  store.client; // The underlying MongoClient object from the MongoDB driver
+});
+
+// Catch errors
+store.on('error', function (err) {
+  if (err) {
+    logger.error("Connection to session storage failed.");
+  }
+});
+
 app.use(session({
   secret: process.env.SESSIONSECRET,
-  store: new MongoDBStore({
-    uri: process.env.DATABASEURL,
-    collection: 'mySessions'
-  }),
-  resave: false,
-  saveUninitialized: false
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 12 // 12 hours
+  },
+  store: store,
+  resave: true,
+  saveUninitialized: true
 }));
 
 // PASSPORT CONFIGURATION

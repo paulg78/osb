@@ -164,7 +164,7 @@ function getRemaining(school, callbackfunction) {
                 }
                 else {
                     // logger.debug("qrySchool=" + qrySchool);
-                    Student.count({
+                    Student.countDocuments({
                             school: school
                         })
                         .exec(function (err, cnt) {
@@ -182,16 +182,21 @@ function getRemaining(school, callbackfunction) {
 }
 
 //CREATE - add new student to DB
-router.post("/", middleware.isLoggedIn, function (req, res) {
-
+router.post("/", function (req, res) {
     var studentData = {
         fname: req.body.firstName,
         lname: req.body.lastName,
         grade: req.body.grade,
-        school: res.locals.currentUser.school,
         slot: null,
         served: false
     };
+    // Can't use middleware.isLoggedIn with ajax since need to return json
+    if (req.isAuthenticated()) {
+        studentData.school = res.locals.currentUser.school; // can assign school only when logged in
+    }
+    else {
+        return res.json({ "msg": "You must be logged in to add a student; student not added." });
+    }
 
     var errMsg = studentValid(studentData);
 
