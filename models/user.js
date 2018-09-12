@@ -56,6 +56,15 @@ UserSchema.methods.comparePassword = function (candidatePassword, cb) {
     });
 };
 
+UserSchema.virtual('hasPw').get(function () {
+    if (this.password == null) {
+        return "N";
+    }
+    else {
+        return "Y";
+    }
+});
+
 UserSchema.plugin(passportLocalMongoose);
 
 module.exports = mongoose.model("User", UserSchema);

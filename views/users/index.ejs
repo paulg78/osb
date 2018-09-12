@@ -19,6 +19,7 @@
                 <th class="filter-select" data-placeholder="All Schools">School</th>
                 <th>UserName</th>
                 <th>PIN</th>
+                <th>PW</th>
                 <th class="filter-select" data-placeholder="All">Role</th>
             </tr>
         </thead>
@@ -30,6 +31,7 @@
                     <td><%= user.school %></td>
                     <td><%= user.username %></td>
                     <td><%= user.PIN %></td>
+                    <td><%= user.hasPw %></td>
                     <td><%= user.role %></td>
                     <% if(currentUser.role == "role_wa"){ %>
                         <td>

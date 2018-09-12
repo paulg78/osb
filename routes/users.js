@@ -23,7 +23,7 @@ router.use(middleware.isLoggedIn, function (req, res, next) {
 //INDEX - show all users
 router.get("/", function (req, res) {
 
-    User.find({}, { name: 1, email: 1, username: 1, role: 1, school: 1, PIN: 1 }).sort({
+    User.find({}, { name: 1, email: 1, username: 1, role: 1, school: 1, PIN: 1, password: 1 }).sort({
         name: 1
     }).exec(function (err, allUsers) {
         if (err) {
@@ -88,6 +88,45 @@ router.get("/:id/edit", function (req, res) {
     });
 });
 
+router.get("/stats", function (req, res) {
+    var stats = {};
+    async.waterfall([
+        getCountNoPw,
+        getCountWithPw,
+    ], function (err, stats) {
+        if (err) {
+            logger.error(err);
+        }
+        res.render("users/stats", {
+            stats: stats
+        });
+    });
+
+    function getCountNoPw(callback) {
+        User.countDocuments({
+                password: null
+            })
+            .exec(function (err, cnt) {
+                if (!err) {
+                    stats.noPw = cnt;
+                }
+                callback(err, stats);
+            });
+    }
+
+    function getCountWithPw(stats, callback) {
+        User.countDocuments({
+                password: { $ne: null }
+            })
+            .exec(function (err, cnt) {
+                if (!err) {
+                    stats.withPw = cnt;
+                }
+                callback(err, stats);
+            });
+    }
+
+});
 
 // Update user in database
 router.put("/:id", function (req, res) {

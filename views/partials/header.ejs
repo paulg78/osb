@@ -34,6 +34,15 @@
                     <a class="navbar-brand role_al role_sc role_wa" href="/students">Students</a>
                     <a class="navbar-brand role_wa" href="/slots/checkCounts/n">checkCounts</a>
                     <a class="navbar-brand role_wa" href="/slots/checkCounts/y">FixCounts</a>
+                    <% if(currentUser.role != 'role_sc'){ %>
+                        <li class="dropdown">
+                          <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Stats <span class="caret"></span></a>
+                          <ul class="dropdown-menu">
+                            <li><a href="/students/stats">Students</a></li>
+                            <li><a href="/users/stats">Users</a></li>
+                          </ul
+                        </li>
+                    <% } %>
                 <% } %>
             </ul>
             <ul class="nav navbar-nav navbar-right">

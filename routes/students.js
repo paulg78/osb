@@ -88,6 +88,63 @@ router.get("/", middleware.isLoggedIn,
     }
 );
 
+router.get("/stats", middleware.isLoggedIn, function (req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("back");
+    }
+    var stats = {};
+    async.waterfall([
+        getCountUnsched,
+        getCountSched,
+        getCountServed,
+    ], function (err, stats) {
+        if (err) {
+            logger.error(err);
+        }
+        res.render("students/stats", {
+            stats: stats
+        });
+    });
+
+    function getCountUnsched(callback) {
+        Student.countDocuments({
+                slot: null
+            })
+            .exec(function (err, cnt) {
+                if (!err) {
+                    stats.unsched = cnt;
+                }
+                callback(err, stats);
+            });
+    }
+
+    function getCountSched(stats, callback) {
+        Student.countDocuments({
+                slot: { $ne: null }
+            })
+            .exec(function (err, cnt) {
+                if (!err) {
+                    stats.sched = cnt;
+                }
+                callback(err, stats);
+            });
+    }
+
+    function getCountServed(stats, callback) {
+        Student.countDocuments({
+                served: true
+            })
+            .exec(function (err, cnt) {
+                if (!err) {
+                    stats.served = cnt;
+                }
+                callback(err, stats);
+            });
+    }
+
+});
+
+
 router.get("/:dateSched", middleware.isLoggedIn, function (req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
@@ -274,7 +331,7 @@ router.put("/:id", function (req, res) {
         lname: req.body.lastName,
         grade: req.body.grade
     };
-    logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
+    // logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
 
     var result = studentValid(newData);
     if (result == "") {
@@ -309,7 +366,7 @@ router.put("/:id", function (req, res) {
                 projection: { _id: 1, count: 1, max: 1 },
                 returnNewDocument: false // returns count before increment, true doesn't seem to work
             }, function (err, slot) {
-                logger.debug("slot before update=" + slot);
+                // logger.debug("slot before update=" + slot);
                 if (err) {
                     callback(err, null);
                 }
@@ -345,7 +402,7 @@ router.put("/:id", function (req, res) {
     }
 
     function updateStudent(newSlotId, callback) {
-        logger.debug("in updateStudent with newSlotId=" + newSlotId);
+        // logger.debug("in updateStudent with newSlotId=" + newSlotId);
         newData.slot = newSlotId;
         Student.findByIdAndUpdate(req.params.id, newData, {
                 projection: { slot: 1 },
@@ -356,14 +413,14 @@ router.put("/:id", function (req, res) {
                     callback(err);
                 }
                 else {
-                    logger.debug("student=" + student);
+                    // logger.debug("student=" + student);
                     callback(null, student.slot);
                 }
             });
     }
 
     function updateOldSlot(oldSlotId, callback) {
-        logger.debug("in updateOldSlot with oldSlotId=" + oldSlotId);
+        // logger.debug("in updateOldSlot with oldSlotId=" + oldSlotId);
         if (oldSlotId) { // student was scheduled
             Slot.findByIdAndUpdate(oldSlotId, {
                 $inc: { count: -1 }
@@ -371,7 +428,7 @@ router.put("/:id", function (req, res) {
                 projection: { _id: 1, count: 1, max: 1 },
                 returnNewDocument: false // returns count before increment, true doesn't seem to work
             }, function (err, slot) {
-                logger.debug("slot before update=" + slot);
+                // logger.debug("slot before update=" + slot);
                 // can't handle error at this point
                 callback(null);
             });

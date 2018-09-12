@@ -1,0 +1,29 @@
+<% include ../partials/header %>
+
+<div class="row">
+    <h2>Student Statistics</h2>
+    <table>
+    <tbody style="font-size: 1.25em;">
+        <tr>
+            <td>Served:</td>
+            <td style="text-align:right;"><%= stats.served %></td>
+        </tr>
+        <tr>
+            <td>Scheduled (unserved):&nbsp;&nbsp;</td>
+            <td style="text-align:right;"><%= stats.sched - stats.served %></td>
+        </tr>
+        <tr>
+            <td>Unscheduled:</td>
+            <td style="text-align:right;"><%= stats.unsched %></td>
+        </tr>
+        <tr>
+            <td>Total:</td>
+            <td style="text-align:right;"><%= stats.unsched + stats.sched %></td>
+        </tr>
+
+    </tbody>
+</table>
+
+</div>
+
+<% include ../partials/footer %>

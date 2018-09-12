@@ -1,0 +1,25 @@
+<% include ../partials/header %>
+
+<div class="row">
+    <h2>User Statistics</h2>
+    <table>
+    <tbody style="font-size: 1.25em;">
+        <tr>
+            <td>Has created password:&nbsp;&nbsp;</td>
+            <td style="text-align:right;"><%= stats.withPw %></td>
+        </tr>
+        <tr>
+            <td>No password created:</td>
+            <td style="text-align:right;"><%= stats.noPw %></td>
+        </tr>
+        <tr>
+            <td>Total:</td>
+            <td style="text-align:right;"><%= stats.withPw + stats.noPw %></td>
+        </tr>
+
+    </tbody>
+</table>
+
+</div>
+
+<% include ../partials/footer %>
