@@ -8,35 +8,72 @@
             <a class="btn btn-primary btn-sm pull-right role_wa" href="/schools/new">Add New School</a>
          </h1>
     </header>
+    <%
+    var unasgn, unsched,
+        qTot=0,
+        unasgnTot=0,
+        unschedTot=0,
+        servedTot=0;
+    %>
     <table id="schoolTable" class="table table-striped tablesorter">
-         <thead>
-             <tr>
-             <th>Name</th>
-             <th>District</th>
-             <th>Quota</th>
-             <th>Quota Unassigned</th>
-             <th>Quota Unscheduled</th>
-             <th>Students Served</th>
-             </tr>
-        </thead>
-         <tbody>
-         <% schools.forEach(function(school){ %>
+        <thead>
             <tr>
-                <td><%= school.name %></td>
-                <td><%= school.district %></td>
-                <td><%= school.quota %></td>
-                <td><%= school.quota - school.count %></td>
-                <td><%= school.quota - school.schedCount %></td>
-                <td><%= school.servedCount %></td>
+                <th>Name</th>
+                <th>District</th>
+                <th>Quota</th>
+                <th>Quota Unassigned</th>
+                <th>Quota Unscheduled</th>
+                <th>Students Served</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% schools.forEach(function(school){ %>
+                <tr>
+                    <%
+                    unasgn= school.quota - school.count;
+                    unsched= school.quota - school.schedCount;
+                    qTot+=school.quota;
+                    unasgnTot+=unasgn;
+                    unschedTot+=unsched;
+                    servedTot+=school.servedCount;
+                    %>
+                    <td><%= school.name %></td>
+                    <td><%= school.district %></td>
+                    <td><%= school.quota %></td>
+                    <td><%= unasgn %></td>
+                    <td><%= unsched %></td>
+                    <td><%= school.servedCount %></td>
+                    <td>
+                        <form style="display: inline" action="/schools/<%=school._id%>?_method=DELETE" method="POST">
+                            <a href="/schools/<%=school._id%>/edit" class="btn btn-xs btn-info">Edit</a>
+                            <button class="hidden" class="btn btn-xs btn-danger">DELETE</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+        <tfoot>
+             <tr>
+                <td>Totals</td>
+                <td></td>
+                <td>Quota</td>
+                <td>Quota Unassigned</td>
+                <td>Quota Unscheduled</td>
+                <td>Students Served</td>
                 <td>
-                    <form style="display: inline" action="/schools/<%=school._id%>?_method=DELETE" method="POST">
-                        <a href="/schools/<%=school._id%>/edit" class="btn btn-xs btn-info">Edit</a>
-                        <button class="hidden" class="btn btn-xs btn-danger">DELETE</button>
-                </form>
                 </td>
             </tr>
-        <% }); %>
-        </tbody>
+             <tr>
+                <td></td>
+                <td></td>
+                <td><%= qTot %></td>
+                <td><%= unasgnTot %></td>
+                <td><%= unschedTot %></td>
+                <td><%= servedTot %></td>
+                <td>
+                </td>
+            </tr>
+        </tfoot>
     </table>
 
 <script>
