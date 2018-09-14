@@ -402,7 +402,7 @@ router.put("/:id", function (req, res) {
     }
 
     function updateNewSlot(callback) {
-        logger.debug("in updateNewSlot");
+        // logger.debug("in updateNewSlot");
         if (req.body.timeSched) { // there is a new slot
             Slot.findOneAndUpdate({ sdate: new Date(req.body.timeSched) }, {
                 $inc: { count: 1 }

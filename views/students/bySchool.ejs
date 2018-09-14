@@ -98,7 +98,7 @@ function dateString(d) {
             <td class="hidden-print">
             <form style="display: inline">
                 <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-primary">Edit</a>
-                <% if (!student.served && student.slot != null) { %>
+                <% if (!student.served && student.slot != null && !missed(student.slot.sdate)) { %>
                     <a href="/students/<%=student._id%>/printPass" class="btn btn-xs btn-primary">Passport</a>
                 <% } %>
             </form>
