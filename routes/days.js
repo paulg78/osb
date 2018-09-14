@@ -113,7 +113,7 @@ router.post("/createSchedule", middleware.isLoggedIn, function (req, res) {
             }
             // clear global days to trigger new database lookup
             global.days = null;
-            logger.debug("Finished schedule upload");
+            // logger.debug("Finished schedule upload");
             res.redirect("/days");
         }
     );
@@ -136,9 +136,6 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
-    var today = new Date();
-    var todayStr = today.getFullYear().toString() + "-" + toStr2(today.getMonth() + 1) + "-" + toStr2(today.getDate());
-    // logger.debug("todayStr=" + todayStr);
     if (global.days == null) {
         Day.find({ $query: {}, $orderby: { date: 1 } }, { date: 1 })
             .exec(function (err, days) {
@@ -151,16 +148,12 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
                     // global.days.forEach(function (day) {
                     // logger.debug("day=" + day);
                     // });
-                    res.render("days/index", {
-                        todayStr: todayStr
-                    });
+                    res.render("days/index");
                 }
             });
     }
     else {
-        res.render("days/index", {
-            todayStr: todayStr
-        });
+        res.render("days/index");
     }
 });
 
@@ -187,6 +180,56 @@ var getPrevNextIds = function (req, res, next) {
     // logger.debug("getPrevNextIds, res.locals.prevDayId=" + res.locals.prevDayId);
     return next();
 };
+
+
+// Show SCHEDULE for next available day (one with open slots)
+router.get("/nextAvail", middleware.isLoggedIn, function (req, res) {
+    function mmdd(d) {
+        return toStr2(d.getMonth()) + toStr2(d.getDate());
+    }
+    var qry = "this.sdate > Date.now() && this.count < this.max";
+    // logger.debug("* qry=" + qry);
+    Slot.find({ $where: qry }, { sdate: 1 }).limit(1).hint("sdate_1")
+        .exec(function (err, slots) {
+            if (err) {
+                logger.error("error finding next avail: " + err.message);
+                req.flash("error", "Next available day not found.");
+                res.redirect("back");
+            }
+            else {
+                if (slots.length < 1) {
+                    logger.info("No available slot found");
+                    req.flash("error", "Next available day not found.");
+                    res.redirect("back");
+                }
+                else {
+                    // logger.debug("slots[0]=" + slots[0]);
+                    // get day Id for slot found
+
+                    // var slotMMDD = toStr2(slots[0].sdate.getMonth()) + toStr2(slots[0].sdate.getDate());
+                    var slotMMDD = mmdd(slots[0].sdate);
+                    // logger.debug("slotMMDD=" + slotMMDD);
+                    for (var i = 0, iLen = global.days.length; i < iLen; i++) {
+                        // logger.debug("i=" + i + ", global.days[i].date=" + global.days[i].date + ", mmdd=" + mmdd(global.days[i].date));
+                        // if (slotMMDD == toStr2(global.days[i].date.getMonth()) + toStr2(global.days[i].date.getDate())) {
+                        if (slotMMDD == mmdd(global.days[i].date)) {
+                            // logger.debug("global.days[i]=" + global.days[i]);
+                            break;
+                        }
+                    }
+                    if (i < iLen) {
+                        // logger.debug("day=" + day);
+                        res.redirect("/days/" + global.days[i]._id);
+                    }
+                    else {
+                        logger.error("nextavail; day not found");
+                        req.flash("error", "Next available day not found.");
+                        res.redirect("back");
+                    }
+                }
+            }
+        });
+});
 
 
 // SHOW SCHEDULE All Students - shows schedule for one day
@@ -247,56 +290,6 @@ router.get("/:dayId", middleware.isLoggedIn, getPrevNextIds, function (req, res)
                                 });
                             }
                         });
-            }
-        });
-});
-
-
-// Show SCHEDULE for next available day (one with open slots)
-router.get("/nextAvail/:date", middleware.isLoggedIn, function (req, res) {
-    function mmdd(d) {
-        return toStr2(d.getMonth()) + toStr2(d.getDate());
-    }
-    var qry = "this.sdate > new Date('" + req.params.date + "') && this.count < this.max";
-    logger.debug("* qry=" + qry);
-    Slot.find({ $where: qry }, { sdate: 1 }).limit(1).hint("sdate_1")
-        .exec(function (err, slots) {
-            if (err) {
-                logger.error("error finding next avail: " + err.message);
-                req.flash("error", "Next available day not found.");
-                res.redirect("back");
-            }
-            else {
-                if (slots.length < 1) {
-                    logger.info("No available slot found");
-                    req.flash("error", "Next available day not found.");
-                    res.redirect("back");
-                }
-                else {
-                    logger.debug("slots[0]=" + slots[0]);
-                    // get day Id for slot found
-
-                    // var slotMMDD = toStr2(slots[0].sdate.getMonth()) + toStr2(slots[0].sdate.getDate());
-                    var slotMMDD = mmdd(slots[0].sdate);
-                    logger.debug("slotMMDD=" + slotMMDD);
-                    for (var i = 0, iLen = global.days.length; i < iLen; i++) {
-                        logger.debug("i=" + i + ", global.days[i].date=" + global.days[i].date + ", mmdd=" + mmdd(global.days[i].date));
-                        // if (slotMMDD == toStr2(global.days[i].date.getMonth()) + toStr2(global.days[i].date.getDate())) {
-                        if (slotMMDD == mmdd(global.days[i].date)) {
-                            logger.debug("global.days[i]=" + global.days[i]);
-                            break;
-                        }
-                    }
-                    if (i < iLen) {
-                        // logger.debug("day=" + day);
-                        res.redirect("/days/" + global.days[i]._id);
-                    }
-                    else {
-                        logger.error("nextavail; day not found");
-                        req.flash("error", "Next available day not found.");
-                        res.redirect("back");
-                    }
-                }
             }
         });
 });

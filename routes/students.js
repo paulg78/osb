@@ -97,6 +97,8 @@ router.get("/stats", middleware.isLoggedIn, function (req, res) {
         getCountUnsched,
         getCountSched,
         getCountServed,
+        getFutureSlotsAvail,
+        getQuotaTotal
     ], function (err, stats) {
         if (err) {
             logger.error(err);
@@ -141,6 +143,48 @@ router.get("/stats", middleware.isLoggedIn, function (req, res) {
                 callback(err, stats);
             });
     }
+
+    function getFutureSlotsAvail(stats, callback) {
+        var dateNow = Date.now();
+        Slot.aggregate([{
+                $match: {
+                    $expr: { $gt: ["$sdate", dateNow] }
+                }
+            }, {
+                $group: {
+                    _id: null,
+                    fsa: {
+                        $sum: { $subtract: ["$max", "$count"] }
+                    }
+                }
+            }])
+            .exec(function (err, slotsAvail) {
+                if (!err) {
+                    // logger.debug("slotsAvail=" + JSON.stringify(slotsAvail));
+                    stats.futureSlotsAvail = slotsAvail[0].fsa;
+                }
+                callback(err, stats);
+            });
+    }
+
+    function getQuotaTotal(stats, callback) {
+        School.aggregate([{
+                $group: {
+                    _id: null,
+                    qt: {
+                        $sum: "$quota"
+                    }
+                }
+            }])
+            .exec(function (err, quotaTotal) {
+                if (!err) {
+                    // logger.debug("quotaTotal=" + JSON.stringify(quotaTotal));
+                    stats.totalQuota = quotaTotal[0].qt;
+                }
+                callback(err, stats);
+            });
+    }
+
 
 });
 

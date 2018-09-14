@@ -15,12 +15,12 @@ function toStr2(x) {
 <h1>Days in  <%= new Date().getFullYear() %></h1>
 
 <div class="container">
-  <table class="dayList">
+    <table class="dayList">
         <tbody>
             <tr>
                 <td class="dayList" style="background-color: #dff0d8;">Next Available Day &nbsp;</td>
                 <td>
-                    <a href=<%="/days/nextAvail/" + todayStr%> class="btn btn-xs btn-primary role_al role_wa role_sc">Schedule</a>
+                    <a href="/days/nextAvail" class="btn btn-xs btn-primary role_al role_wa role_sc">Schedule</a>
                 </td>
             </tr>
             <% global.days.forEach(function(day){ %>
