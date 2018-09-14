@@ -384,6 +384,7 @@ router.put("/:id", function (req, res) {
             updateStudent,
             updateOldSlot,
         ], function (err) {
+            logger.debug("ending update waterfall");
             if (err) {
                 logger.error(err.message);
                 req.flash("error", "Changes not saved: " + err.message);
@@ -402,7 +403,7 @@ router.put("/:id", function (req, res) {
     }
 
     function updateNewSlot(callback) {
-        // logger.debug("in updateNewSlot");
+        logger.debug("in updateNewSlot");
         if (req.body.timeSched) { // there is a new slot
             Slot.findOneAndUpdate({ sdate: new Date(req.body.timeSched) }, {
                 $inc: { count: 1 }
@@ -446,7 +447,7 @@ router.put("/:id", function (req, res) {
     }
 
     function updateStudent(newSlotId, callback) {
-        // logger.debug("in updateStudent with newSlotId=" + newSlotId);
+        logger.debug("in updateStudent with newSlotId=" + newSlotId);
         newData.slot = newSlotId;
         Student.findByIdAndUpdate(req.params.id, newData, {
                 projection: { slot: 1 },
@@ -454,17 +455,45 @@ router.put("/:id", function (req, res) {
             },
             function (err, student) {
                 if (err) {
-                    callback(err);
+                    callback(err, null);
                 }
                 else {
-                    // logger.debug("student=" + student);
-                    callback(null, student.slot);
+                    if (!student) { // student not found; may have been deleted in another window
+                        // undo slot update if needed
+                        if (newSlotId) { // student was added to new slot
+                            logger.debug("undoing slot update");
+                            Slot.findByIdAndUpdate(newSlotId, {
+                                $inc: { count: -1 }
+                            }, function (err) {
+                                if (err) {
+                                    logger.error("error on slot undo");
+                                    callback(err, null);
+                                }
+                                else {
+                                    logger.debug("slot undo complete");
+                                    callback({
+                                        message: "Student not found; may have been deleted."
+                                    }, null);
+                                }
+                            });
+                        }
+                        else {
+                            logger.debug("no slot undo");
+                            callback({
+                                message: "Student not found; may have been deleted."
+                            });
+                        }
+                    }
+                    else {
+                        logger.debug("in updateStudent, student=" + student);
+                        callback(null, student.slot);
+                    }
                 }
             });
     }
 
     function updateOldSlot(oldSlotId, callback) {
-        // logger.debug("in updateOldSlot with oldSlotId=" + oldSlotId);
+        logger.debug("in updateOldSlot with oldSlotId=" + oldSlotId);
         if (oldSlotId) { // student was scheduled
             Slot.findByIdAndUpdate(oldSlotId, {
                 $inc: { count: -1 }
