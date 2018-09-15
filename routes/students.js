@@ -382,13 +382,18 @@ router.put("/:id", function (req, res) {
         async.waterfall([
             updateNewSlot,
             updateStudent,
-            updateOldSlot,
+            updateOldSlot
         ], function (err) {
-            logger.debug("ending update waterfall");
+            // logger.debug("ending update waterfall");
             if (err) {
                 logger.error(err.message);
                 req.flash("error", "Changes not saved: " + err.message);
-                res.redirect("back");
+                if (err.studNotFound) {
+                    res.redirect("/students");
+                }
+                else {
+                    res.redirect("back");
+                }
             }
             else {
                 req.flash("success", "Successfully Updated " + newData.fname + " " + newData.lname + ".");
@@ -403,7 +408,7 @@ router.put("/:id", function (req, res) {
     }
 
     function updateNewSlot(callback) {
-        logger.debug("in updateNewSlot");
+        // logger.debug("in updateNewSlot");
         if (req.body.timeSched) { // there is a new slot
             Slot.findOneAndUpdate({ sdate: new Date(req.body.timeSched) }, {
                 $inc: { count: 1 }
@@ -413,7 +418,7 @@ router.put("/:id", function (req, res) {
             }, function (err, slot) {
                 // logger.debug("slot before update=" + slot);
                 if (err) {
-                    callback(err, null);
+                    callback(err);
                 }
                 else {
                     if (slot.count >= slot.max) { // slot is over-filled (count is one less than actual)
@@ -423,7 +428,7 @@ router.put("/:id", function (req, res) {
                             },
                             function (err) {
                                 if (err) {
-                                    callback(err, null);
+                                    callback(err);
                                 }
                                 else {
                                     callback({
@@ -431,7 +436,7 @@ router.put("/:id", function (req, res) {
                                             new Date(req.body.timeSched).
                                         toLocaleDateString("en-US", { year: '2-digit', month: '2-digit', day: 'numeric', hour: '2-digit', minute: '2-digit' }) +
                                         ") filled before you saved changes."
-                                    }, null);
+                                    });
                                 }
                             });
                     }
@@ -454,12 +459,14 @@ router.put("/:id", function (req, res) {
                 returnNewDocument: false // returns student before update
             },
             function (err, student) {
+                logger.debug("in updateStudent, student=" + student);
                 if (err) {
-                    callback(err, null);
+                    callback(err);
                 }
                 else {
                     if (!student) { // student not found; may have been deleted in another window
                         // undo slot update if needed
+                        logger.debug("student to update is missing");
                         if (newSlotId) { // student was added to new slot
                             logger.debug("undoing slot update");
                             Slot.findByIdAndUpdate(newSlotId, {
@@ -467,25 +474,26 @@ router.put("/:id", function (req, res) {
                             }, function (err) {
                                 if (err) {
                                     logger.error("error on slot undo");
-                                    callback(err, null);
+                                    callback(err);
                                 }
                                 else {
                                     logger.debug("slot undo complete");
                                     callback({
+                                        studNotFound: true,
                                         message: "Student not found; may have been deleted."
-                                    }, null);
+                                    });
                                 }
                             });
                         }
                         else {
                             logger.debug("no slot undo");
                             callback({
+                                studNotFound: true,
                                 message: "Student not found; may have been deleted."
                             });
                         }
                     }
                     else {
-                        logger.debug("in updateStudent, student=" + student);
                         callback(null, student.slot);
                     }
                 }
