@@ -145,10 +145,11 @@ router.get("/stats", middleware.isLoggedIn, function (req, res) {
     }
 
     function getFutureSlotsAvail(stats, callback) {
-        var dateNow = Date.now();
+        var d = new Date(Date.now() - 5 * 3600000); // one hour from now in mountain time
+        logger.debug("one hour from now=" + d);
         Slot.aggregate([{
                 $match: {
-                    $expr: { $gt: ["$sdate", dateNow] }
+                    $expr: { $gt: ["$sdate", d] }
                 }
             }, {
                 $group: {
@@ -162,6 +163,7 @@ router.get("/stats", middleware.isLoggedIn, function (req, res) {
                 if (!err) {
                     // logger.debug("slotsAvail=" + JSON.stringify(slotsAvail));
                     stats.futureSlotsAvail = slotsAvail[0].fsa;
+                    stats.futureDate = d.toLocaleString();
                 }
                 callback(err, stats);
             });

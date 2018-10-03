@@ -26,7 +26,8 @@
 </table>
 <br><br>
 <h4>Remaining allotment to be scheduled: <%= stats.totalQuota - stats.sched %> (of total allotment <%= stats.totalQuota %>)</h4>
-<h4>Future slots available: <%= stats.futureSlotsAvail %></h4>
+<h4>Future (after <%= stats.futureDate %>) slots available: <%= stats.futureSlotsAvail %></h4>
+<p>Note: these are slots at least an hour from now, on the assumption the student would need to be notified at least an hour in advance. </p>
 </div>
 
 <% include ../partials/footer %>
