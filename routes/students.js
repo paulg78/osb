@@ -431,6 +431,7 @@ router.put("/:id", function (req, res) {
                                     callback(err);
                                 }
                                 else {
+                                    console.log("overfilled slot._id=" + slot._id + "; count=" + slot.count + "; max=" + slot.max);
                                     callback({
                                         message: "Selected slot (" +
                                             new Date(req.body.timeSched).
@@ -452,23 +453,28 @@ router.put("/:id", function (req, res) {
     }
 
     function updateStudent(newSlotId, callback) {
-        logger.debug("in updateStudent with newSlotId=" + newSlotId);
-        newData.slot = newSlotId;
+        // logger.debug("in updateStudent with newSlotId=" + newSlotId);
+        if (req.body.unschedule == "y") {
+            newData.slot = null;
+        }
+        else if (newSlotId) {
+            newData.slot = newSlotId;
+        }
         Student.findByIdAndUpdate(req.params.id, newData, {
                 projection: { slot: 1 },
                 returnNewDocument: false // returns student before update
             },
             function (err, student) {
-                logger.debug("in updateStudent, student=" + student);
+                // logger.debug("in updateStudent, student=" + student);
                 if (err) {
                     callback(err);
                 }
                 else {
                     if (!student) { // student not found; may have been deleted in another window
                         // undo slot update if needed
-                        logger.debug("student to update is missing");
+                        // logger.debug("student to update is missing");
                         if (newSlotId) { // student was added to new slot
-                            logger.debug("undoing slot update");
+                            // logger.debug("undoing slot update");
                             Slot.findByIdAndUpdate(newSlotId, {
                                 $inc: { count: -1 }
                             }, function (err) {
@@ -477,7 +483,7 @@ router.put("/:id", function (req, res) {
                                     callback(err);
                                 }
                                 else {
-                                    logger.debug("slot undo complete");
+                                    // logger.debug("slot undo complete");
                                     callback({
                                         studNotFound: true,
                                         message: "Student not found; may have been deleted."
@@ -486,7 +492,7 @@ router.put("/:id", function (req, res) {
                             });
                         }
                         else {
-                            logger.debug("no slot undo");
+                            // logger.debug("no slot undo");
                             callback({
                                 studNotFound: true,
                                 message: "Student not found; may have been deleted."
@@ -494,15 +500,16 @@ router.put("/:id", function (req, res) {
                         }
                     }
                     else {
-                        callback(null, student.slot);
+                        callback(null, student.slot, newSlotId);
                     }
                 }
             });
     }
 
-    function updateOldSlot(oldSlotId, callback) {
-        logger.debug("in updateOldSlot with oldSlotId=" + oldSlotId);
-        if (oldSlotId) { // student was scheduled
+    function updateOldSlot(oldSlotId, newSlotId, callback) {
+        // logger.debug("in updateOldSlot with oldSlotId=" + oldSlotId);
+        // logger.debug("in updateOldSlot with newSlotId=" + newSlotId);
+        if (oldSlotId && (newSlotId || req.body.unschedule == "y")) { // student was scheduled and is either being unscheduled or rescheduled
             Slot.findByIdAndUpdate(oldSlotId, {
                 $inc: { count: -1 }
             }, {

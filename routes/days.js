@@ -164,17 +164,19 @@ var getPrevNextIds = function (req, res, next) {
     res.locals.nextDayId = "";
     // logger.debug("req.params.dayId=" + req.params.dayId);
     // logger.debug("global.days=" + global.days + ", global.days.length=", global.days.length);
-    for (var i = 0, iLen = global.days.length; i < iLen; i++) {
-        // logger.debug("i=" + i + ", iLen=" + iLen + ", global.days[i]._id=" + global.days[i]._id);
-        if (global.days[i]._id == req.params.dayId) {
-            // logger.debug("global.days[i]=" + global.days[i]);
-            if (i > 0) {
-                res.locals.prevDayId = global.days[i - 1]._id;
+    if (global && global.days) {
+        for (var i = 0, iLen = global.days.length; i < iLen; i++) {
+            // logger.debug("i=" + i + ", iLen=" + iLen + ", global.days[i]._id=" + global.days[i]._id);
+            if (global.days[i]._id == req.params.dayId) {
+                // logger.debug("global.days[i]=" + global.days[i]);
+                if (i > 0) {
+                    res.locals.prevDayId = global.days[i - 1]._id;
+                }
+                if (i < global.days.length - 1) {
+                    res.locals.nextDayId = global.days[i + 1]._id;
+                }
+                break;
             }
-            if (i < global.days.length - 1) {
-                res.locals.nextDayId = global.days[i + 1]._id;
-            }
-            break;
         }
     }
     // logger.debug("getPrevNextIds, res.locals.prevDayId=" + res.locals.prevDayId);
