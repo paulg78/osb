@@ -162,7 +162,12 @@ router.get("/stats", middleware.isLoggedIn, function (req, res) {
             .exec(function (err, slotsAvail) {
                 if (!err) {
                     // logger.debug("slotsAvail=" + JSON.stringify(slotsAvail));
-                    stats.futureSlotsAvail = slotsAvail[0].fsa;
+                    if (slotsAvail[0]) {
+                        stats.futureSlotsAvail = slotsAvail[0].fsa;
+                    }
+                    else {
+                        stats.futureSlotsAvail = 0;
+                    }
                     stats.futureDate = d.toLocaleString();
                 }
                 callback(err, stats);
