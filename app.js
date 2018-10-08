@@ -31,19 +31,22 @@ var
   userRoutes = require("./routes/users"),
   userUpdateRoutes = require("./routes/userUpdates");
 
-console.log("process.env.DATABASEURL=" + process.env.DATABASEURL);
-logger.debug("process.env.DATABASEURL=" + process.env.DATABASEURL);
+console.log("process.env.DATABASEURL='" + process.env.DATABASEURL + "'");
+console.log("process.env.FORCESSL='" + process.env.FORCESSL + "'");
 
 mongoose.connect(process.env.DATABASEURL, { useNewUrlParser: true });
 
-// redirect http to https
-var forceSsl = function (req, res, next) {
-  if (req.headers['x-forwarded-proto'] !== 'https') {
-    return res.redirect(['https://', req.get('Host'), req.url].join(''));
-  }
-  return next();
-};
-app.use(forceSsl);
+if (process.env.FORCESSL == 'y') {
+  logger.debug("https redirection enabled");
+  // redirect http to https
+  var forceSsl = function (req, res, next) {
+    if (req.headers['x-forwarded-proto'] !== 'https') {
+      return res.redirect(['https://', req.get('Host'), req.url].join(''));
+    }
+    return next();
+  };
+  app.use(forceSsl);
+}
 
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({
