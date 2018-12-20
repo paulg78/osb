@@ -8,7 +8,17 @@ var async = require('async');
 
 /* global logger */
 
-// All user routes start here; blocks user actions by role_sc
+//subscribe - show form to subscribe new user to mailchimp
+router.get("/subscribe", function (req, res) {
+    res.render("users/subscribe");
+});
+
+//subscribe - show form to subscribe new user to mailchimp
+router.get("/newsubscribe", function (req, res) {
+    res.render("users/newsubscribe");
+});
+
+// All user routes other than subscribe start here; blocks user actions by role_sc
 router.use(middleware.isLoggedIn, function (req, res, next) {
     // logger.debug("went to all user routes");
     if (res.locals.currentUser.role == 'role_sc') {
