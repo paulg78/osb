@@ -9,17 +9,68 @@ var async = require('async');
 /* global logger */
 
 //subscribe - show form to subscribe new user to mailchimp
-router.get("/subscribe", function (req, res) {
+router.get("/subscribe", function(req, res) {
     res.render("users/subscribe");
 });
 
 //subscribe - show form to subscribe new user to mailchimp
-router.get("/newsubscribe", function (req, res) {
+router.get("/newsubscribe", function(req, res) {
     res.render("users/newsubscribe");
 });
 
-// All user routes other than subscribe start here; blocks user actions by role_sc
-router.use(middleware.isLoggedIn, function (req, res, next) {
+// REGISTER - add new user to DB
+router.post("/register", function(req, res) {
+    logger.debug("In User Register");
+    logger.debug("req.body.name=" + req.body.name);
+    logger.debug("req.body.phone=" + req.body.phone);
+    logger.debug("req.body.username=" + req.body.username);
+    logger.debug("req.body.schoolCode=" + req.body.schoolCode);
+    logger.debug("req.body.email=" + req.body.email);
+
+    if (req.body.password != req.body.confirm) {
+        logger.debug("password mismatch");
+        req.flash('error', "Password confirmation doesn't match first password entered.");
+        return res.redirect("back");
+    }
+
+    var newUser = {
+        username: shared.myTrim(req.body.username.toLowerCase()),
+        name: shared.myTrim(req.body.name),
+        phone: shared.myTrim(req.body.phone),
+        role: "role_sc",
+        schoolCode: req.body.schoolCode,
+        email: req.body.email
+    };
+
+    // logger.debug("user.password before save=" + user.password);
+
+    // Create a new user and save to DB
+    User.create(newUser, function(err) {
+        if (err) {
+            // logger.debug("user save error=" + err.message);
+            if (err.message.indexOf("E11000") >= 0) { // duplicate key error
+                req.flash('error', "Sorry, that username is already in use. Please make up another one.");
+                return res.redirect("back");
+            }
+            else {
+                req.flash('error', "System error on user create.");
+                logger.error("System error on user create: " + err.message);
+                return res.redirect("back");
+            }
+        }
+        else {
+            logger.debug("created user, username=" + newUser.username);
+            res.render('resetpw', {
+                schoolCode: newUser.schoolCode,
+                username: newUser.username
+            });
+        }
+    });
+});
+
+
+// All user routes other than those above start here; blocks user actions by role_sc
+router.use(middleware.isLoggedIn, function(req, res, next) {
     // logger.debug("went to all user routes");
     if (res.locals.currentUser.role == 'role_sc') {
         res.redirect("back");
@@ -31,11 +82,11 @@ router.use(middleware.isLoggedIn, function (req, res, next) {
 });
 
 //INDEX - show all users
-router.get("/", function (req, res) {
+router.get("/", function(req, res) {
 
     User.find({}, { name: 1, email: 1, username: 1, role: 1, school: 1, PIN: 1, password: 1 }).sort({
         name: 1
-    }).exec(function (err, allUsers) {
+    }).exec(function(err, allUsers) {
         if (err) {
             logger.error(err);
         }
@@ -49,7 +100,7 @@ router.get("/", function (req, res) {
 });
 
 //CREATE - add new user to DB
-router.post("/", function (req, res) {
+router.post("/", function(req, res) {
     // get data from form and add to users collection
 
     var newUser = {
@@ -62,7 +113,7 @@ router.post("/", function (req, res) {
     };
 
     // Create a new user and save to DB
-    User.create(newUser, function (err) {
+    User.create(newUser, function(err) {
         if (err) {
             var msg = err.message;
             if (msg.indexOf("E11000") >= 0) { // duplicate key error
@@ -80,13 +131,13 @@ router.post("/", function (req, res) {
 });
 
 //NEW - show form to create new user
-router.get("/new", function (req, res) {
+router.get("/new", function(req, res) {
     res.render("users/new");
 });
 
 // Find user and render edit user form
-router.get("/:id/edit", function (req, res) {
-    User.findById(req.params.id, function (err, foundUser) {
+router.get("/:id/edit", function(req, res) {
+    User.findById(req.params.id, function(err, foundUser) {
         if (err) {
             logger.error(err);
         }
@@ -98,12 +149,12 @@ router.get("/:id/edit", function (req, res) {
     });
 });
 
-router.get("/stats", function (req, res) {
+router.get("/stats", function(req, res) {
     var stats = {};
     async.waterfall([
         getCountNoPw,
         getCountWithPw,
-    ], function (err, stats) {
+    ], function(err, stats) {
         if (err) {
             logger.error(err);
         }
@@ -116,7 +167,7 @@ router.get("/stats", function (req, res) {
         User.countDocuments({
                 password: null
             })
-            .exec(function (err, cnt) {
+            .exec(function(err, cnt) {
                 if (!err) {
                     stats.noPw = cnt;
                 }
@@ -128,7 +179,7 @@ router.get("/stats", function (req, res) {
         User.countDocuments({
                 password: { $ne: null }
             })
-            .exec(function (err, cnt) {
+            .exec(function(err, cnt) {
                 if (!err) {
                     stats.withPw = cnt;
                 }
@@ -139,7 +190,7 @@ router.get("/stats", function (req, res) {
 });
 
 // Update user in database
-router.put("/:id", function (req, res) {
+router.put("/:id", function(req, res) {
     var newData = {
         name: shared.myTrim(req.body.name),
         role: req.body.role,
@@ -153,7 +204,7 @@ router.put("/:id", function (req, res) {
 
     User.findByIdAndUpdate(req.params.id, {
         $set: newData
-    }, function (err, user) {
+    }, function(err, user) {
         if (err) {
             logger.error("edit error");
             req.flash("error", err.message);
@@ -167,11 +218,11 @@ router.put("/:id", function (req, res) {
 });
 
 // Delete user
-router.delete("/:userId", middleware.isLoggedIn, function (req, res) {
+router.delete("/:userId", middleware.isLoggedIn, function(req, res) {
     // logger.debug("user to delete=" + req.params.userId);
     User.findOneAndRemove({
         _id: req.params.userId
-    }, function (err, user) {
+    }, function(err, user) {
         if (err) {
             logger.error("Error deleting user: " + err.message);
             req.flash("error", err.message);
@@ -184,7 +235,7 @@ router.delete("/:userId", middleware.isLoggedIn, function (req, res) {
 
 
 // upload users from CSV file -- show form
-router.get("/uploadUsers", function (req, res) {
+router.get("/uploadUsers", function(req, res) {
     res.render("users/uploadUsers");
 });
 
@@ -192,7 +243,7 @@ router.get("/uploadUsers", function (req, res) {
 // upload users from CSV file -- determine changes
 // Only uploads school counselors; assumes all valid counselors are in the update file
 // (create user, delete user, or update user's name)
-router.post("/uploadUsers2", function (req, res) {
+router.post("/uploadUsers2", function(req, res) {
     logger.info("Starting User upload--determine changes");
     var users = JSON.parse(req.body.usersString);
     var numRows = users.length;
@@ -226,7 +277,7 @@ router.post("/uploadUsers2", function (req, res) {
     }
 
     // sort user updates by email/school to match User query order
-    userUpdates.sort(function (a, b) {
+    userUpdates.sort(function(a, b) {
         if (a.email < b.email) {
             return -1;
         }
@@ -245,7 +296,7 @@ router.post("/uploadUsers2", function (req, res) {
 
     // find existing users
     User.find({ role: "role_sc" }, { _id: 0, name: 1, email: 1, school: 1 }).sort({ email: 1, school: 1 })
-        .exec(function (err, usersFound) {
+        .exec(function(err, usersFound) {
             if (err) {
                 logger.error(err);
                 req.flash("error", "error finding existing users");
@@ -298,7 +349,7 @@ router.post("/uploadUsers2", function (req, res) {
 
 
 // upload users from CSV file -- update db
-router.post("/createUsers", function (req, res) {
+router.post("/createUsers", function(req, res) {
     // logger.debug("global.upd:");
     // for (var i = 0; i < global.upd.length; i++) {
     //     logger.debug("i=" + i + ":" + global.upd[i].name + ", " +
@@ -321,7 +372,7 @@ router.post("/createUsers", function (req, res) {
 
     logger.info("Starting User updates");
     User.find({}, { _id: 0, PIN: 1 }).sort({ PIN: -1 }).limit(1)
-        .exec(function (err, maxPinUser) {
+        .exec(function(err, maxPinUser) {
             if (err) {
                 logger.error(err);
                 res.redirect("/users");
@@ -332,72 +383,72 @@ router.post("/createUsers", function (req, res) {
                 logger.debug("first pin=" + pin);
                 var i = 0;
                 var numUpdates = global.upd.length;
-                async.whilst(function () {
+                async.whilst(function() {
                         return i < numUpdates;
                     },
-                    function (userCallback) {
+                    function(userCallback) {
                         // logger.debug("async user iteratee called");
                         logger.info("i=" + i + ": " + global.upd[i].name + ", " +
                             global.upd[i].email + ", " +
                             global.upd[i].school + ", " +
                             global.upd[i].action);
                         switch (global.upd[i].action) {
-                        case "C":
-                            var user = {
-                                name: global.upd[i].name,
-                                email: global.upd[i].email,
-                                role: "role_sc",
-                                school: global.upd[i].school,
-                                username: pin.toString(),
-                                PIN: pin
-                            };
-                            User.create(user, function (err) {
-                                if (err) {
-                                    logger.error("error creating user:" + err.message);
-                                }
-                                else {
-                                    pin = nextPIN(pin);
-                                }
-                                userUpdate.creates += user.name + "," + user.email + "," + user.school + ",user," + user.PIN + "\r\n";
+                            case "C":
+                                var user = {
+                                    name: global.upd[i].name,
+                                    email: global.upd[i].email,
+                                    role: "role_sc",
+                                    school: global.upd[i].school,
+                                    username: pin.toString(),
+                                    PIN: pin
+                                };
+                                User.create(user, function(err) {
+                                    if (err) {
+                                        logger.error("error creating user:" + err.message);
+                                    }
+                                    else {
+                                        pin = nextPIN(pin);
+                                    }
+                                    userUpdate.creates += user.name + "," + user.email + "," + user.school + ",user," + user.PIN + "\r\n";
+                                    i++; // move to next update
+                                    userCallback(null); // don't stop for errors
+                                });
+                                break;
+                            case "U":
+                                User.findOneAndUpdate({ email: global.upd[i].email, school: global.upd[i].school }, {
+                                    $set: { name: global.upd[i].name }
+                                }, {
+                                    projection: { "_id": 0, "email": 1, "school": 1, "PIN": 1 }
+                                }, function(err, user) {
+                                    if (err) {
+                                        logger.error("error updating user:" + err.message);
+                                    }
+                                    logger.debug("user=" + user);
+                                    userUpdate.creates += global.upd[i].name + "," + user.email + "," + user.school + ",user," + user.PIN + "\r\n";
+                                    i++; // move to next update
+                                    userCallback(null); // don't stop for errors
+                                });
+                                break;
+                            case "D":
+                                User.findOneAndRemove({ email: global.upd[i].email, school: global.upd[i].school }, {
+                                    projection: { "_id": 0, "name": 1, "PIN": 1 }
+                                }, function(err, user) {
+                                    if (err) {
+                                        logger.error("error deleting user:" + err.message);
+                                    }
+                                    logger.debug("user=" + user);
+                                    userUpdate.deletes += user.name + "," + global.upd[i].email + "," + global.upd[i].school + ",user," + user.PIN + "\r\n";
+                                    i++; // move to next update
+                                    userCallback(null); // don't stop for errors
+                                });
+                                break;
+                            default:
+                                logger.error("invalid action=" + global.upd[i].action);
                                 i++; // move to next update
                                 userCallback(null); // don't stop for errors
-                            });
-                            break;
-                        case "U":
-                            User.findOneAndUpdate({ email: global.upd[i].email, school: global.upd[i].school }, {
-                                $set: { name: global.upd[i].name }
-                            }, {
-                                projection: { "_id": 0, "email": 1, "school": 1, "PIN": 1 }
-                            }, function (err, user) {
-                                if (err) {
-                                    logger.error("error updating user:" + err.message);
-                                }
-                                logger.debug("user=" + user);
-                                userUpdate.creates += global.upd[i].name + "," + user.email + "," + user.school + ",user," + user.PIN + "\r\n";
-                                i++; // move to next update
-                                userCallback(null); // don't stop for errors
-                            });
-                            break;
-                        case "D":
-                            User.findOneAndRemove({ email: global.upd[i].email, school: global.upd[i].school }, {
-                                projection: { "_id": 0, "name": 1, "PIN": 1 }
-                            }, function (err, user) {
-                                if (err) {
-                                    logger.error("error deleting user:" + err.message);
-                                }
-                                logger.debug("user=" + user);
-                                userUpdate.deletes += user.name + "," + global.upd[i].email + "," + global.upd[i].school + ",user," + user.PIN + "\r\n";
-                                i++; // move to next update
-                                userCallback(null); // don't stop for errors
-                            });
-                            break;
-                        default:
-                            logger.error("invalid action=" + global.upd[i].action);
-                            i++; // move to next update
-                            userCallback(null); // don't stop for errors
                         }
                     },
-                    function (err) {
+                    function(err) {
                         if (err) {
                             logger.error("error while creating users--shouldn't happen since errors are just logged in console.");
                             req.flash("error", "error while uploading users");
@@ -405,7 +456,7 @@ router.post("/createUsers", function (req, res) {
                         else {
                             req.flash("success", "Users uploaded!");
                         }
-                        UserUpdate.create(userUpdate, function (err) {
+                        UserUpdate.create(userUpdate, function(err) {
                             if (err) {
                                 logger.error("error creating userUpdate:" + err.message);
                             }

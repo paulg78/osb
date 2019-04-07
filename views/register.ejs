@@ -1,0 +1,23 @@
+<% include ./partials/header %>
+<div class="container">
+    <div class="row">
+        <h2 style="text-align: center">Register to use the Operation School Bell website</h1>
+        <div style="width: 50%; margin: 25px auto;">
+            <form action="/registerData" method="get">
+                <div class="form-group">
+                    <h4>errmsg: <%= errmsg %></h4>
+                    <h4>Email address:</h4>
+                    <input class="form-control" type="email" name="email" value="<%= email %>" aria-describedby="helpEmail">
+                    <span id="helpEmail" class="help-block">Enter the school email address you are using with Operation School Bell.</span>
+                    <br>
+                    <h4>School Code:</h4>
+                    <input class="form-control" type="text" name="schoolCode" value="<%= schoolCode %>" aria-describedby="helpschoolCode">
+                    <span id="helpschoolCode" class="help-block">Enter the School Code assigned by the Assistance League. Please contact the Assistance League if you don't know the School Code for your school.</span>
+                    <br>
+                    <button style="margin-top: 30px;" class="btn btn-lg btn-primary btn-block">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<% include ./partials/footer %>

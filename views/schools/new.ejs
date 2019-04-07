@@ -3,9 +3,15 @@
         <h1 style="text-align: center">Create a New School</h1>
         <div style="width: 30%; margin: 25px auto;">
             <form action="/schools" method="POST">
+                 <div class="form-group">
+                    <input class="form-control" type="text" name="schoolCode" placeholder="school code">
+                </div>
                 <div class="form-group">
                     <input class="form-control" type="text" name="name" placeholder="school name">
                 </div>
+                <div class="form-group">
+                    <input class="form-control" type="text" name="district" placeholder="district">
+                </div>                
                 <div class="form-group">
                     <input class="form-control" type="text" name="quota" placeholder="student quota">
                 </div>

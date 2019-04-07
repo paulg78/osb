@@ -1,16 +1,16 @@
 <% include ./partials/header %>
 <div class="container">
     <div class="row">
-        <h2 style="text-align: center">Set Username/Password -- Authorization</h1>
+        <h2 style="text-align: center">Reset Username/Password -- Authorization</h1>
         <div style="width: 50%; margin: 25px auto;">
             <form action="/requestpwreset" method="post">
                 <div class="form-group">
-                    <h4>PIN:</h4>
-                    <input class="form-control" type="text" name="PIN" aria-describedby="helpPIN">
-                    <span id="helpPIN" class="help-block">Enter the PIN you received in email from the Assistance League.</span>
+                    <h4>School Code:</h4>
+                    <input class="form-control" type="text" name="schoolCode" aria-describedby="helpschoolCode">
+                    <span id="helpschoolCode" class="help-block">Enter the School Code assigned by the Assistance League. Please contact the Assistance League if you don't know the School Code for your school.</span>
                     <h4>Email address:</h4>
                     <input class="form-control" type="email" name="email" aria-describedby="helpEmail">
-                    <span id="helpEmail" class="help-block">Enter the email address you are using with Operation School Bell. This should be the email address to which your PIN was sent. Please contact the Assistance League if you have trouble setting a username/password.</span>
+                    <span id="helpEmail" class="help-block">Enter the email address you are using with Operation School Bell. Please contact the Assistance League if you have trouble setting a username/password.</span>
                     <p></p>
                     <button style="margin-top: 30px;" class="btn btn-lg btn-primary btn-block">Submit</button>
                 </div>

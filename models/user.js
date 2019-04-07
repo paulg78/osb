@@ -13,10 +13,8 @@ var UserSchema = new mongoose.Schema({
         type: String
     },
     email: String, // email address
-    PIN: { // used with email address for username/pw reset
-        type: Number,
-        required: true,
-        unique: true
+    PIN: { // no longer used
+        type: Number
     },
     role: {
         type: String,
@@ -26,21 +24,23 @@ var UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    school: {
+    school: String, // no longer used
+    schoolCode: { // used with email address for registration and username/pw reset
         type: String
-    }
+    },
+    phone: String
 });
 
-UserSchema.pre('save', function (next) {
+UserSchema.pre('save', function(next) {
     var user = this;
     var SALT_FACTOR = 5;
     // logger.debug("in UserSchema pre save");
     if (!user.isModified('password')) return next();
 
-    bcrypt.genSalt(SALT_FACTOR, function (err, salt) {
+    bcrypt.genSalt(SALT_FACTOR, function(err, salt) {
         if (err) return next(err);
 
-        bcrypt.hash(user.password, salt, null, function (err, hash) {
+        bcrypt.hash(user.password, salt, null, function(err, hash) {
             if (err) return next(err);
             user.password = hash;
             next();
@@ -48,15 +48,15 @@ UserSchema.pre('save', function (next) {
     });
 });
 
-UserSchema.methods.comparePassword = function (candidatePassword, cb) {
-    bcrypt.compare(candidatePassword, this.password, function (err, isMatch) {
+UserSchema.methods.comparePassword = function(candidatePassword, cb) {
+    bcrypt.compare(candidatePassword, this.password, function(err, isMatch) {
         // logger.debug("in comparePassword, isMatch=" + isMatch);
         if (err) return cb(err);
         cb(null, isMatch);
     });
 };
 
-UserSchema.virtual('hasPw').get(function () {
+UserSchema.virtual('hasPw').get(function() {
     if (this.password == null) {
         return "N";
     }

@@ -1,0 +1,38 @@
+<% include ./partials/header %>
+    <div class="row">
+        <h1 style="text-align: center">Register to use OSB Website</h1>
+        <h2 style="text-align: center">For <%= schoolName %></h2>
+        <div style="width: 30%; margin: 25px auto;">
+            <form action="/users/register" method="POST">
+                <div class="form-group">
+                    <label>Email Address:</label>
+                    <%= email %>
+                </div>
+                <div class="form-group">
+                    <label>Full Name:</label>
+                    <input class="form-control" type="text" name="name">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number:</label>
+                    <input class="form-control" type="text" name="phone">
+                </div>                
+                <div class="form-group">
+                    <label>Username:</label>
+                    <input id="uname" class="form-control" type="text" name="username" value="<%= email %>">
+                    <p><strong>You may use your email address as your Username or change it. Must be unique.</strong></p>
+                </div>
+                <div class="form-group">
+                    <button type=submit class="btn btn-lg btn-primary btn-block">Submit!</button>
+                </div>
+                <div class="form-group">
+                    <input class="form-control" type="hidden" name="email" value="<%= email %>">
+                </div>   
+                <div class="form-group">
+                    <input class="form-control" type="hidden" name="schoolCode" value="<%= schoolCode %>">
+                </div>
+            </form>
+            <a href="/users">Cancel</a>
+        </div>
+    </div>
+<% include ./partials/footer %>
+

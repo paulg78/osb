@@ -33,13 +33,14 @@ var
 
 console.log("process.env.DATABASEURL='" + process.env.DATABASEURL + "'");
 console.log("process.env.FORCESSL='" + process.env.FORCESSL + "'");
+console.log("process.env.APPLOGLEVEL='" + process.env.APPLOGLEVEL + "'");
 
 mongoose.connect(process.env.DATABASEURL, { useNewUrlParser: true });
 
 if (process.env.FORCESSL == 'y') {
   logger.debug("https redirection enabled");
   // redirect http to https
-  var forceSsl = function (req, res, next) {
+  var forceSsl = function(req, res, next) {
     if (req.headers['x-forwarded-proto'] !== 'https') {
       return res.redirect(['https://', req.get('Host'), req.url].join(''));
     }
@@ -65,12 +66,12 @@ var store = new MongoDBStore({
   collection: 'mySessions'
 });
 
-store.on('connected', function () {
+store.on('connected', function() {
   store.client; // The underlying MongoClient object from the MongoDB driver
 });
 
 // Catch errors
-store.on('error', function (err) {
+store.on('error', function(err) {
   if (err) {
     logger.error("Connection to session storage failed.");
   }
@@ -89,15 +90,15 @@ app.use(session({
 // PASSPORT CONFIGURATION
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(function (username, password, done) {
+passport.use(new LocalStrategy(function(username, password, done) {
   User.findOne({
     username: username.toLowerCase()
-  }, function (err, user) {
+  }, function(err, user) {
     if (err) return done(err);
     if (!user) return done(null, false, {
       message: 'Incorrect username.'
     });
-    user.comparePassword(password, function (err, isMatch) {
+    user.comparePassword(password, function(err, isMatch) {
       if (isMatch) {
         return done(null, user);
       }
@@ -110,17 +111,17 @@ passport.use(new LocalStrategy(function (username, password, done) {
   });
 }));
 
-passport.serializeUser(function (user, done) {
+passport.serializeUser(function(user, done) {
   done(null, user.id);
 });
 
-passport.deserializeUser(function (id, done) {
-  User.findById(id, function (err, user) {
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
     done(err, user);
   });
 });
 
-app.use(function (req, res, next) {
+app.use(function(req, res, next) {
   res.locals.currentUser = req.user;
   res.locals.success = req.flash('success');
   res.locals.error = req.flash('error');
@@ -135,6 +136,6 @@ app.use("/days", dayRoutes);
 app.use("/slots", slotRoutes);
 app.use("/userUpdates", userUpdateRoutes);
 
-app.listen(process.env.PORT, process.env.IP, function () {
+app.listen(process.env.PORT, process.env.IP, function() {
   logger.debug("Server running on port " + process.env.PORT + ", IP " + process.env.IP);
 });
