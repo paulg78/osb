@@ -43,13 +43,17 @@ function dateString(d) {
         <tr>
             <td><%= student.lname %></td>
             <td><%= student.fname %></td>
-            <td><%= student.school %></td>
+            <td>            
+              <% if (student.skool) { %>
+                  <%= student.skool.name %>
+                  <% } %>
+            </td>
             <td><%= student.grade %></td>
-            <% if (student.slot != null) { %>
-                <td><%= dateString(student.slot.sdate) %></td>
-            <% } else { %>
-                <td></td>
-                <% } %>
+            <td>
+              <% if (student.slot != null) { %>
+                  <%= dateString(student.slot.sdate) %>
+                  <% } %>
+            </td>
             <td>
                 <% if (student.served) { %>
                 <button type="button" class="btn btn-xs btn-primary checkIn"><span class="glyphicon glyphicon-ok"></span></button>

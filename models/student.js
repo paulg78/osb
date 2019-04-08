@@ -1,6 +1,6 @@
 var mongoose = require("mongoose");
 
-var studentSchema = new mongoose.Schema({
+const studentSchema = new mongoose.Schema({
     fname: {
         type: String
     },
@@ -10,7 +10,7 @@ var studentSchema = new mongoose.Schema({
     grade: {
         type: String
     },
-    school: String, // no longer used; was school name
+    // school: String, // no longer used; was school name
     schoolCode: { // used as a key to school
         type: String
     },
@@ -21,6 +21,13 @@ var studentSchema = new mongoose.Schema({
     served: {
         type: Boolean
     }
+});
+
+studentSchema.virtual('skool', {
+    ref: 'School',
+    localField: 'schoolCode',
+    foreignField: 'schoolCode',
+    justOne: true
 });
 
 studentSchema.virtual('fullName').get(function() {

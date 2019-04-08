@@ -87,19 +87,20 @@ router.use(middleware.isLoggedIn, function(req, res, next) {
 //INDEX - show all users
 router.get("/", function(req, res) {
 
-    User.find({}, { name: 1, email: 1, username: 1, role: 1, school: 1, PIN: 1, password: 1 }).sort({
-        name: 1
-    }).exec(function(err, allUsers) {
-        if (err) {
-            logger.error(err);
-        }
-        else {
-            // logger.debug("allUsers=" + allUsers);
-            res.render("users/index", {
-                users: allUsers
-            });
-        }
-    });
+    User.find({}, { name: 1, email: 1, username: 1, role: 1, password: 1, schoolCode: 1 })
+        .populate('school', { _id: 0, name: 1 })
+        .sort({ name: 1 })
+        .exec(function(err, allUsers) {
+            if (err) {
+                logger.error(err);
+            }
+            else {
+                // logger.debug("allUsers=" + allUsers);
+                res.render("users/index", {
+                    users: allUsers
+                });
+            }
+        });
 });
 
 //CREATE - add new user to DB

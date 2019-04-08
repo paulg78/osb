@@ -18,7 +18,6 @@
                 <th>Email</th>
                 <th class="filter-select" data-placeholder="All Schools">School</th>
                 <th>UserName</th>
-                <th>PIN</th>
                 <th>PW</th>
                 <th class="filter-select" data-placeholder="All">Role</th>
             </tr>
@@ -28,9 +27,12 @@
                 <tr>
                     <td><%= user.name %></td>
                     <td><%= user.email %></td>
-                    <td><%= user.school %></td>
+                    <td>            
+                    <% if (user.school) { %>
+                        <%= user.school.name %>
+                        <% } %>
+                    </td>
                     <td><%= user.username %></td>
-                    <td><%= user.PIN %></td>
                     <td><%= user.hasPw %></td>
                     <td><%= user.role %></td>
                     <% if(currentUser.role == "role_wa"){ %>

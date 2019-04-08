@@ -19,7 +19,8 @@ router.get("/", middleware.isLoggedIn,
             // logger.debug("after next");
             Student.find()
                 .sort({ "lname": 1, "fname": 1 })
-                .populate('slot', { sdate: 1, _id: 0 })
+                .populate('slot', { _id: 0, sdate: 1 })
+                .populate('skool', { _id: 0, name: 1 })
                 .exec(function(err, queryResponse) {
                     if (err) {
                         logger.error(err.message);
@@ -200,7 +201,8 @@ router.get("/:dateSched", middleware.isLoggedIn, function(req, res) {
                 // logger.debug("foundDay.slots[2]=" + foundDay.slots[2]);
                 // find the students scheduled for this day
                 Student.find({ slot: { $in: foundDay.slots } })
-                    .populate('slot', { sdate: 1, _id: 0 })
+                    .populate('slot', { _id: 0, sdate: 1 })
+                    .populate('skool', { _id: 0, name: 1 })
                     .exec(
                         function(err, queryResponse) {
                             if (err) {

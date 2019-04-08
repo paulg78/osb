@@ -19,6 +19,7 @@
         <thead>
             <tr>
                 <th>Name</th>
+                <th>School Code</th>
                 <th>District</th>
                 <th>Quota</th>
                 <th>Quota Unassigned</th>
@@ -38,6 +39,7 @@
                     servedTot+=school.servedCount;
                     %>
                     <td><%= school.name %></td>
+                    <td><%= school.schoolCode %></td>                    
                     <td><%= school.district %></td>
                     <td><%= school.quota %></td>
                     <td><%= unasgn %></td>
