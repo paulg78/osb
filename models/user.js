@@ -13,9 +13,9 @@ var UserSchema = new mongoose.Schema({
         type: String
     },
     email: String, // email address
-    PIN: { // no longer used
-        type: Number
-    },
+    // PIN: { // no longer used
+    //     type: Number
+    // },
     role: {
         type: String,
         required: true

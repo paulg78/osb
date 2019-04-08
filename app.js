@@ -28,8 +28,7 @@ var
   dayRoutes = require("./routes/days"),
   slotRoutes = require("./routes/slots"),
   indexRoutes = require("./routes/index"),
-  userRoutes = require("./routes/users"),
-  userUpdateRoutes = require("./routes/userUpdates");
+  userRoutes = require("./routes/users");
 
 console.log("process.env.DATABASEURL='" + process.env.DATABASEURL + "'");
 console.log("process.env.FORCESSL='" + process.env.FORCESSL + "'");
@@ -134,7 +133,6 @@ app.use("/students", studentRoutes);
 app.use("/schools", schoolRoutes);
 app.use("/days", dayRoutes);
 app.use("/slots", slotRoutes);
-app.use("/userUpdates", userUpdateRoutes);
 
 app.listen(process.env.PORT, process.env.IP, function() {
   logger.debug("Server running on port " + process.env.PORT + ", IP " + process.env.IP);

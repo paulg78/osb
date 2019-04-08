@@ -331,8 +331,9 @@ router.get("/:id/edit", middleware.isLoggedIn, function(req, res) {
 
 // Find student and render passport form
 router.get("/:id/printPass", middleware.isLoggedIn, function(req, res) {
-    Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, slot: 1, served: 1, school: 1 })
+    Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, slot: 1, served: 1, schoolCode: 1 })
         .populate('slot', { _id: 1, sdate: 1 })
+        .populate('skool', { _id: 0, name: 1 })
         .exec(function(err, foundStudent) {
             if (err) {
                 logger.error(err);

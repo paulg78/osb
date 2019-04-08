@@ -70,8 +70,8 @@ router.get('/requestpwresetData', function(req, res) {
         .populate({ path: 'school', select: 'name' })
         .exec(function(err, user) {
             if (err) {
-                req.flash('error', "System error on user lookup " + req.query.email + "-" + req.query.PIN);
-                logger.error("System error on user lookup " + req.query.email + "-" + req.query.PIN);
+                req.flash('error', "System error on user lookup " + req.query.email + "-" + req.query.schoolCode);
+                logger.error("System error on user lookup " + req.query.email + "-" + req.query.schoolCode);
                 return res.redirect('/requestpwreset');
             }
             if (user == null) {
@@ -80,7 +80,7 @@ router.get('/requestpwresetData', function(req, res) {
             }
             else {
                 logger.debug("in requestpwreset user=" + user);
-                logger.debug('user.school=' + user.school);
+                logger.debug('user.schoolCode=' + user.schoolCode);
                 res.render('resetpw', {
                     schoolCode: req.query.schoolCode,
                     username: user.username,
@@ -175,8 +175,8 @@ router.post('/register', function(req, res) {
         schoolCode: req.body.schoolCode
     }, { username: 1, school: 1 }, function(err, user) {
         if (err) {
-            req.flash('error', "System error on user lookup " + req.body.email + "-" + req.body.PIN);
-            logger.error("System error on user lookup " + req.body.email + "-" + req.body.PIN);
+            req.flash('error', "System error on user lookup " + req.body.email + "-" + req.body.schoolCode);
+            logger.error("System error on user lookup " + req.body.email + "-" + req.body.schoolCode);
             return res.redirect('back');
         }
         if (user == null) {
@@ -220,9 +220,9 @@ router.post('/register', function(req, res) {
 
 // show username/password reset form (with school for counselors)
 // used to re-render reset form with an error message
-router.get('/resetpw/:PIN/:username/:school', function(req, res) {
+router.get('/resetpw/:username/:schoolCode/:school', function(req, res) {
     res.render('resetpw', {
-        PIN: req.params.PIN,
+        schoolCode: req.params.schoolCode,
         username: req.params.username,
         school: req.params.school
     });
@@ -231,9 +231,9 @@ router.get('/resetpw/:PIN/:username/:school', function(req, res) {
 
 // show username/password reset form (without school for non-counselor roles)
 // used to re-render reset form with an error message
-router.get('/resetpw/:PIN/:username', function(req, res) {
+router.get('/resetpw/:username/:schoolCode', function(req, res) {
     res.render('resetpw', {
-        PIN: req.params.PIN,
+        schoolCode: req.params.schoolCode,
         username: req.params.username,
         school: null
     });
@@ -250,7 +250,7 @@ router.post('/resetpw', function(req, res) {
 
     User.findOne({
         username: req.body.username
-    }, { username: 1, school: 1 }, function(err, user) {
+    }, { username: 1 }, function(err, user) {
         if (err) {
             var errmsg = 'System error finding user; username=' + req.body.username;
             logger.error(errmsg + ";" + err.message);
