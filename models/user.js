@@ -24,11 +24,18 @@ var UserSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    school: String, // no longer used
     schoolCode: { // used with email address for registration and username/pw reset
+        // also is a key to school
         type: String
     },
     phone: String
+});
+
+UserSchema.virtual('school', {
+    ref: 'School',
+    localField: 'schoolCode',
+    foreignField: 'schoolCode',
+    justOne: true
 });
 
 UserSchema.pre('save', function(next) {

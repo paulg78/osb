@@ -37,10 +37,15 @@ function dateString(d) {
     }
     return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
 }
+
+var nbrStudents = 0;
+if (qrySchool.students) {
+    nbrStudents = qrySchool.students.length;
+}
 %>
 
-    <h2><%=qrySchool.name + " -- Allotment: " + qrySchool.quota + ",  Remaining: "%><span id='remaining'><%= (qrySchool.quota-students.length) %></h2>
-    <% if (qrySchool.quota-students.length > 0) { %>
+    <h2><%=qrySchool.name + " -- Allotment: " + qrySchool.quota + ",  Remaining: "%><span id='remaining'><%= (qrySchool.quota - nbrStudents) %></h2>
+    <% if (qrySchool.quota - nbrStudents > 0) { %>
         <div style="width: 100%; margin: 25px auto;">
             <form action="/students" method="POST" class="form-inline hidden-print" id=newStudentForm>
                 <h3>Add Student&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="addMsg"></span></h3>
@@ -76,7 +81,8 @@ function dateString(d) {
              </tr>
         </thead>
     <tbody id='studentList'>
-     <% students.forEach(function(student){ %>
+    <% if (qrySchool.students) { %>        
+     <% qrySchool.students.forEach(function(student){ %>
         <tr>
             <td><%= student.fname %></td>
             <td><%= student.lname %></td>
@@ -105,8 +111,9 @@ function dateString(d) {
             </td>
         </tr>
     <% }); %>
-        </tbody>
-    </table>
+   <% } %>
+  </tbody>
+ </table>
 <script src="/js/ajax.js"></script>
 
 <script>

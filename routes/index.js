@@ -59,30 +59,35 @@ router.get('/requestpwreset', function(req, res) {
 });
 
 // show username/password reset form for password reset (existing user)
-router.post('/requestpwreset', function(req, res) {
+router.get('/requestpwresetData', function(req, res) {
+    logger.debug("req.query.email=" + req.query.email);
+    logger.debug("req.query.schoolCode=" + req.query.schoolCode);
 
     User.findOne({
-        email: req.body.email.toLowerCase(),
-        schoolCode: req.body.schoolCode
-    }, { username: 1, school: 1 }, function(err, user) {
-        if (err) {
-            req.flash('error', "System error on user lookup " + req.body.email + "-" + req.body.PIN);
-            logger.error("System error on user lookup " + req.body.email + "-" + req.body.PIN);
-            return res.redirect('/requestpwreset');
-        }
-        if (user == null) {
-            req.flash('error', "No account found for School Code " + req.body.schoolCode + ", email address " + req.body.email);
-            return res.redirect('/requestpwreset');
-        }
-        else {
-            // logger.debug("in requestpwreset user=" + user);
-            res.render('resetpw', {
-                schoolCode: req.body.schoolCode,
-                username: user.username,
-                school: user.school
-            });
-        }
-    });
+            email: req.query.email.toLowerCase(),
+            schoolCode: req.query.schoolCode
+        }, { _id: 0, username: 1, schoolCode: 1 })
+        .populate({ path: 'school', select: 'name' })
+        .exec(function(err, user) {
+            if (err) {
+                req.flash('error', "System error on user lookup " + req.query.email + "-" + req.query.PIN);
+                logger.error("System error on user lookup " + req.query.email + "-" + req.query.PIN);
+                return res.redirect('/requestpwreset');
+            }
+            if (user == null) {
+                req.flash('error', "No account found for School Code " + req.query.schoolCode + ", email address " + req.query.email);
+                return res.redirect('/requestpwreset');
+            }
+            else {
+                logger.debug("in requestpwreset user=" + user);
+                logger.debug('user.school=' + user.school);
+                res.render('resetpw', {
+                    schoolCode: req.query.schoolCode,
+                    username: user.username,
+                    school: user.school.name
+                });
+            }
+        });
 });
 
 
@@ -136,22 +141,34 @@ router.get('/registerData', function(req, res) {
                 });
             }
             else {
-                req.flash("error", req.query.email + " is already registered with School Code " + req.query.schoolCode);
+                req.flash("error", req.query.email + " is already registered with School Code " + req.query.schoolCode); // doesn't work with res.render
                 // res.redirect("back");  // loses form content
                 // res.render('register', { message: req.flash('error') }); // loses the err msg
-                res.render('register', {
-                    email: req.query.email,
-                    schoolCode: req.query.schoolCode,
-                    errmsg: req.query.email + " is already registered with School Code " + req.query.schoolCode
-                });
+                // res.render('register', {
+                //     email: req.query.email,
+                //     schoolCode: req.query.schoolCode,
+                //     errmsg: req.query.email + " is already registered with School Code " + req.query.schoolCode
+                // });
+                res.redirect('backToregister' + "/" + req.query.email + "/" + req.query.schoolCode);
             }
         });
     });
 });
 
+
+// show first registration form after error
+router.get('/backToregister/:email/:schoolCode', function(req, res) {
+    res.render('register', {
+        email: req.params.email,
+        schoolCode: req.params.schoolCode,
+        errmsg: req.params.email + " is already registered with School Code " + req.params.schoolCode
+    });
+});
+
+
+
 // show username/password reset form for registering a new user
 router.post('/register', function(req, res) {
-
 
     User.findOne({
         email: req.body.email.toLowerCase(),
@@ -224,40 +241,35 @@ router.get('/resetpw/:PIN/:username', function(req, res) {
 
 
 // reset username/password
-router.post('/resetpw/:PIN', function(req, res) {
+router.post('/resetpw', function(req, res) {
     logger.debug("req.body.password=" + req.body.password);
     logger.debug("req.body.confirm=" + req.body.confirm);
     logger.debug("req.body.username=" + req.body.username);
-    logger.debug("req.params.PIN=" + req.params.PIN);
+    logger.debug("req.body.newUsername=" + req.body.newUsername);
+    logger.debug("req.body.schoolCode=" + req.body.schoolCode);
 
     User.findOne({
-        PIN: parseInt(req.params.PIN, 10)
+        username: req.body.username
     }, { username: 1, school: 1 }, function(err, user) {
         if (err) {
-            logger.error("System error finding user in resetpw: " + err.message);
-            req.flash('error', 'System error finding user; PIN: ' + req.params.PIN);
+            var errmsg = 'System error finding user; username=' + req.body.username;
+            logger.error(errmsg + ";" + err.message);
+            req.flash('error', errmsg);
             return res.redirect('/requestpwreset');
         }
         if (!user) {
-            logger.error("System error: User not found in resetpw; PIN: " + req.params.PIN);
-            req.flash('error', 'User not found with PIN: ' + req.params.PIN);
+            var errmsg = 'System error user not found; username=' + req.body.username;
+            logger.error(errmsg);
+            req.flash('error', errmsg);
             return res.redirect('/requestpwreset');
-        }
-
-        // logger.debug("in resetpw, user=" + user);
-        // disallow new numeric username to avoid dup usernames when uploading new users, which are
-        // created with username = a numeric PIN
-        if (req.body.username != user.username && !isNaN(req.body.username)) { // user is changing username to a number
-            req.flash('error', "Sorry, a new username cannot be numeric. A new username must contain at least one non-digit character.");
-            return res.redirect("/resetpw/" + req.params.PIN + "/" + user.username + "/" + user.school);
         }
 
         if (req.body.password != req.body.confirm) {
             logger.debug("password mismatch");
             req.flash('error', "Password confirmation doesn't match first password entered.");
-            return res.redirect("/resetpw/" + req.params.PIN + "/" + user.username + "/" + user.school);
+            return res.redirect("/resetpw/" + user.username + "/" + req.body.schoolCode + "/" + user.school);
         }
-        user.username = req.body.username.toLowerCase();
+        user.username = req.body.newUsername.toLowerCase();
         user.password = req.body.password;
         // logger.debug("user.password before save=" + user.password);
 
@@ -266,12 +278,12 @@ router.post('/resetpw/:PIN', function(req, res) {
                 // logger.debug("user save error=" + err.message);
                 if (err.message.indexOf("E11000") >= 0) { // duplicate key error
                     req.flash('error', "Sorry, that username is already in use. Please make up another one.");
-                    return res.redirect("/resetpw/" + req.params.username + "/" + user.school);
+                    return res.redirect("/resetpw/" + user.username + "/" + req.body.schoolCode + "/" + user.school);
                 }
                 else {
                     req.flash('error', "Error--new password didn't save.");
                     logger.error("System error on user username/password save: " + err.message);
-                    return res.redirect("/resetpw/" + req.params.username + "/" + user.school);
+                    return res.redirect("/resetpw/" + user.username + "/" + req.body.schoolCode + "/" + user.school);
                 }
             }
             else {

@@ -23,8 +23,9 @@ router.post("/register", function(req, res) {
     logger.debug("In User Register");
     logger.debug("req.body.name=" + req.body.name);
     logger.debug("req.body.phone=" + req.body.phone);
-    logger.debug("req.body.username=" + req.body.username);
+    // logger.debug("req.body.username=" + req.body.username);
     logger.debug("req.body.schoolCode=" + req.body.schoolCode);
+    logger.debug("req.body.schoolName=" + req.body.schoolName);
     logger.debug("req.body.email=" + req.body.email);
 
     if (req.body.password != req.body.confirm) {
@@ -34,7 +35,7 @@ router.post("/register", function(req, res) {
     }
 
     var newUser = {
-        username: shared.myTrim(req.body.username.toLowerCase()),
+        username: req.body.email,
         name: shared.myTrim(req.body.name),
         phone: shared.myTrim(req.body.phone),
         role: "role_sc",
@@ -62,7 +63,9 @@ router.post("/register", function(req, res) {
             logger.debug("created user, username=" + newUser.username);
             res.render('resetpw', {
                 schoolCode: newUser.schoolCode,
-                username: newUser.username
+                school: req.body.schoolName,
+                username: newUser.username,
+                email: newUser.email
             });
         }
     });

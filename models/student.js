@@ -10,7 +10,10 @@ var studentSchema = new mongoose.Schema({
     grade: {
         type: String
     },
-    school: String,
+    school: String, // no longer used; was school name
+    schoolCode: { // used as a key to school
+        type: String
+    },
     slot: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Slot'
@@ -20,11 +23,11 @@ var studentSchema = new mongoose.Schema({
     }
 });
 
-studentSchema.virtual('fullName').get(function () {
+studentSchema.virtual('fullName').get(function() {
     return this.fname + ' ' + this.lname;
 });
 
-studentSchema.virtual('servedyn').get(function () {
+studentSchema.virtual('servedyn').get(function() {
     if (this.served) {
         return "yes";
     }

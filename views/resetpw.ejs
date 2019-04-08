@@ -6,13 +6,11 @@
             <h3 style="text-align: center">for School <span style="color:blue;"></spanstyle><%= school %></span></h2>
             <% } %>
         <div style="width: 30%; margin: 25px auto;">
-            <p>PIN: <%= PIN %></p>
-            <form action="/resetpw/<%=PIN%>" method="post">
+            <form action="/resetpw" method="post">
                 <div class="form-group">
                     <h4>Username:</h4>
-                    <input class="form-control" type="text" name="username" value="<%= username %>">
-                    <span id="Username" class="help-block">Your initial username is the PIN you received from
-                    the Assistance League. If you like, you may change your username to a unique value that is not all digits.
+                    <input class="form-control" type="text" name="newUsername" value="<%= username %>">
+                    <span id="Username" class="help-block">Your initial username is your email address. If you like, you may change your username but it has to be unique so make up something other counselors would be unlikely to use. If you are supporting more than one school using the same email address, you will need a unique username for each school.
                     </span>
                 </div>
                 <h4>Please enter new password:</h4>
@@ -26,6 +24,12 @@
                 <div class="form-group">
                     <button class="btn btn-lg btn-primary btn-block">Save new username/password</button>
                 </div>
+                <div class="form-group">
+                    <input class="form-control" type="hidden" name="username" value="<%= username %>">
+                </div>   
+                <div class="form-group">
+                    <input class="form-control" type="hidden" name="schoolCode" value="<%= schoolCode %>">
+                </div>                                   
             </form>
             <a href="/login">Cancel</a>
         </div>

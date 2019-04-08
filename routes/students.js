@@ -10,7 +10,7 @@ var async = require('async');
 
 // List Students (all or by school)
 router.get("/", middleware.isLoggedIn,
-    function (req, res, next) {
+    function(req, res, next) {
         if (res.locals.currentUser.role == 'role_sc') {
             // logger.debug("skipping to next students handler");
             next();
@@ -20,7 +20,7 @@ router.get("/", middleware.isLoggedIn,
             Student.find()
                 .sort({ "lname": 1, "fname": 1 })
                 .populate('slot', { sdate: 1, _id: 0 })
-                .exec(function (err, queryResponse) {
+                .exec(function(err, queryResponse) {
                     if (err) {
                         logger.error(err.message);
                         req.flash("error", "System Error: " + err.message);
@@ -37,58 +37,43 @@ router.get("/", middleware.isLoggedIn,
                 });
         }
     },
-    function (req, res) { //  List students for school
+    function(req, res) { //  List students for school
         School.findOne({
-                name: res.locals.currentUser.school
-            })
-            .exec(function (err, qrySchool) {
+                schoolCode: res.locals.currentUser.schoolCode
+            }, { _id: 0, name: 1, quota: 1, schoolCode: 1 })
+            .populate({ path: 'students' })
+            .exec(function(err, qrySchool) {
                 if (err) {
                     logger.error(err.errmsg);
                     req.flash("error", "System Error: " + err.message);
                     return res.redirect("back");
                 }
                 if (qrySchool == null) {
-                    logger.info("School missing from database: " + res.locals.currentUser.school);
-                    req.flash("error", "School missing from database: " + res.locals.currentUser.school);
+                    logger.info("School missing from database: " + res.locals.currentUser.schoolCode);
+                    req.flash("error", "School missing from database: " + res.locals.currentUser.schoolCode);
                     return res.redirect("back");
                 }
-                // logger.debug("in list students for a school");
-                Student.find({
-                        school: res.locals.currentUser.school
-                    }, { school: 0 })
-                    .populate('slot', { sdate: 1, _id: 0 })
-                    .sort({
-                        fname: 1,
-                        lname: 1
-                    })
-                    .exec(function (err, queryResponse) {
-                        if (err) {
-                            logger.error(err);
-                            req.flash("error", "System Error: " + err.message);
-                            return res.redirect("back");
-                        }
-                        // logger.debug("qrySchool=" + qrySchool);
-                        // logger.debug("queryResponse=" + queryResponse);
-                        var today = new Date();
-                        var mm = (today.getMonth() + 1).toString();
-                        if (mm.length == 1) {
-                            mm = "0" + mm;
-                        }
-                        var dd = today.getDate().toString();
-                        if (dd.length == 1) {
-                            dd = "0" + dd;
-                        }
-                        res.render("students/bySchool", {
-                            todayMMDD: mm + dd,
-                            students: queryResponse,
-                            qrySchool: qrySchool
-                        });
-                    });
+
+                logger.debug("qrySchool=" + qrySchool);
+                logger.debug("qrySchool.students=" + qrySchool.students);
+                var today = new Date();
+                var mm = (today.getMonth() + 1).toString();
+                if (mm.length == 1) {
+                    mm = "0" + mm;
+                }
+                var dd = today.getDate().toString();
+                if (dd.length == 1) {
+                    dd = "0" + dd;
+                }
+                res.render("students/bySchool", {
+                    todayMMDD: mm + dd,
+                    qrySchool: qrySchool
+                });
             });
     }
 );
 
-router.get("/stats", middleware.isLoggedIn, function (req, res) {
+router.get("/stats", middleware.isLoggedIn, function(req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
@@ -99,7 +84,7 @@ router.get("/stats", middleware.isLoggedIn, function (req, res) {
         getCountServed,
         getFutureSlotsAvail,
         getQuotaTotal
-    ], function (err, stats) {
+    ], function(err, stats) {
         if (err) {
             logger.error(err);
         }
@@ -112,7 +97,7 @@ router.get("/stats", middleware.isLoggedIn, function (req, res) {
         Student.countDocuments({
                 slot: null
             })
-            .exec(function (err, cnt) {
+            .exec(function(err, cnt) {
                 if (!err) {
                     stats.unsched = cnt;
                 }
@@ -124,7 +109,7 @@ router.get("/stats", middleware.isLoggedIn, function (req, res) {
         Student.countDocuments({
                 slot: { $ne: null }
             })
-            .exec(function (err, cnt) {
+            .exec(function(err, cnt) {
                 if (!err) {
                     stats.sched = cnt;
                 }
@@ -136,7 +121,7 @@ router.get("/stats", middleware.isLoggedIn, function (req, res) {
         Student.countDocuments({
                 served: true
             })
-            .exec(function (err, cnt) {
+            .exec(function(err, cnt) {
                 if (!err) {
                     stats.served = cnt;
                 }
@@ -159,7 +144,7 @@ router.get("/stats", middleware.isLoggedIn, function (req, res) {
                     }
                 }
             }])
-            .exec(function (err, slotsAvail) {
+            .exec(function(err, slotsAvail) {
                 if (!err) {
                     // logger.debug("slotsAvail=" + JSON.stringify(slotsAvail));
                     if (slotsAvail[0]) {
@@ -183,7 +168,7 @@ router.get("/stats", middleware.isLoggedIn, function (req, res) {
                     }
                 }
             }])
-            .exec(function (err, quotaTotal) {
+            .exec(function(err, quotaTotal) {
                 if (!err) {
                     // logger.debug("quotaTotal=" + JSON.stringify(quotaTotal));
                     stats.totalQuota = quotaTotal[0].qt;
@@ -196,14 +181,14 @@ router.get("/stats", middleware.isLoggedIn, function (req, res) {
 });
 
 
-router.get("/:dateSched", middleware.isLoggedIn, function (req, res) {
+router.get("/:dateSched", middleware.isLoggedIn, function(req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
     // logger.debug("req.params.dateSched=" + req.params.dateSched);
     Day.findOne({ date: new Date(req.params.dateSched) }, { _id: 0 })
         .populate('slots', { _id: 1 })
-        .exec(function (err, foundDay) {
+        .exec(function(err, foundDay) {
             if (err) {
                 logger.error(err);
                 req.flash("error", "System error:" + err.message);
@@ -217,7 +202,7 @@ router.get("/:dateSched", middleware.isLoggedIn, function (req, res) {
                 Student.find({ slot: { $in: foundDay.slots } })
                     .populate('slot', { sdate: 1, _id: 0 })
                     .exec(
-                        function (err, queryResponse) {
+                        function(err, queryResponse) {
                             if (err) {
                                 logger.error(err);
                             }
@@ -256,41 +241,32 @@ function studentValid(student) {
     return "";
 }
 
-function getRemaining(school, callbackfunction) {
+function getRemaining(schoolCode, callbackfunction) {
     School.findOne({
-            name: school
-        }, { _id: 0, quota: 1 })
-        .exec(function (err, qrySchool) {
+            schoolCode: schoolCode
+        }, { _id: 0, quota: 1, schoolCode: 1 })
+        .populate('nbrStudents')
+        .exec(function(err, qrySchool) {
             if (err) {
                 logger.error("getRemaining, finding school, " + err.errmsg);
                 callbackfunction(0);
             }
             else {
                 if (qrySchool == null) {
-                    logger.error("getRemaining, School missing: " + school);
+                    logger.error("getRemaining, School missing: " + schoolCode);
                     callbackfunction(0);
                 }
                 else {
-                    // logger.debug("qrySchool=" + qrySchool);
-                    Student.countDocuments({
-                            school: school
-                        })
-                        .exec(function (err, cnt) {
-                            if (err) {
-                                logger.error("getRemaining, getting student count, " + err.errmsg);
-                                callbackfunction(0);
-                            }
-                            else {
-                                callbackfunction(qrySchool.quota - cnt);
-                            }
-                        });
+                    logger.debug("getRemaining: qrySchool=" + qrySchool);
+                    logger.debug("qrySchool.nbrStudents=" + qrySchool.nbrStudents);
+                    callbackfunction(qrySchool.quota - qrySchool.nbrStudents);
                 }
             }
         });
 }
 
 //CREATE - add new student to DB
-router.post("/", function (req, res) {
+router.post("/", function(req, res) {
     var studentData = {
         fname: req.body.firstName,
         lname: req.body.lastName,
@@ -300,7 +276,7 @@ router.post("/", function (req, res) {
     };
     // Can't use middleware.isLoggedIn with ajax since need to return json
     if (req.isAuthenticated()) {
-        studentData.school = res.locals.currentUser.school; // can assign school only when logged in
+        studentData.schoolCode = res.locals.currentUser.schoolCode; // can assign school only when logged in
     }
     else {
         return res.json({ "msg": "You must be logged in to add a student; student not added." });
@@ -309,10 +285,10 @@ router.post("/", function (req, res) {
     var errMsg = studentValid(studentData);
 
     if (errMsg == "") {
-        getRemaining(studentData.school, function (remain) {
+        getRemaining(studentData.schoolCode, function(remain) {
             // logger.debug("remain=" + remain);
             if (remain > 0) {
-                Student.create(studentData, function (err, newStudent) {
+                Student.create(studentData, function(err, newStudent) {
                     if (err) {
                         logger.error("create failed: " + err.message);
                         res.json({ "msg": err.message });
@@ -333,10 +309,10 @@ router.post("/", function (req, res) {
 });
 
 // Find student and render edit form
-router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
+router.get("/:id/edit", middleware.isLoggedIn, function(req, res) {
     Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, slot: 1, served: 1 })
         .populate('slot', { _id: 1, sdate: 1 })
-        .exec(function (err, foundStudent) {
+        .exec(function(err, foundStudent) {
             if (err) {
                 logger.error(err);
             }
@@ -352,10 +328,10 @@ router.get("/:id/edit", middleware.isLoggedIn, function (req, res) {
 });
 
 // Find student and render passport form
-router.get("/:id/printPass", middleware.isLoggedIn, function (req, res) {
+router.get("/:id/printPass", middleware.isLoggedIn, function(req, res) {
     Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, slot: 1, served: 1, school: 1 })
         .populate('slot', { _id: 1, sdate: 1 })
-        .exec(function (err, foundStudent) {
+        .exec(function(err, foundStudent) {
             if (err) {
                 logger.error(err);
             }
@@ -376,7 +352,7 @@ router.get("/:id/printPass", middleware.isLoggedIn, function (req, res) {
 
 
 // Update student/slots in database
-router.put("/:id", function (req, res) {
+router.put("/:id", function(req, res) {
     var newData = {
         fname: req.body.firstName,
         lname: req.body.lastName,
@@ -390,7 +366,7 @@ router.put("/:id", function (req, res) {
             updateNewSlot,
             updateStudent,
             updateOldSlot
-        ], function (err) {
+        ], function(err) {
             // logger.debug("ending update waterfall");
             if (err) {
                 logger.error(err.message);
@@ -422,7 +398,7 @@ router.put("/:id", function (req, res) {
             }, {
                 projection: { _id: 1, count: 1, max: 1 },
                 returnNewDocument: false // returns count before increment, true doesn't seem to work
-            }, function (err, slot) {
+            }, function(err, slot) {
                 // logger.debug("slot before update=" + slot);
                 if (err) {
                     callback(err);
@@ -433,7 +409,7 @@ router.put("/:id", function (req, res) {
                         Slot.findByIdAndUpdate(slot._id, {
                                 $inc: { count: -1 }
                             },
-                            function (err) {
+                            function(err) {
                                 if (err) {
                                     callback(err);
                                 }
@@ -471,7 +447,7 @@ router.put("/:id", function (req, res) {
                 projection: { slot: 1 },
                 returnNewDocument: false // returns student before update
             },
-            function (err, student) {
+            function(err, student) {
                 // logger.debug("in updateStudent, student=" + student);
                 if (err) {
                     callback(err);
@@ -484,7 +460,7 @@ router.put("/:id", function (req, res) {
                             // logger.debug("undoing slot update");
                             Slot.findByIdAndUpdate(newSlotId, {
                                 $inc: { count: -1 }
-                            }, function (err) {
+                            }, function(err) {
                                 if (err) {
                                     logger.error("error on slot undo");
                                     callback(err);
@@ -522,7 +498,7 @@ router.put("/:id", function (req, res) {
             }, {
                 projection: { _id: 1, count: 1, max: 1 },
                 returnNewDocument: false // returns count before increment, true doesn't seem to work
-            }, function (err, slot) {
+            }, function(err, slot) {
                 // logger.debug("slot before update=" + slot);
                 // can't handle error at this point
                 callback(null);
@@ -536,14 +512,14 @@ router.put("/:id", function (req, res) {
 });
 
 // Check In
-router.put("/:id/checkIn/:served", function (req, res) {
+router.put("/:id/checkIn/:served", function(req, res) {
     // logger.debug("req.params.served=" + req.params.served);
     var newVal = req.params.served == "no";
     Student.findByIdAndUpdate(req.params.id, {
         $set: {
             served: newVal
         }
-    }, function (err) {
+    }, function(err) {
         if (err) {
             logger.error("checkin failed: " + err.message);
             res.status(500).send(err.message);
@@ -556,11 +532,11 @@ router.put("/:id/checkIn/:served", function (req, res) {
 
 
 // Delete student
-router.delete("/:studentId", middleware.isLoggedIn, function (req, res) {
+router.delete("/:studentId", middleware.isLoggedIn, function(req, res) {
     // logger.debug("student to delete=" + req.params.studentId);
     Student.findOneAndRemove({
         _id: req.params.studentId
-    }, function (err, student) {
+    }, function(err, student) {
         if (err) {
             logger.error("Error deleting student: " + err.message);
             req.flash("error", err.message);
@@ -571,7 +547,7 @@ router.delete("/:studentId", middleware.isLoggedIn, function (req, res) {
                 Slot.findByIdAndUpdate(student.slot, {
                         $inc: { count: -1 }
                     },
-                    function (err) {
+                    function(err) {
                         if (err) {
                             logger.error("delete student, decrementing count" + err.message);
                         }
