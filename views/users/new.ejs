@@ -12,14 +12,14 @@
                     <input class="form-control" type="email" name="email">
                 </div>
                 <div class="form-group">
-                    <label>School:</label>
-                    <input class="form-control" type="text" name="school">
-                    <p>For counselor, must exactly match a school name in the database. Blank for other roles.</p>
+                    <label>School Code:</label>
+                    <input class="form-control" type="text" name="schoolCode">
+                    <p>For counselor, must match a school code in the database. Blank for other roles.</p>
                 </div>
                 <div class="form-group">
                     <label>Username:</label>
                     <input class="form-control" type="text" name="username">
-                    <p>Initial value is PIN (stored as a string). Can be changed to a non-numeric value.</p>
+                    <p>Initial value is email address. Can be changed to a unique value.</p>
                 </div>
                 <div class="form-group">
                     <label>Role:</label>
@@ -28,11 +28,6 @@
                         <option value="role_al">Assistance League</option>
                         <option class="role_wa" value="role_wa">Website administrator</option>
                     </select>
-                </div>
-                <div class="form-group">
-                    <label>PIN:</label>
-                    <input class="form-control" type="text" name="PIN">
-                    <p>Unique number assigned when user is created. Used to create/reset username/password.</p>
                 </div>
                 <div class="form-group">
                     <button type=submit class="btn btn-lg btn-primary btn-block">Submit!</button>

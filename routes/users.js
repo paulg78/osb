@@ -111,8 +111,7 @@ router.post("/", function(req, res) {
         username: shared.myTrim(req.body.username.toLowerCase()),
         name: shared.myTrim(req.body.name),
         role: shared.myTrim(req.body.role),
-        school: shared.myTrim(req.body.school),
-        PIN: parseInt(shared.myTrim(req.body.PIN), 10),
+        schoolCode: shared.myTrim(req.body.schoolCode),
         email: shared.myTrim(req.body.email)
     };
 
@@ -197,13 +196,12 @@ router.get("/stats", function(req, res) {
 router.put("/:id", function(req, res) {
     var newData = {
         name: shared.myTrim(req.body.name),
-        role: req.body.role,
+        schoolCode: shared.myTrim(req.body.schoolCode),
+        role: shared.myTrim(req.body.role),
         email: shared.myTrim(req.body.email)
     };
     if (res.locals.currentUser.role == "role_wa") { // only admin can update key fields
         newData.username = shared.myTrim(req.body.username.toLowerCase());
-        newData.PIN = parseInt(shared.myTrim(req.body.PIN), 10);
-        newData.school = shared.myTrim(req.body.school);
     }
 
     User.findByIdAndUpdate(req.params.id, {

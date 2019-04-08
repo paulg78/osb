@@ -167,15 +167,18 @@ router.post("/", function(req, res) {
 
     School.create({
         name: shared.myTrim(req.body.name),
-        quota: req.body.quota
+        quota: req.body.quota,
+        district: req.body.district,
+        schoolCode: shared.myTrim(req.body.schoolCode)
     }, function(err, newlyCreated) {
         if (err) {
             logger.error(err.errmsg);
             if (err.code == 11000) {
-                req.flash("error", req.body.name + " has already been created.");
+                req.flash("error", 'Add failed, duplicate schoolCode=' +
+                    req.body.schoolCode);
             }
             else {
-                req.flash("error", "Add school failed: " + err.message);
+                req.flash("error", "System error in add school: " + err.message);
             }
             res.redirect("back");
         }
@@ -210,8 +213,8 @@ router.get("/:id/edit", function(req, res) {
 
 router.put("/:id", function(req, res) {
     var newData = {
-        schoolCode: req.body.schoolCode,
-        name: req.body.name,
+        schoolCode: shared.myTrim(req.body.schoolCode),
+        name: shared.myTrim(req.body.name),
         district: req.body.district,
         quota: req.body.quota
     };
