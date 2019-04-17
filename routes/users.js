@@ -4,8 +4,28 @@ var User = require("../models/user");
 var middleware = require("../middleware");
 var shared = require("../shared");
 var async = require('async');
+// const https = require("https");
+const request = require("request");
 
 /* global logger */
+
+function updateMailChimp(user, schoolName, callbackFunction) {
+    logger.debug('Updating Mailchimp');
+    // If email is not in Mailchimp, add it
+    // If email is in mailchimp and is subscribed, update; otherwise do nothing
+    // https.get('https://us15.api.mailchimp.com/3.0/lists/f91c40d839')
+    request({
+        method: 'GET',
+        uri: 'https://' + process.env.MCUSER + ':' + process.env.MCAPI + '@' + process.env.MCDC + '.api.mailchimp.com/3.0/lists/' + process.env.MCLISTID + '/members/79f4a945d8a4c716427b7d9732d4429d?fields=status'
+    }, function(err, response, body) {
+        if (err) {
+            logger.debug('err=' + err);
+        }
+        logger.debug('response=' + JSON.stringify(response, null, 2));
+        logger.debug('body=' + body);
+        callbackFunction(err, response);
+    });
+}
 
 //subscribe - show form to subscribe new user to mailchimp
 router.get("/subscribe", function(req, res) {
@@ -22,16 +42,9 @@ router.post("/register", function(req, res) {
     logger.debug("In User Register");
     logger.debug("req.body.name=" + req.body.name);
     logger.debug("req.body.phone=" + req.body.phone);
-    // logger.debug("req.body.username=" + req.body.username);
     logger.debug("req.body.schoolCode=" + req.body.schoolCode);
     logger.debug("req.body.schoolName=" + req.body.schoolName);
     logger.debug("req.body.email=" + req.body.email);
-
-    if (req.body.password != req.body.confirm) {
-        logger.debug("password mismatch");
-        req.flash('error', "Password confirmation doesn't match first password entered.");
-        return res.redirect("back");
-    }
 
     var newUser = {
         username: req.body.email,
@@ -41,8 +54,6 @@ router.post("/register", function(req, res) {
         schoolCode: req.body.schoolCode,
         email: req.body.email
     };
-
-    // logger.debug("user.password before save=" + user.password);
 
     // Create a new user and save to DB
     User.create(newUser, function(err) {
@@ -60,12 +71,21 @@ router.post("/register", function(req, res) {
         }
         else {
             logger.debug("created user, username=" + newUser.username);
-            res.render('resetpw', {
-                schoolCode: newUser.schoolCode,
-                school: req.body.schoolName,
-                username: newUser.username,
-                email: newUser.email
+            updateMailChimp(newUser, req.body.schoolName, function(err, MCresult) {
+                if (err) {
+                    logger.debug("err from mailchimp");
+                }
+                res.render('users/registerComplete', {
+                    user: newUser,
+                    schoolName: req.body.schoolName
+                });
             });
+            // res.render('resetpw', {
+            //     schoolCode: newUser.schoolCode,
+            //     school: req.body.schoolName,
+            //     username: newUser.username,
+            //     email: newUser.email
+            // });
         }
     });
 });

@@ -1,0 +1,39 @@
+<% include ../partials/header %>
+    <div class="row">
+        <h1 style="text-align: center">Email Address Registered</h1>
+        <h2 style="text-align: center">For <%= schoolName %></h2>
+        <br>
+        <h4 style="text-align: center">You are now registered to use the OSB website</h4>
+        <br>
+        <div style="width: 30%; margin: 25px auto;">
+            <form action=<%= "../resetpw/" + user.username + "/" + user.schoolCode + "/" + schoolName %> method="GET">
+                <div class="form-group">
+                    <label>Email Address:</label>
+                    <%= user.email %>
+                </div>
+                <div class="form-group">
+                    <label>Username:</label>
+                    <%= user.username %>
+                </div>
+                <div class="form-group">
+                    <label>Name:</label>
+                    <%= user.name %>
+                </div>                
+                <div class="form-group">
+                    <label>Phone number:</label>
+                    <%= user.phone %>
+                </div>                
+                <div class="form-group">
+                    <label>School code:</label>
+                    <%= user.schoolCode %>
+                </div>
+                <p>Your email address has been added to the OSB mailing list, which is used <strong>only</strong> to provide information about OSB.</p>
+                <p>To login to the OSB website, you will need a password, which you can create by clicking the button below.</p>
+                <div class="form-group">
+                    <button type=submit class="btn btn-lg btn-primary btn-block">Set Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+<% include ../partials/footer %>
+

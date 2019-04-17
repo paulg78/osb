@@ -4,6 +4,7 @@ var passport = require("passport");
 var User = require("../models/user");
 var School = require("../models/school");
 var shared = require("../shared");
+
 /* global logger */
 
 //root route
