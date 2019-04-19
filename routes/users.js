@@ -6,6 +6,7 @@ var shared = require("../shared");
 var async = require('async');
 // const https = require("https");
 const request = require("request");
+const MEMBERS_URI = 'https://' + process.env.MCUSER + ':' + process.env.MCAPI + '@' + process.env.MCDC + '.api.mailchimp.com/3.0/lists/' + process.env.MCLISTID + '/members';
 
 /* global logger */
 function emailHash(email) {
@@ -47,7 +48,7 @@ router.post("/register", function(req, res) {
         checkMailChimp,
         updateMailChimp,
         createUser
-    ], function(err, status) {
+    ], function(err, MCresult, status) {
         if (err) {
             // logger.debug("user save error=" + err.message);
             if (err.message.indexOf("E11000") >= 0) { // duplicate key error
@@ -61,6 +62,7 @@ router.post("/register", function(req, res) {
         }
         res.render('users/registerComplete', {
             MCstatus: status,
+            MCresult: MCresult,
             user: newUser,
             schoolName: req.body.schoolName
         });
@@ -71,7 +73,7 @@ router.post("/register", function(req, res) {
         logger.debug('Checking Mailchimp with email=' + newUser.email);
         request({
             method: 'GET',
-            uri: 'https://' + process.env.MCUSER + ':' + process.env.MCAPI + '@' + process.env.MCDC + '.api.mailchimp.com/3.0/lists/' + process.env.MCLISTID + '/members/' + emailHash(newUser.email) + '?fields=status'
+            uri: MEMBERS_URI + '/' + emailHash(newUser.email) + '?fields=status'
         }, function(err, response, body) {
             if (err) {
                 logger.error(err);
@@ -91,7 +93,7 @@ router.post("/register", function(req, res) {
                 logger.debug('not subscribed case');
                 request({
                     method: 'POST',
-                    uri: 'https://' + process.env.MCUSER + ':' + process.env.MCAPI + '@' + process.env.MCDC + '.api.mailchimp.com/3.0/lists/' + process.env.MCLISTID + '/members',
+                    uri: MEMBERS_URI,
                     body: {
                         email_address: newUser.email,
                         status: 'subscribed'
@@ -100,37 +102,38 @@ router.post("/register", function(req, res) {
                 }, function(err, response, body) {
                     if (err) {
                         logger.error(err);
-                        callback(null, 'error');
+                        callback(null, 'fail', 'error');
                     }
                     else {
-                        callback(null, status);
+                        callback(null, 'success', status);
                     }
                 });
                 break;
             case 'subscribed':
                 logger.debug('subscribed case');
-                callback(null, status);
+                callback(null, 'success', status);
                 break;
             case 'unsubscribed':
                 logger.debug('unsubscribed case');
-                callback(null, status);
+                callback(null, 'success', status);
                 break;
             case 'cleaned':
                 logger.debug('cleaned case');
-                callback(null, status);
+                callback(null, 'none', status);
                 break;
             case 'error':
                 logger.debug('error case');
-                callback(null, status);
+                callback(null, 'none', status);
                 break;
 
             default:
-                logger.debug('unexpected case');
-                callback(null, status);
+                logger.error('updateMailChimp: unexpected case');
+                callback(null, 'none', status);
         }
     }
 
-    function createUser(status, callback) {
+    function createUser(MCresult, status, callback) {
+        logger.debug('MCresult=' + MCresult);
         // Create a new user in DB
         User.create(newUser, function(err) {
             if (err) {
@@ -138,7 +141,7 @@ router.post("/register", function(req, res) {
             }
             else {
                 logger.debug("created user, username=" + newUser.username);
-                callback(null, status);
+                callback(null, MCresult, status);
             }
         });
     }
