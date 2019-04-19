@@ -27,7 +27,13 @@
                     <label>School code:</label>
                     <%= user.schoolCode %>
                 </div>
-                <p>Your email address has been added to the OSB mailing list, which is used <strong>only</strong> to provide information about OSB.</p>
+                <% if (MCresult == 'success'){ %>
+                    <% if (MCstatus == 404){ %>                
+                        <p>Your email address has been added to the OSB mailing list, which is used <strong>only</strong> to provide information about OSB.</p>
+                    <% } else { %>
+                        <p>Your email address is subscribed to the OSB mailing list, which is used <strong>only</strong> to provide information about OSB.</p>
+                    <% } %>                    
+                <% } %>
                 <p>To login to the OSB website, you will need a password, which you can create by clicking the button below.</p>
                 <div class="form-group">
                     <button type=submit class="btn btn-lg btn-primary btn-block">Set Password</button>

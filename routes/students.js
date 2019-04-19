@@ -537,7 +537,7 @@ router.put("/:id/checkIn/:served", function(req, res) {
 // Delete student
 router.delete("/:studentId", middleware.isLoggedIn, function(req, res) {
     // logger.debug("student to delete=" + req.params.studentId);
-    Student.findOneAndRemove({
+    Student.findOneAndDelete({
         _id: req.params.studentId
     }, function(err, student) {
         if (err) {

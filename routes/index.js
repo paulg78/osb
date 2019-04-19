@@ -105,8 +105,14 @@ router.get('/register', function(req, res) {
 router.get('/registerData', function(req, res) {
     logger.debug("req.query.email=" + req.query.email);
     logger.debug("req.query.schoolCode=" + req.query.schoolCode);
-    // todo: verify a valid email address
-    // see: https://stackoverflow.com/questions/18022365/mongoose-validate-email-syntax
+
+    var email = req.query.email.toLowerCase();
+    var tester = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/; // copied from email-validator package code
+
+    if (!tester.test(email)) {
+        req.flash("error", "Please check email address; " + email + " does not look valid.");
+        return res.redirect('backToregister' + "/" + email + "/" + req.query.schoolCode);
+    }
 
     // find/verify school code
     School.findOne({
@@ -125,11 +131,11 @@ router.get('/registerData', function(req, res) {
         logger.debug("school=" + school);
         // verify user not yet registered
         User.findOne({
-            email: req.query.email.toLowerCase(),
+            email: email,
             schoolCode: req.query.schoolCode
         }, function(err, user) {
             if (err) {
-                var errmsg = "System error on user lookup: " + req.query.email + "-" + req.query.schoolCode;
+                var errmsg = "System error on user lookup: " + email + "-" + req.query.schoolCode;
                 req.flash('error', errmsg);
                 logger.error(errmsg);
                 return res.redirect('back');
@@ -137,20 +143,14 @@ router.get('/registerData', function(req, res) {
             if (user == null) {
                 res.render('registerData', {
                     schoolCode: req.query.schoolCode,
-                    email: req.query.email,
+                    email: email,
                     schoolName: school.name
                 });
             }
             else {
-                req.flash("error", req.query.email + " is already registered with School Code " + req.query.schoolCode); // doesn't work with res.render
+                req.flash("error", email + " is already registered with School Code " + req.query.schoolCode); // flash doesn't work with res.render
                 // res.redirect("back");  // loses form content
-                // res.render('register', { message: req.flash('error') }); // loses the err msg
-                // res.render('register', {
-                //     email: req.query.email,
-                //     schoolCode: req.query.schoolCode,
-                //     errmsg: req.query.email + " is already registered with School Code " + req.query.schoolCode
-                // });
-                res.redirect('backToregister' + "/" + req.query.email + "/" + req.query.schoolCode);
+                res.redirect('backToregister' + "/" + email + "/" + req.query.schoolCode);
             }
         });
     });
@@ -162,7 +162,6 @@ router.get('/backToregister/:email/:schoolCode', function(req, res) {
     res.render('register', {
         email: req.params.email,
         schoolCode: req.params.schoolCode,
-        errmsg: req.params.email + " is already registered with School Code " + req.params.schoolCode
     });
 });
 

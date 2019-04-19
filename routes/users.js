@@ -10,7 +10,7 @@ const MEMBERS_URI = 'https://' + process.env.MCUSER + ':' + process.env.MCAPI + 
 
 /* global logger */
 function emailHash(email) {
-    var h = require('crypto').createHash('md5').update(email.toLowerCase(), 'utf8').digest('hex');
+    var h = require('crypto').createHash('md5').update(email, 'utf8').digest('hex');
     logger.debug('hash value=' + h);
     return h;
 }
@@ -41,7 +41,7 @@ router.post("/register", function(req, res) {
         phone: shared.myTrim(req.body.phone),
         role: "role_sc",
         schoolCode: req.body.schoolCode,
-        email: req.body.email
+        email: shared.myTrim(req.body.email).toLowerCase()
     };
 
     async.waterfall([
@@ -71,16 +71,21 @@ router.post("/register", function(req, res) {
 
     function checkMailChimp(callback) {
         logger.debug('Checking Mailchimp with email=' + newUser.email);
-        request({
-            method: 'GET',
-            uri: MEMBERS_URI + '/' + emailHash(newUser.email) + '?fields=status'
-        }, function(err, response, body) {
+        request.get({
+            // method: 'GET',
+            uri: MEMBERS_URI + '/' + emailHash(newUser.email) + '?fields=status',
+            json: true,
+            timeout: 1500
+        }, function(err, response) {
+            logger.debug('JSON.stringify(response)=' + JSON.stringify(response));
             if (err) {
                 logger.error(err);
                 callback(null, 'error');
             }
             else {
-                callback(null, JSON.parse(body).status);
+                // logger.debug('status from response=' + JSON.parse(response.body.status));
+                // callback(null, JSON.parse(response.body).status);
+                callback(null, response.body.status);
             }
         });
     }
@@ -89,20 +94,33 @@ router.post("/register", function(req, res) {
     function updateMailChimp(status, callback) {
         logger.debug('status=' + status);
         switch (status) {
-            case 404:
+            case 404: // not on list
+                // case 'subscribed':
+                // case 'unsubscribed':
                 logger.debug('not subscribed case');
-                request({
-                    method: 'POST',
+                request.post({
+                    // method: 'POST',
                     uri: MEMBERS_URI,
                     body: {
                         email_address: newUser.email,
-                        status: 'subscribed'
+                        status: 'subscribed',
+                        merge_fields: {
+                            NAME: newUser.name,
+                            SCHOOLCODE: newUser.schoolCode,
+                            SCHOOLNAME: req.body.schoolName
+                        }
                     },
-                    json: true
-                }, function(err, response, body) {
+                    json: true,
+                    timeout: 1500
+                }, function(err, response) {
+                    logger.debug('JSON.stringify(response)=' + JSON.stringify(response));
                     if (err) {
-                        logger.error(err);
-                        callback(null, 'fail', 'error');
+                        logger.error('email=' + newUser.email + ', ' + err);
+                        callback(null, 'fail', status);
+                    }
+                    else if (response.statusCode != 200) {
+                        logger.error('email=' + newUser.email + ', statusCode=' + response.statusCode + ', title=' + response.body.title + ', ' + response.body.detail);
+                        callback(null, 'fail', status);
                     }
                     else {
                         callback(null, 'success', status);
@@ -121,7 +139,7 @@ router.post("/register", function(req, res) {
                 logger.debug('cleaned case');
                 callback(null, 'none', status);
                 break;
-            case 'error':
+            case 'error': // MailChimp check failed
                 logger.debug('error case');
                 callback(null, 'none', status);
                 break;
@@ -137,7 +155,7 @@ router.post("/register", function(req, res) {
         // Create a new user in DB
         User.create(newUser, function(err) {
             if (err) {
-                callback(err, status);
+                callback(err, MCresult, status);
             }
             else {
                 logger.debug("created user, username=" + newUser.username);
@@ -299,7 +317,7 @@ router.put("/:id", function(req, res) {
 // Delete user
 router.delete("/:userId", middleware.isLoggedIn, function(req, res) {
     // logger.debug("user to delete=" + req.params.userId);
-    User.findOneAndRemove({
+    User.findOneAndDelete({
         _id: req.params.userId
     }, function(err, user) {
         if (err) {

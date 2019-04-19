@@ -5,9 +5,6 @@
         <div style="width: 50%; margin: 25px auto;">
             <form action="/registerData" method="get">
                 <div class="form-group">
-                    <% if (errmsg != '') { %>
-                            <h4><span style="color: red"><%= errmsg %></span></h4>
-                    <% } %>
                     <h4>Email address:</h4>
                     <input class="form-control" type="email" name="email" value="<%= email %>" aria-describedby="helpEmail">
                     <span id="helpEmail" class="help-block">Enter the school email address you are using with Operation School Bell.</span>
