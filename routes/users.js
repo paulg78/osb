@@ -8,24 +8,12 @@ var async = require('async');
 const request = require("request");
 
 /* global logger */
-
-function updateMailChimp(user, schoolName, callbackFunction) {
-    logger.debug('Updating Mailchimp');
-    // If email is not in Mailchimp, add it
-    // If email is in mailchimp and is subscribed, update; otherwise do nothing
-    // https.get('https://us15.api.mailchimp.com/3.0/lists/f91c40d839')
-    request({
-        method: 'GET',
-        uri: 'https://' + process.env.MCUSER + ':' + process.env.MCAPI + '@' + process.env.MCDC + '.api.mailchimp.com/3.0/lists/' + process.env.MCLISTID + '/members/79f4a945d8a4c716427b7d9732d4429d?fields=status'
-    }, function(err, response, body) {
-        if (err) {
-            logger.debug('err=' + err);
-        }
-        logger.debug('response=' + JSON.stringify(response, null, 2));
-        logger.debug('body=' + body);
-        callbackFunction(err, response);
-    });
+function emailHash(email) {
+    var h = require('crypto').createHash('md5').update(email.toLowerCase(), 'utf8').digest('hex');
+    logger.debug('hash value=' + h);
+    return h;
 }
+
 
 //subscribe - show form to subscribe new user to mailchimp
 router.get("/subscribe", function(req, res) {
@@ -55,39 +43,106 @@ router.post("/register", function(req, res) {
         email: req.body.email
     };
 
-    // Create a new user and save to DB
-    User.create(newUser, function(err) {
+    async.waterfall([
+        checkMailChimp,
+        updateMailChimp,
+        createUser
+    ], function(err, status) {
         if (err) {
             // logger.debug("user save error=" + err.message);
             if (err.message.indexOf("E11000") >= 0) { // duplicate key error
-                req.flash('error', "Sorry, that username is already in use. Please make up another one.");
-                return res.redirect("back");
+                req.flash('error', "Sorry, that username is already in use. Please make up another one and try again.");
             }
             else {
                 req.flash('error', "System error on user create.");
                 logger.error("System error on user create: " + err.message);
-                return res.redirect("back");
             }
+            return res.redirect("back");
         }
-        else {
-            logger.debug("created user, username=" + newUser.username);
-            updateMailChimp(newUser, req.body.schoolName, function(err, MCresult) {
-                if (err) {
-                    logger.debug("err from mailchimp");
-                }
-                res.render('users/registerComplete', {
-                    user: newUser,
-                    schoolName: req.body.schoolName
-                });
-            });
-            // res.render('resetpw', {
-            //     schoolCode: newUser.schoolCode,
-            //     school: req.body.schoolName,
-            //     username: newUser.username,
-            //     email: newUser.email
-            // });
-        }
+        res.render('users/registerComplete', {
+            MCstatus: status,
+            user: newUser,
+            schoolName: req.body.schoolName
+        });
     });
+
+
+    function checkMailChimp(callback) {
+        logger.debug('Checking Mailchimp with email=' + newUser.email);
+        request({
+            method: 'GET',
+            uri: 'https://' + process.env.MCUSER + ':' + process.env.MCAPI + '@' + process.env.MCDC + '.api.mailchimp.com/3.0/lists/' + process.env.MCLISTID + '/members/' + emailHash(newUser.email) + '?fields=status'
+        }, function(err, response, body) {
+            if (err) {
+                logger.error(err);
+                callback(null, 'error');
+            }
+            else {
+                callback(null, JSON.parse(body).status);
+            }
+        });
+    }
+
+
+    function updateMailChimp(status, callback) {
+        logger.debug('status=' + status);
+        switch (status) {
+            case 404:
+                logger.debug('not subscribed case');
+                request({
+                    method: 'POST',
+                    uri: 'https://' + process.env.MCUSER + ':' + process.env.MCAPI + '@' + process.env.MCDC + '.api.mailchimp.com/3.0/lists/' + process.env.MCLISTID + '/members',
+                    body: {
+                        email_address: newUser.email,
+                        status: 'subscribed'
+                    },
+                    json: true
+                }, function(err, response, body) {
+                    if (err) {
+                        logger.error(err);
+                        callback(null, 'error');
+                    }
+                    else {
+                        callback(null, status);
+                    }
+                });
+                break;
+            case 'subscribed':
+                logger.debug('subscribed case');
+                callback(null, status);
+                break;
+            case 'unsubscribed':
+                logger.debug('unsubscribed case');
+                callback(null, status);
+                break;
+            case 'cleaned':
+                logger.debug('cleaned case');
+                callback(null, status);
+                break;
+            case 'error':
+                logger.debug('error case');
+                callback(null, status);
+                break;
+
+            default:
+                logger.debug('unexpected case');
+                callback(null, status);
+        }
+    }
+
+    function createUser(status, callback) {
+        // Create a new user in DB
+        User.create(newUser, function(err) {
+            if (err) {
+                callback(err, status);
+            }
+            else {
+                logger.debug("created user, username=" + newUser.username);
+                callback(null, status);
+            }
+        });
+    }
+
 });
 
 
