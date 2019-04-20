@@ -64,6 +64,7 @@ router.post("/register", function(req, res) {
         res.render('users/registerComplete', {
             MCstatus: status,
             MCresult: MCresult,
+            MCsubscribe: process.env.MCSUBSCRIBE,
             user: newUser,
             schoolName: req.body.schoolName
         });

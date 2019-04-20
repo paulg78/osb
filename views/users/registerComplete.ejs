@@ -33,7 +33,11 @@
                     <% } else { %>
                         <p>Your email address is subscribed to the OSB mailing list, which is used <strong>only</strong> to provide information about OSB.</p>
                     <% } %>                    
-                <% } %>
+                <% } else { %>
+                    <% if (MCstatus == 'unsubscribed'){ %>
+                        <p><span style="color: red;">Your email address is no longer subscribed to the OSB mailing list.</span> This mailing list is used <strong>only</strong> to provide information about OSB. You may resubscribe at: <a href="<%= MCsubscribe %>" target="_blank">MailChimp subscribe link</a></p>                        
+                    <% } %>                    
+                <% } %>                        
                 <p>To login to the OSB website, you will need a password, which you can create by clicking the button below.</p>
                 <div class="form-group">
                     <button type=submit class="btn btn-lg btn-primary btn-block">Set Password</button>
