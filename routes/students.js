@@ -56,7 +56,7 @@ router.get("/", middleware.isLoggedIn,
                 }
 
                 logger.debug("qrySchool=" + qrySchool);
-                logger.debug("qrySchool.students=" + qrySchool.students);
+                // logger.debug("qrySchool.students=" + qrySchool.students);
                 var today = new Date();
                 var mm = (today.getMonth() + 1).toString();
                 if (mm.length == 1) {

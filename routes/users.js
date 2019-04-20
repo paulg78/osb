@@ -7,12 +7,11 @@ var async = require('async');
 // const https = require("https");
 const request = require("request");
 const MEMBERS_URI = 'https://' + process.env.MCUSER + ':' + process.env.MCAPI + '@' + process.env.MCDC + '.api.mailchimp.com/3.0/lists/' + process.env.MCLISTID + '/members';
+const MCtimeout = 5000;
 
 /* global logger */
 function emailHash(email) {
-    var h = require('crypto').createHash('md5').update(email, 'utf8').digest('hex');
-    logger.debug('hash value=' + h);
-    return h;
+    return require('crypto').createHash('md5').update(email, 'utf8').digest('hex');
 }
 
 
@@ -44,6 +43,8 @@ router.post("/register", function(req, res) {
         email: shared.myTrim(req.body.email).toLowerCase()
     };
 
+    const ehash = emailHash(newUser.email);
+
     async.waterfall([
         checkMailChimp,
         updateMailChimp,
@@ -72,19 +73,16 @@ router.post("/register", function(req, res) {
     function checkMailChimp(callback) {
         logger.debug('Checking Mailchimp with email=' + newUser.email);
         request.get({
-            // method: 'GET',
-            uri: MEMBERS_URI + '/' + emailHash(newUser.email) + '?fields=status',
+            uri: MEMBERS_URI + '/' + ehash + '?fields=status',
             json: true,
-            timeout: 1500
+            timeout: MCtimeout
         }, function(err, response) {
-            logger.debug('JSON.stringify(response)=' + JSON.stringify(response));
+            // logger.debug('JSON.stringify(response)=' + JSON.stringify(response));
             if (err) {
                 logger.error(err);
                 callback(null, 'error');
             }
             else {
-                // logger.debug('status from response=' + JSON.parse(response.body.status));
-                // callback(null, JSON.parse(response.body).status);
                 callback(null, response.body.status);
             }
         });
@@ -94,13 +92,11 @@ router.post("/register", function(req, res) {
     function updateMailChimp(status, callback) {
         logger.debug('status=' + status);
         switch (status) {
-            case 404: // not on list
-                // case 'subscribed':
-                // case 'unsubscribed':
-                logger.debug('not subscribed case');
-                request.post({
-                    // method: 'POST',
-                    uri: MEMBERS_URI,
+            case 404: // not on MC list
+            case 'subscribed':
+            case 'unsubscribed':
+                request.put({
+                    uri: MEMBERS_URI + '/' + ehash,
                     body: {
                         email_address: newUser.email,
                         status: 'subscribed',
@@ -111,9 +107,9 @@ router.post("/register", function(req, res) {
                         }
                     },
                     json: true,
-                    timeout: 1500
+                    timeout: MCtimeout
                 }, function(err, response) {
-                    logger.debug('JSON.stringify(response)=' + JSON.stringify(response));
+                    // logger.debug('JSON.stringify(response)=' + JSON.stringify(response));
                     if (err) {
                         logger.error('email=' + newUser.email + ', ' + err);
                         callback(null, 'fail', status);
@@ -127,25 +123,10 @@ router.post("/register", function(req, res) {
                     }
                 });
                 break;
-            case 'subscribed':
-                logger.debug('subscribed case');
-                callback(null, 'success', status);
-                break;
-            case 'unsubscribed':
-                logger.debug('unsubscribed case');
-                callback(null, 'success', status);
-                break;
-            case 'cleaned':
-                logger.debug('cleaned case');
-                callback(null, 'none', status);
-                break;
-            case 'error': // MailChimp check failed
-                logger.debug('error case');
-                callback(null, 'none', status);
-                break;
 
-            default:
-                logger.error('updateMailChimp: unexpected case');
+            case 'cleaned': // invalid email address on MC
+            case 'error': // MailChimp check failed
+            default: // unexpected value
                 callback(null, 'none', status);
         }
     }
@@ -207,7 +188,8 @@ router.post("/", function(req, res) {
         name: shared.myTrim(req.body.name),
         role: shared.myTrim(req.body.role),
         schoolCode: shared.myTrim(req.body.schoolCode),
-        email: shared.myTrim(req.body.email)
+        email: shared.myTrim(req.body.email),
+        phone: shared.myTrim(req.body.phone)
     };
 
     // Create a new user and save to DB
@@ -293,7 +275,8 @@ router.put("/:id", function(req, res) {
         name: shared.myTrim(req.body.name),
         schoolCode: shared.myTrim(req.body.schoolCode),
         role: shared.myTrim(req.body.role),
-        email: shared.myTrim(req.body.email)
+        email: shared.myTrim(req.body.email),
+        phone: shared.myTrim(req.body.phone)
     };
     if (res.locals.currentUser.role == "role_wa") { // only admin can update key fields
         newData.username = shared.myTrim(req.body.username.toLowerCase());

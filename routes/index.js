@@ -81,11 +81,10 @@ router.get('/requestpwresetData', function(req, res) {
             }
             else {
                 logger.debug("in requestpwreset user=" + user);
-                logger.debug('user.schoolCode=' + user.schoolCode);
                 res.render('resetpw', {
                     schoolCode: req.query.schoolCode,
                     username: user.username,
-                    school: user.school.name
+                    school: user.school ? user.school.name : 'none'
                 });
             }
         });
@@ -173,7 +172,7 @@ router.post('/register', function(req, res) {
     User.findOne({
         email: req.body.email.toLowerCase(),
         schoolCode: req.body.schoolCode
-    }, { username: 1, school: 1 }, function(err, user) {
+    }, { username: 1 }, function(err, user) {
         if (err) {
             req.flash('error', "System error on user lookup " + req.body.email + "-" + req.body.schoolCode);
             logger.error("System error on user lookup " + req.body.email + "-" + req.body.schoolCode);
@@ -218,7 +217,7 @@ router.post('/register', function(req, res) {
 });
 
 
-// show username/password reset form (with school for counselors)
+// show username/password reset form
 // used to re-render reset form with an error message
 router.get('/resetpw/:username/:schoolCode/:school', function(req, res) {
     res.render('resetpw', {
@@ -229,70 +228,64 @@ router.get('/resetpw/:username/:schoolCode/:school', function(req, res) {
 });
 
 
-// show username/password reset form (without school for non-counselor roles)
-// used to re-render reset form with an error message
-router.get('/resetpw/:username/:schoolCode', function(req, res) {
-    res.render('resetpw', {
-        schoolCode: req.params.schoolCode,
-        username: req.params.username,
-        school: null
-    });
-});
-
-
 // reset username/password
 router.post('/resetpw', function(req, res) {
-    logger.debug("req.body.password=" + req.body.password);
-    logger.debug("req.body.confirm=" + req.body.confirm);
+    // logger.debug("req.body.password=" + req.body.password);
+    // logger.debug("req.body.confirm=" + req.body.confirm);
     logger.debug("req.body.username=" + req.body.username);
     logger.debug("req.body.newUsername=" + req.body.newUsername);
     logger.debug("req.body.schoolCode=" + req.body.schoolCode);
 
     User.findOne({
-        username: req.body.username
-    }, { username: 1 }, function(err, user) {
-        if (err) {
-            var errmsg = 'System error finding user; username=' + req.body.username;
-            logger.error(errmsg + ";" + err.message);
-            req.flash('error', errmsg);
-            return res.redirect('/requestpwreset');
-        }
-        if (!user) {
-            var errmsg = 'System error user not found; username=' + req.body.username;
-            logger.error(errmsg);
-            req.flash('error', errmsg);
-            return res.redirect('/requestpwreset');
-        }
-
-        if (req.body.password != req.body.confirm) {
-            logger.debug("password mismatch");
-            req.flash('error', "Password confirmation doesn't match first password entered.");
-            return res.redirect("/resetpw/" + user.username + "/" + req.body.schoolCode + "/" + user.school);
-        }
-        user.username = req.body.newUsername.toLowerCase();
-        user.password = req.body.password;
-        // logger.debug("user.password before save=" + user.password);
-
-        user.save(function(err) {
+            username: req.body.username
+        }, { username: 1, schoolCode: 1 })
+        .populate({ path: 'school', select: 'name' })
+        .exec(function(err, user) {
             if (err) {
-                // logger.debug("user save error=" + err.message);
-                if (err.message.indexOf("E11000") >= 0) { // duplicate key error
-                    req.flash('error', "Sorry, that username is already in use. Please make up another one.");
-                    return res.redirect("/resetpw/" + user.username + "/" + req.body.schoolCode + "/" + user.school);
+                var errmsg = 'System error finding user; username=' + req.body.username;
+                logger.error(errmsg + ";" + err.message);
+                req.flash('error', errmsg);
+                return res.redirect('/requestpwreset');
+            }
+            if (!user) {
+                errmsg = 'System error user not found; username=' + req.body.username;
+                logger.error(errmsg);
+                req.flash('error', errmsg);
+                return res.redirect('/requestpwreset');
+            }
+            // logger.debug('school name=' + (user.school ? user.school.name : "none"));
+
+            var resetpwRoute = "/resetpw/" + user.username + "/" + req.body.schoolCode + "/" + (user.school ? user.school.name : "none");
+            // logger.debug('resetpwRoute=' + resetpwRoute);
+
+            if (req.body.password != req.body.confirm) {
+                logger.debug("password mismatch");
+                req.flash('error', "Password confirmation doesn't match first password entered.");
+                return res.redirect(resetpwRoute);
+            }
+            user.username = req.body.newUsername.toLowerCase();
+            user.password = req.body.password;
+            // logger.debug("user.password before save=" + user.password);
+
+            user.save(function(err) {
+                if (err) {
+                    // logger.debug("user save error=" + err.message);
+                    if (err.message.indexOf("E11000") >= 0) { // duplicate key error
+                        req.flash('error', "Sorry, that username is already in use. Please make up another one.");
+                    }
+                    else {
+                        req.flash('error', "Error--new password didn't save.");
+                        logger.error("System error on user username/password save: " + err.message);
+                    }
+                    res.redirect(resetpwRoute);
                 }
                 else {
-                    req.flash('error', "Error--new password didn't save.");
-                    logger.error("System error on user username/password save: " + err.message);
-                    return res.redirect("/resetpw/" + user.username + "/" + req.body.schoolCode + "/" + user.school);
+                    // logger.debug("user.password after save=" + user.password);
+                    req.flash('success', 'Success! Your new username/password has been saved.');
+                    res.redirect('/login');
                 }
-            }
-            else {
-                // logger.debug("user.password after save=" + user.password);
-                req.flash('success', 'Success! Your new username/password has been saved.');
-                res.redirect('/login');
-            }
+            });
         });
-    });
 });
 
 module.exports = router;

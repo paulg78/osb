@@ -10,7 +10,6 @@ const studentSchema = new mongoose.Schema({
     grade: {
         type: String
     },
-    // school: String, // no longer used; was school name
     schoolCode: { // used as a key to school
         type: String
     },

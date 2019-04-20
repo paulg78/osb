@@ -12,10 +12,11 @@ var UserSchema = new mongoose.Schema({
     password: {
         type: String
     },
-    email: String, // email address
-    // PIN: { // no longer used
-    //     type: Number
-    // },
+    email: String, // email address + school code are a unique key
+    schoolCode: { // used with email address for registration and username/pw reset
+        // also is a key to school
+        type: String
+    },
     role: {
         type: String,
         required: true
@@ -23,10 +24,6 @@ var UserSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true
-    },
-    schoolCode: { // used with email address for registration and username/pw reset
-        // also is a key to school
-        type: String
     },
     phone: String
 });
