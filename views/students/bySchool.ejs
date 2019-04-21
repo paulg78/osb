@@ -87,7 +87,7 @@ if (qrySchool.students) {
             <td><%= student.fname %></td>
             <td><%= student.lname %></td>
             <td><%= student.grade %></td>
-            <% if (student.slot != null) { %>
+            <% if (student.slot && student.slot.sdate) { %>
                 <td><%= dateString(student.slot.sdate) %></td>
             <% } else { %>
                 <td></td>

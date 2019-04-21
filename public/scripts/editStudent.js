@@ -27,7 +27,7 @@ function getAvailDates() {
     $.ajax({
         url: "/slots/avail",
         type: 'GET',
-        success: function (slotsJson) {
+        success: function(slotsJson) {
             // console.log("slots returned=" + slotsJson + ".");
             var dateSel = document.getElementById('dateSched');
             var slots = JSON.parse(slotsJson);
@@ -48,10 +48,10 @@ function getAvailDates() {
     // console.log("finished getAvailDates");
 }
 
-$("#dateSched").on('change', function (e) {
+$("#dateSched").on('change', function(e) {
     var timeSel = document.getElementById('timeSched');
     if (this.selectedIndex > 0) { // selected a real date
-        console.log("changed date to " + this.value);
+        // console.log("changed date to " + this.value);
         var slots = JSON.parse($("#slotsAvail").text());
         var i, d, md;
         var sel = new Date(this.value);
@@ -62,7 +62,7 @@ $("#dateSched").on('change', function (e) {
             d = new Date(slots[i].sdate);
             md = d.getMonth() + "-" + d.getDate();
             if (md == selmd) {
-                timeSel.add(new Option(timeString(new Date(slots[i].sdate)), slots[i].sdate));
+                timeSel.add(new Option(timeString(new Date(slots[i].sdate)) + ' - ' + (slots[i].max - slots[i].count), slots[i].sdate));
             }
         }
         timeSel.disabled = false;
@@ -73,7 +73,7 @@ $("#dateSched").on('change', function (e) {
     timeSel.selectedIndex = 0;
 });
 
-$("#unschedCB").on('change', function (e) {
+$("#unschedCB").on('change', function(e) {
     // console.log("unsched CB changed to " + this.checked);
     if (this.checked) {
         $("#schedForm").hide();
@@ -83,13 +83,13 @@ $("#unschedCB").on('change', function (e) {
     }
 });
 
-$("#delStudBtn").on('click', function (e) {
+$("#delStudBtn").on('click', function(e) {
     if (confirm("Ready to delete " + $("#fname").val() + " " + $("#lname").val() + ".  Click Cancel or OK.") != true) {
         e.preventDefault();
     }
 });
 
-$("#saveStudBtn").on('click', function (e) {
+$("#saveStudBtn").on('click', function(e) {
     this.disabled = true;
     if ($("#fname").val().trim() == "" || $("#lname").val().trim() == "") {
         alert("First and last name are required fields");

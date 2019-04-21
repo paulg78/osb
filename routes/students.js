@@ -42,7 +42,11 @@ router.get("/", middleware.isLoggedIn,
         School.findOne({
                 schoolCode: res.locals.currentUser.schoolCode
             }, { _id: 0, name: 1, quota: 1, schoolCode: 1 })
-            .populate({ path: 'students' })
+
+            // A select like this works but schoolCode, the foreign key is automatically included
+            // .populate({ path: 'students', select: 'fname grade slot served', populate: { path: 'slot', select: 'sdate' } })
+
+            .populate({ path: 'students', populate: { path: 'slot', select: 'sdate' } })
             .exec(function(err, qrySchool) {
                 if (err) {
                     logger.error(err.errmsg);
@@ -55,7 +59,7 @@ router.get("/", middleware.isLoggedIn,
                     return res.redirect("back");
                 }
 
-                logger.debug("qrySchool=" + qrySchool);
+                // logger.debug("qrySchool=" + qrySchool);
                 // logger.debug("qrySchool.students=" + qrySchool.students);
                 var today = new Date();
                 var mm = (today.getMonth() + 1).toString();

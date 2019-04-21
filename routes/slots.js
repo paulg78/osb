@@ -7,13 +7,14 @@ var middleware = require("../middleware");
 
 
 // Return list of available slots
-router.get("/avail", function (req, res) {
+router.get("/avail", function(req, res) {
     // logger.debug("today=" + new Date());
     // subtract 6 hours to account for mountain time
     var qry = "this.sdate > Date.now() - 21600000 && this.count < this.max";
     // logger.debug("avail slots qry=" + qry);
-    Slot.find({ $where: qry }, { _id: 0, sdate: 1 }).hint("sdate_1")
-        .exec(function (err, slots) {
+    Slot.find({ $where: qry }, { _id: 0, sdate: 1, count: 1, max: 1 }).hint("sdate_1")
+        // .populate('remaining')
+        .exec(function(err, slots) {
             if (err) {
                 logger.error("error finding avail slots: " + err.message);
                 res.status(500).send(err.message);
@@ -27,7 +28,7 @@ router.get("/avail", function (req, res) {
 
 
 // in slots, find and optionally fix counts that don't match actual number of students scheduled
-router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function (req, res) {
+router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function(req, res) {
     if (res.locals.currentUser.role != 'role_wa') {
         return res.redirect("back");
     }
@@ -50,7 +51,7 @@ router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function (req, res) {
                 _id: 1
             }
         }])
-        .exec(function (err, schedStudCounts) {
+        .exec(function(err, schedStudCounts) {
             if (err) {
                 logger.error("checkCounts, student aggregate " + err.message);
             }
@@ -60,7 +61,7 @@ router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function (req, res) {
                     .sort({
                         _id: 1,
                     })
-                    .exec(function (err, slots) {
+                    .exec(function(err, slots) {
                         if (err) {
                             logger.error("checkCounts, finding slots " + err.message);
                         }
@@ -87,7 +88,7 @@ router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function (req, res) {
                                         Slot.findByIdAndUpdate(slots[i]._id.toString(), {
                                                 $set: { count: studentCount }
                                             },
-                                            function (err) {
+                                            function(err) {
                                                 if (err) {
                                                     logger.error("checkCounts, updating slot" + err.message);
                                                 }
