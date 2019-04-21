@@ -14,25 +14,6 @@
     font-weight: bold;
 }
 
-.addStudBtn {
-    color: black;
-    background-color: green;
-    border-style: none;
-    font-weight: bold;
-    font-size: 1.25em;
-    padding: 0px 20px;
-    float: right;
-}
-
-.remStudBtn {
-    color: red;
-    font-weight: bold;
-    font-size: 1.25em;
-    padding: 2px 20px;
-    border-width: 1px;
-    border-color: red;
-}
-
 .role_sc,
 .role_al,
 .role_wa {

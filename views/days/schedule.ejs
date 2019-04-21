@@ -29,7 +29,7 @@ function timeString(d) {
                         <span class="availDelim">(</span>
                         <span class="availSlots"><%=remaining%></span>
                         <span class="availDelim">)</span>
-                    <ul class="list-group schedList">
+                    <ul class="list-group">
                         <% sched[i].students.forEach(function(student){ %>
                                 <li class="list-group-item schedStud">
                                     <span name="studentText"><%= student.fullName + "(" + student.grade + ")" %></span>
