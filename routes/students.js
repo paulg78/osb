@@ -145,7 +145,7 @@ router.get("/stats", middleware.isLoggedIn, function(req, res) {
                 $group: {
                     _id: null,
                     fsa: {
-                        $sum: { $subtract: ["$max", "$count"] }
+                        $sum: "$avCnt"
                     }
                 }
             }])
@@ -401,27 +401,27 @@ router.put("/:id", function(req, res) {
         // logger.debug("in updateNewSlot");
         if (req.body.timeSched) { // there is a new slot
             Slot.findOneAndUpdate({ sdate: new Date(req.body.timeSched) }, {
-                $inc: { count: 1 }
+                $inc: { avCnt: -1 }
             }, {
-                projection: { _id: 1, count: 1, max: 1 },
-                returnNewDocument: false // returns count before increment, true doesn't seem to work
+                projection: { _id: 1, avCnt: 1 },
+                returnNewDocument: false // returns avCnt before decrement, true doesn't seem to work
             }, function(err, slot) {
                 // logger.debug("slot before update=" + slot);
                 if (err) {
                     callback(err);
                 }
                 else {
-                    if (slot.count >= slot.max) { // slot is over-filled (count is one less than actual)
+                    if (slot.avCnt <= 0) { // slot is over-filled (avCnt is one more than actual)
                         // restore original since slot is full and student won't be added
                         Slot.findByIdAndUpdate(slot._id, {
-                                $inc: { count: -1 }
+                                $inc: { avCnt: 1 }
                             },
                             function(err) {
                                 if (err) {
                                     callback(err);
                                 }
                                 else {
-                                    console.log("overfilled slot._id=" + slot._id + "; count=" + slot.count + "; max=" + slot.max);
+                                    console.log("overfilled slot._id=" + slot._id + "; avCnt=" + slot.avCnt);
                                     callback({
                                         message: "Selected slot (" +
                                             new Date(req.body.timeSched).
@@ -466,7 +466,7 @@ router.put("/:id", function(req, res) {
                         if (newSlotId) { // student was added to new slot
                             // logger.debug("undoing slot update");
                             Slot.findByIdAndUpdate(newSlotId, {
-                                $inc: { count: -1 }
+                                $inc: { avCnt: 1 }
                             }, function(err) {
                                 if (err) {
                                     logger.error("error on slot undo");
@@ -501,10 +501,10 @@ router.put("/:id", function(req, res) {
         // logger.debug("in updateOldSlot with newSlotId=" + newSlotId);
         if (oldSlotId && (newSlotId || req.body.unschedule == "y")) { // student was scheduled and is either being unscheduled or rescheduled
             Slot.findByIdAndUpdate(oldSlotId, {
-                $inc: { count: -1 }
+                $inc: { avCnt: 1 }
             }, {
-                projection: { _id: 1, count: 1, max: 1 },
-                returnNewDocument: false // returns count before increment, true doesn't seem to work
+                projection: { _id: 1, avCnt: 1 },
+                returnNewDocument: false // returns avCnt before increment, true doesn't seem to work
             }, function(err, slot) {
                 // logger.debug("slot before update=" + slot);
                 // can't handle error at this point
@@ -552,11 +552,11 @@ router.delete("/:studentId", middleware.isLoggedIn, function(req, res) {
         if (student != null) { // need null check in case student has been deleted in another window
             if (student.slot != null) {
                 Slot.findByIdAndUpdate(student.slot, {
-                        $inc: { count: -1 }
+                        $inc: { avCnt: 1 }
                     },
                     function(err) {
                         if (err) {
-                            logger.error("delete student, decrementing count" + err.message);
+                            logger.error("delete student, incrementing avCnt" + err.message);
                         }
                     });
             }

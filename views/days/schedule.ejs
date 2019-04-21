@@ -25,9 +25,8 @@ function timeString(d) {
                 <% for (var i = 0, iLim = day.slots.length; i < iLim; i++){ %>
                     <div class="col-sm-3 solidborder">
                         <span class="slot-time"><%= timeString(day.slots[i].sdate) %></span>
-                        <% var remaining = day.slots[i].max - day.slots[i].count; %>
                         <span class="availDelim">(</span>
-                        <span class="availSlots"><%=remaining%></span>
+                        <span class="availSlots"><%= day.slots[i].avCnt %></span>
                         <span class="availDelim">)</span>
                     <ul class="list-group">
                         <% sched[i].students.forEach(function(student){ %>

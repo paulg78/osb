@@ -10,10 +10,11 @@ var middleware = require("../middleware");
 router.get("/avail", function(req, res) {
     // logger.debug("today=" + new Date());
     // subtract 6 hours to account for mountain time
-    var qry = "this.sdate > Date.now() - 21600000 && this.count < this.max";
+    const future = Date.now() - 21600000;
+    // var qry = "this.sdate > Date.now() - 21600000 && this.count < this.max";
     // logger.debug("avail slots qry=" + qry);
-    Slot.find({ $where: qry }, { _id: 0, sdate: 1, count: 1, max: 1 }).hint("sdate_1")
-        // .populate('remaining')
+    // Slot.find({ $where: qry }, { _id: 0, sdate: 1, count: 1, max: 1 }).hint("sdate_1")
+    Slot.find({ $and: [{ sdate: { $gt: future } }, { avCnt: { $gt: 0 } }] }, { _id: 0, sdate: 1, avCnt: 1 })
         .exec(function(err, slots) {
             if (err) {
                 logger.error("error finding avail slots: " + err.message);
@@ -57,7 +58,7 @@ router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function(req, res) {
             }
             else {
                 // logger.debug("schedStudCounts=" + JSON.stringify(schedStudCounts));
-                Slot.find({}, { count: 1 })
+                Slot.find({}, { avCnt: 1, max:1 })
                     .sort({
                         _id: 1,
                     })
@@ -80,13 +81,13 @@ router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function(req, res) {
                                 if (j < jlim && schedStudCounts[j]._id == slots[i]._id.toString()) {
                                     studentCount = schedStudCounts[j].count;
                                 }
-                                if (studentCount != slots[i].count) {
-                                    logger.info("count mismatch id=" + slots[i]._id + ", student count=" + studentCount + ", slot count=" + slots[i].count);
+                                if (studentCount != slots[i].max - slots[i].avCnt) {
+                                    logger.info("count mismatch id=" + slots[i]._id + ", student count=" + studentCount + ", slot count=" + slots[i].max - slots[i].avCnt);
                                     nbrMismatch++;
-                                    if (req.params.fixflag == "y") { // fix count in Slot
-                                        logger.info("setting slot count to " + studentCount);
+                                    if (req.params.fixflag == "y") { // fix avCnt in Slot
+                                        logger.info("fixing avCnt to match number of students scheduled");
                                         Slot.findByIdAndUpdate(slots[i]._id.toString(), {
-                                                $set: { count: studentCount }
+                                                $set: { avCnt: slots[i].max - studentCount }
                                             },
                                             function(err) {
                                                 if (err) {

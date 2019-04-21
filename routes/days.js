@@ -8,7 +8,7 @@ var async = require('async');
 /* global logger */
 
 // upload days and slots (schedule of fittings)
-router.get("/uploadSchedule", middleware.isLoggedIn, function (req, res) {
+router.get("/uploadSchedule", middleware.isLoggedIn, function(req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
@@ -16,7 +16,7 @@ router.get("/uploadSchedule", middleware.isLoggedIn, function (req, res) {
 });
 
 // called from uploadSchedule; updates database with days and slots (schedule of fittings)
-router.post("/createSchedule", middleware.isLoggedIn, function (req, res) {
+router.post("/createSchedule", middleware.isLoggedIn, function(req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
@@ -26,10 +26,10 @@ router.post("/createSchedule", middleware.isLoggedIn, function (req, res) {
     function saveSlots(row, day, callbackfunction) {
         var col = 1;
         async.whilst(
-            function () {
+            function() {
                 return col < scheduleArray[row].length;
             },
-            function (slotCallback) {
+            function(slotCallback) {
                 // logger.debug("async slot iteratee called");
                 logger.info("col=" + col);
 
@@ -51,10 +51,10 @@ router.post("/createSchedule", middleware.isLoggedIn, function (req, res) {
                         var slot = {
                             sdate: d,
                             max: scheduleArray[row + 1][col],
-                            count: 0
+                            avCnt: scheduleArray[row + 1][col]
                         };
                         // save slot and add it to day
-                        Slot.create(slot, function (err, newSlot) {
+                        Slot.create(slot, function(err, newSlot) {
                             if (!err) {
                                 logger.info("created slot=" + newSlot.sdate);
                                 // add slot id to day
@@ -67,7 +67,7 @@ router.post("/createSchedule", middleware.isLoggedIn, function (req, res) {
                     }
                 }
             },
-            function (err) {
+            function(err) {
                 callbackfunction(err);
             }
         );
@@ -77,23 +77,23 @@ router.post("/createSchedule", middleware.isLoggedIn, function (req, res) {
     logger.info("numRows=" + numRows);
     var row = 0;
     async.whilst(
-        function () {
+        function() {
             return row < numRows;
         },
-        function (dayCallback) {
+        function(dayCallback) {
             logger.info("async day iteratee called");
             logger.info("row=" + row);
             var day = {
                 date: scheduleArray[row][0],
                 slots: []
             };
-            saveSlots(row, day, function (slotErr) {
+            saveSlots(row, day, function(slotErr) {
                 if (slotErr) {
                     dayCallback(slotErr);
                 }
                 else
                     // save day
-                    Day.create(day, function (dayErr, newDay) {
+                    Day.create(day, function(dayErr, newDay) {
                         if (dayErr) {
                             dayCallback(dayErr);
                         }
@@ -106,7 +106,7 @@ router.post("/createSchedule", middleware.isLoggedIn, function (req, res) {
                     });
             });
         },
-        function (err) {
+        function(err) {
             if (err) {
                 logger.error("Error creating schedule: " + err.message);
                 req.flash("error", "Schedule upload failed: " + err.message);
@@ -132,13 +132,13 @@ function toStr2(x) {
 
 
 //INDEX - List days
-router.get("/", middleware.isLoggedIn, function (req, res) {
+router.get("/", middleware.isLoggedIn, function(req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
     if (global.days == null) {
         Day.find({ $query: {}, $orderby: { date: 1 } }, { date: 1 })
-            .exec(function (err, days) {
+            .exec(function(err, days) {
                 if (err) {
                     logger.error(err);
                     return res.redirect("back");
@@ -159,7 +159,7 @@ router.get("/", middleware.isLoggedIn, function (req, res) {
 
 
 // Middleware function to popluate res.locals with previous and next day Ids
-var getPrevNextIds = function (req, res, next) {
+var getPrevNextIds = function(req, res, next) {
     res.locals.prevDayId = "";
     res.locals.nextDayId = "";
     // logger.debug("req.params.dayId=" + req.params.dayId);
@@ -185,14 +185,15 @@ var getPrevNextIds = function (req, res, next) {
 
 
 // Show SCHEDULE for next available day (one with open slots)
-router.get("/nextAvail", middleware.isLoggedIn, function (req, res) {
+router.get("/nextAvail", middleware.isLoggedIn, function(req, res) {
     function mmdd(d) {
         return toStr2(d.getMonth()) + toStr2(d.getDate());
     }
-    var qry = "this.sdate > Date.now() && this.count < this.max";
+    // var qry = "this.sdate > Date.now() && this.avCnt > 0";
     // logger.debug("* qry=" + qry);
-    Slot.find({ $where: qry }, { sdate: 1 }).limit(1).hint("sdate_1")
-        .exec(function (err, slots) {
+    // Slot.find({ $where: qry }, { sdate: 1 }).limit(1).hint("sdate_1")
+    Slot.find({ $and: [{ sdate: { $gt: Date.now() } }, { avCnt: { $gt: 0 } }] }, { sdate: 1 }).limit(1)
+        .exec(function(err, slots) {
             if (err) {
                 logger.error("error finding next avail: " + err.message);
                 req.flash("error", "Next available day not found.");
@@ -235,13 +236,13 @@ router.get("/nextAvail", middleware.isLoggedIn, function (req, res) {
 
 
 // SHOW SCHEDULE All Students - shows schedule for one day
-router.get("/:dayId", middleware.isLoggedIn, getPrevNextIds, function (req, res) {
+router.get("/:dayId", middleware.isLoggedIn, getPrevNextIds, function(req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
     Day.findById(req.params.dayId)
-        .populate('slots', { sdate: 1, max: 1, count: 1 })
-        .exec(function (err, foundDay) {
+        .populate('slots', { sdate: 1, avCnt: 1 })
+        .exec(function(err, foundDay) {
             if (err) {
                 logger.error(err);
                 req.flash("error", "System error:" + err.message);
@@ -257,7 +258,7 @@ router.get("/:dayId", middleware.isLoggedIn, getPrevNextIds, function (req, res)
                         lname: 1
                     })
                     .exec(
-                        function (err, queryResponse) {
+                        function(err, queryResponse) {
                             if (err) {
                                 logger.error(err);
                             }

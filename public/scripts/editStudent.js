@@ -62,7 +62,7 @@ $("#dateSched").on('change', function(e) {
             d = new Date(slots[i].sdate);
             md = d.getMonth() + "-" + d.getDate();
             if (md == selmd) {
-                timeSel.add(new Option(timeString(new Date(slots[i].sdate)) + ' - ' + (slots[i].max - slots[i].count), slots[i].sdate));
+                timeSel.add(new Option(timeString(new Date(slots[i].sdate)) + ' (' + slots[i].avCnt + '\)', slots[i].sdate));
             }
         }
         timeSel.disabled = false;

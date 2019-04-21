@@ -39,7 +39,7 @@ router.get("/", function(req, res) {
 
     function getSchools(callback) {
         School.find().sort({
-                name: 1
+                schoolCode: 1
             })
             .exec(function(err, schools) {
                 callback(err, schools);
@@ -50,7 +50,7 @@ router.get("/", function(req, res) {
         // logger.debug("Getting student count by school");
         Student.aggregate([{
                 $group: {
-                    _id: '$school',
+                    _id: '$schoolCode',
                     count: {
                         $sum: 1
                     }
@@ -64,13 +64,13 @@ router.get("/", function(req, res) {
                 var i = 0;
                 var len = schoolCounts.length;
                 schools.forEach(function(school) {
-                    while (i < len && schoolCounts[i]._id < school.name) {
+                    while (i < len && schoolCounts[i]._id < school.schoolCode) {
                         i++;
                         // logger.debug("i=" + i);
                     }
-                    if (i < len && school.name == schoolCounts[i]._id) {
+                    if (i < len && school.schoolCode == schoolCounts[i]._id) {
                         school.count = schoolCounts[i].count;
-                        // logger.debug("school.name=" + school.name + ", student count=" + school.count);
+                        // logger.debug("school.schoolCode=" + school.schoolCode + ", student count=" + school.count);
                     }
                     else {
                         school.count = 0;
@@ -90,7 +90,7 @@ router.get("/", function(req, res) {
                 }
             }, {
                 $group: {
-                    _id: '$school',
+                    _id: '$schoolCode',
                     count: {
                         $sum: 1
                     }
@@ -104,13 +104,13 @@ router.get("/", function(req, res) {
                 var i = 0;
                 var len = schoolCounts.length;
                 schools.forEach(function(school) {
-                    while (i < len && schoolCounts[i]._id < school.name) {
+                    while (i < len && schoolCounts[i]._id < school.schoolCode) {
                         i++;
                         // logger.debug("i=" + i);
                     }
-                    if (i < len && school.name == schoolCounts[i]._id) {
+                    if (i < len && school.schoolCode == schoolCounts[i]._id) {
                         school.schedCount = schoolCounts[i].count;
-                        // logger.debug("school.name=" + school.name + ", student schedCount=" + school.schedCount);
+                        // logger.debug("school.schoolCode=" + school.schoolCode + ", student schedCount=" + school.schedCount);
                     }
                     else {
                         school.schedCount = 0;
@@ -130,7 +130,7 @@ router.get("/", function(req, res) {
                 }
             }, {
                 $group: {
-                    _id: '$school',
+                    _id: '$schoolCode',
                     count: {
                         $sum: 1
                     }
@@ -144,13 +144,13 @@ router.get("/", function(req, res) {
                 var i = 0;
                 var len = schoolCounts.length;
                 schools.forEach(function(school) {
-                    while (i < len && schoolCounts[i]._id < school.name) {
+                    while (i < len && schoolCounts[i]._id < school.schoolCode) {
                         i++;
                         // logger.debug("i=" + i);
                     }
-                    if (i < len && school.name == schoolCounts[i]._id) {
+                    if (i < len && school.schoolCode == schoolCounts[i]._id) {
                         school.servedCount = schoolCounts[i].count;
-                        // logger.debug("school.name=" + school.name + ", student servedCount=" + school.servedCount);
+                        // logger.debug("school.schoolCode=" + school.schoolCode + ", student servedCount=" + school.servedCount);
                     }
                     else {
                         school.servedCount = 0;
