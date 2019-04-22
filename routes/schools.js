@@ -255,10 +255,11 @@ router.post("/createSchools", function(req, res) {
             var school = {
                 name: shared.myTrim(schools[row][0]),
                 district: shared.myTrim(schools[row][1]),
-                quota: schools[row][2]
+                schoolCode: shared.myTrim(schools[row][2]),
+                quota: schools[row][3]
             };
             School.findOne({
-                name: school.name
+                schoolCode: school.schoolCode
             }, function(err, schoolFound) {
                 if (err) {
                     logger.error("Error finding school=" + school.name + ", " + err.message);
@@ -277,8 +278,9 @@ router.post("/createSchools", function(req, res) {
                             schoolCallback(err);
                         });
                     }
-                    else { // update quota/district if changed
-                        if (school.district != schoolFound.district || school.quota != schoolFound.quota) {
+                    else { // update if anything changed
+                        if (school.name != schoolFound.name || school.district != schoolFound.district || school.quota != schoolFound.quota) {
+                            schoolFound.name = school.name;
                             schoolFound.district = school.district;
                             schoolFound.quota = school.quota;
                             schoolFound.save(function(err) {
