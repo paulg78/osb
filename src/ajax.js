@@ -1,5 +1,5 @@
 /* global $ */
-$('#newStudentForm').submit(function (e) {
+$('#newStudentForm').submit(function(e) {
     e.preventDefault();
     var studentStr = $(this).serialize();
 
@@ -7,7 +7,7 @@ $('#newStudentForm').submit(function (e) {
         url: '/students',
         type: 'POST',
         data: studentStr,
-        success: function (result) {
+        success: function(result) {
             // console.log('Ajax post returned success');
             if (result.student != null) {
                 $('#studentList').append(
@@ -16,6 +16,7 @@ $('#newStudentForm').submit(function (e) {
                 <td>${result.student.fname}</td>
                 <td>${result.student.lname}</td>
                 <td>${result.student.grade}</td>
+                <td></td>                
                 <td></td>
                 <td>no</td>
                 <td>
@@ -43,7 +44,7 @@ $('#newStudentForm').submit(function (e) {
                 $('#remaining').text(result.remaining);
             }
         },
-        error: function (err) {
+        error: function(err) {
             console.log('Ajax post returned error: ' + err.responseText);
             $('#addMsg').removeClass('failMsg successMsg');
             $('#addMsg').addClass('failMsg');
@@ -52,7 +53,7 @@ $('#newStudentForm').submit(function (e) {
     });
 });
 
-$(".delStudBtn").on('click', function (e) {
+$(".delStudBtn").on('click', function(e) {
     var tds = $(this).parent().parent().siblings();
     if (confirm("Ready to delete " + tds[0].innerText + " " + tds[1].innerText + ".  Click Cancel or OK.") != true) {
         e.preventDefault();

@@ -12,7 +12,7 @@ $('#newStudentForm').submit(function (e) {
         success: function success(result) {
             // console.log('Ajax post returned success');
             if (result.student != null) {
-                $('#studentList').append('\n            <tr>\n                <td>' + result.student.fname + '</td>\n                <td>' + result.student.lname + '</td>\n                <td>' + result.student.grade + '</td>\n                <td></td>\n                <td>no</td>\n                <td>\n                    <form style="display: inline">\n                        <a href="/students/' + result.student._id + '/edit" class="btn btn-xs btn-primary">Edit</a>\n                    </form>\n                </td>\n            </tr>\n                ');
+                $('#studentList').append('\n            <tr>\n                <td>' + result.student.fname + '</td>\n                <td>' + result.student.lname + '</td>\n                <td>' + result.student.grade + '</td>\n                <td></td>                \n                <td></td>\n                <td>no</td>\n                <td>\n                    <form style="display: inline">\n                        <a href="/students/' + result.student._id + '/edit" class="btn btn-xs btn-primary">Edit</a>\n                    </form>\n                </td>\n            </tr>\n                ');
                 $('#addMsg').removeClass('failMsg successMsg');
                 $('#addMsg').addClass('successMsg');
                 $('#addMsg').text(result.student.fname + " " + result.student.lname + " added.");

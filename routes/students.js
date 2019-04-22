@@ -20,7 +20,8 @@ router.get("/", middleware.isLoggedIn,
             Student.find()
                 .sort({ "lname": 1, "fname": 1 })
                 .populate('slot', { _id: 0, sdate: 1 })
-                .populate('skool', { _id: 0, name: 1 })
+                .populate('school', { _id: 0, name: 1 })
+                .populate('addedBy', { _id: 0, name: 1 })
                 .exec(function(err, queryResponse) {
                     if (err) {
                         logger.error(err.message);
@@ -42,11 +43,11 @@ router.get("/", middleware.isLoggedIn,
         School.findOne({
                 schoolCode: res.locals.currentUser.schoolCode
             }, { _id: 0, name: 1, quota: 1, schoolCode: 1 })
-
-            // A select like this works but schoolCode, the foreign key is automatically included
+            // .populate({ path: 'students', populate: { path: 'slot', select: 'sdate' } })
+            // A select like this also works but schoolCode, the foreign key is automatically included
             // .populate({ path: 'students', select: 'fname grade slot served', populate: { path: 'slot', select: 'sdate' } })
-
-            .populate({ path: 'students', populate: { path: 'slot', select: 'sdate' } })
+            // .populate({ path: 'students', populate: { {path: 'slot', select: 'sdate'}, { path: 'addedBy', select: 'name' } }})
+            .populate({ path: 'students', populate: { path: 'slot', select: 'sdate' }, populate: { path: 'addedBy', select: 'name' } })
             .exec(function(err, qrySchool) {
                 if (err) {
                     logger.error(err.errmsg);
@@ -206,7 +207,7 @@ router.get("/:dateSched", middleware.isLoggedIn, function(req, res) {
                 // find the students scheduled for this day
                 Student.find({ slot: { $in: foundDay.slots } })
                     .populate('slot', { _id: 0, sdate: 1 })
-                    .populate('skool', { _id: 0, name: 1 })
+                    .populate('school', { _id: 0, name: 1 })
                     .exec(
                         function(err, queryResponse) {
                             if (err) {
@@ -283,6 +284,7 @@ router.post("/", function(req, res) {
     // Can't use middleware.isLoggedIn with ajax since need to return json
     if (req.isAuthenticated()) {
         studentData.schoolCode = res.locals.currentUser.schoolCode; // can assign school only when logged in
+        studentData.addedBy = res.locals.currentUser._id;
     }
     else {
         return res.json({ "msg": "You must be logged in to add a student; student not added." });
@@ -337,7 +339,7 @@ router.get("/:id/edit", middleware.isLoggedIn, function(req, res) {
 router.get("/:id/printPass", middleware.isLoggedIn, function(req, res) {
     Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, slot: 1, served: 1, schoolCode: 1 })
         .populate('slot', { _id: 1, sdate: 1 })
-        .populate('skool', { _id: 0, name: 1 })
+        .populate('school', { _id: 0, name: 1 })
         .exec(function(err, foundStudent) {
             if (err) {
                 logger.error(err);

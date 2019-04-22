@@ -19,10 +19,14 @@ const studentSchema = new mongoose.Schema({
     },
     served: {
         type: Boolean
+    },
+    addedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User'
     }
 });
 
-studentSchema.virtual('skool', {
+studentSchema.virtual('school', {
     ref: 'School',
     localField: 'schoolCode',
     foreignField: 'schoolCode',

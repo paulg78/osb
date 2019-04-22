@@ -34,6 +34,7 @@ function dateString(d) {
              <th>First Name</th>
              <th class="filter-select" data-placeholder="All Schools">School</th>
              <th>Grade</th>
+             <th>Added By</th>             
              <th class="sorter-shortDate dateFormat-ddmmyyyy">Scheduled</th>
              <th class="filter-select">Served</th>
              </tr>
@@ -44,11 +45,16 @@ function dateString(d) {
             <td><%= student.lname %></td>
             <td><%= student.fname %></td>
             <td>            
-              <% if (student.skool) { %>
-                  <%= student.skool.name %>
+              <% if (student.school) { %>
+                  <%= student.school.name %>
                   <% } %>
             </td>
             <td><%= student.grade %></td>
+            <td>
+              <% if (student.addedBy) { %>            
+                  <%= student.addedBy.name %>
+                  <% } %>                  
+            </td>
             <td>
               <% if (student.slot != null) { %>
                   <%= dateString(student.slot.sdate) %>

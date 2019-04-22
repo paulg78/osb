@@ -76,6 +76,7 @@ if (qrySchool.students) {
              <th>First Name</th>
              <th>Last Name</th>
              <th>Grade</th>
+             <th>Added By</th>             
              <th class="sorter-shortDate dateFormat-ddmmyyyy">Scheduled</th>
              <th>Served</th>
              </tr>
@@ -87,6 +88,11 @@ if (qrySchool.students) {
             <td><%= student.fname %></td>
             <td><%= student.lname %></td>
             <td><%= student.grade %></td>
+            <td>
+              <% if (student.addedBy) { %>            
+                  <%= student.addedBy.name %>
+                  <% } %>                  
+            </td>
             <% if (student.slot && student.slot.sdate) { %>
                 <td><%= dateString(student.slot.sdate) %></td>
             <% } else { %>
