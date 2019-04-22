@@ -43,11 +43,11 @@ router.get("/", middleware.isLoggedIn,
         School.findOne({
                 schoolCode: res.locals.currentUser.schoolCode
             }, { _id: 0, name: 1, quota: 1, schoolCode: 1 })
-            // .populate({ path: 'students', populate: { path: 'slot', select: 'sdate' } })
-            // A select like this also works but schoolCode, the foreign key is automatically included
+            .populate({ path: 'students', populate: { path: 'slot', select: 'sdate' } })
+            .populate({ path: 'students', populate: { path: 'addedBy', select: 'name' } })
+            // A select like this also works but schoolCode, the foreign key, is automatically included, even though it isn't in the select
             // .populate({ path: 'students', select: 'fname grade slot served', populate: { path: 'slot', select: 'sdate' } })
-            // .populate({ path: 'students', populate: { {path: 'slot', select: 'sdate'}, { path: 'addedBy', select: 'name' } }})
-            .populate({ path: 'students', populate: { path: 'slot', select: 'sdate' }, populate: { path: 'addedBy', select: 'name' } })
+
             .exec(function(err, qrySchool) {
                 if (err) {
                     logger.error(err.errmsg);
