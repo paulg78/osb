@@ -1,0 +1,36 @@
+<% include ../partials/header %>
+    <div class="row">
+        <h1 style="text-align: center">Edit <%= user.username %></h1>
+        <div style="width: 30%; margin: 25px auto;">
+            <form action="/users/<%=user._id%>?_method=PUT" method="POST">
+                <div class="form-group">
+                    <label>Full Name:</label>
+                    <input class="form-control" type="text" name="name" value="<%= user.name %>">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number:</label>
+                    <input class="form-control" type="phone" name="phone" value="<%= user.phone %>">
+                </div>                                
+                <div class="form-group">
+                    <label>Email Address:</label>
+                    <%= user.email %>
+                </div>
+                <div class="form-group">
+                    <label>School Code:</label>
+                    <%= user.schoolCode %>
+                </div>
+                <div class="form-group">
+                    <label>Username:</label>
+                    <%= user.username %>
+                </div>
+                <br>
+                <div class="form-group">
+                    <button type=submit class="btn btn-lg btn-primary btn-block">Submit!</button>
+                </div>
+            </form>
+            <a href="/users">Cancel</a>
+        </div>
+    </div>
+
+<% include ../partials/footer %>
+

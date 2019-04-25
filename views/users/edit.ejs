@@ -9,7 +9,7 @@
                 </div>
                 <div class="form-group">
                     <label>Email Address:</label>
-                    <input class="form-control" type="email" name="email" value="<%= user.email %>">
+                    <input id="email" class="form-control" type="email" name="email" value="<%= user.email %>">
                 </div>
                 <div class="form-group">
                     <label>School Code:</label>
@@ -45,9 +45,10 @@
     $(document).ready(function() {
         document.getElementById("roleSelect").value = "<%=user.role %>";
         if ("<%=currentUser.role%>" != "role_wa") {
-            document.getElementById("pin").disabled = true;
+            document.getElementById("email").disabled = true;
             document.getElementById("uname").disabled = true;
-            document.getElementById("sch").disabled = true;
+            document.getElementById("schoolCode").disabled = true;
+            document.getElementById("roleSelect").disabled = true;            
         }
     })
 </script>

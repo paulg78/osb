@@ -1,0 +1,47 @@
+<% include ../partials/header %>
+
+    <header>
+        <h1>
+            <span>People Registered to Support OSB for your School </span>
+        </h1>
+    </header>
+    <table id="userTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>UserName</th>
+                <th>Phone number</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% users.forEach(function(user){ %>
+                <tr>
+                    <td><%= user.name %></td>
+                    <td><%= user.email %></td>
+                    <td><%= user.username %></td>
+                    <td><%= user.phone %></td>
+                    <% if(currentUser.username == user.username){ %>
+                        <td>
+                            <form style="display: inline" action="/users/<%=user._id%>?_method=DELETE" method="POST">
+                                <a href="/users/<%=user._id%>/editSelf" class="btn btn-xs btn-info">Edit</a>
+                                <button class="delUserBtn btn btn-xs btn-danger">DEL</button>
+                            </form>
+                        </td>
+                    <% }; %>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+
+<script>
+
+$(".delUserBtn").on('click', function (e) {
+    var tds = $(this).parent().parent().siblings();
+    if (confirm("Ready to delete " + tds[0].innerText + ".  Click Cancel or OK.") != true) {
+        e.preventDefault();
+    }
+});
+</script>
+
+<% include ../partials/footer %>

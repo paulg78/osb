@@ -21,12 +21,11 @@ schoolSchema.virtual('students', {
     options: { sort: { fname: 1, lname: 1 } }
 });
 
-schoolSchema.virtual('nbrStudents', {
-    ref: 'Student',
-    localField: 'schoolCode',
-    foreignField: 'schoolCode',
-    count: true
-});
-
+// schoolSchema.virtual('nbrStudents', {
+//     ref: 'Student',
+//     localField: 'schoolCode',
+//     foreignField: 'schoolCode',
+//     count: true
+// });
 
 module.exports = mongoose.model("School", schoolSchema);

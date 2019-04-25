@@ -15,16 +15,6 @@ function emailHash(email) {
 }
 
 
-//subscribe - show form to subscribe new user to mailchimp
-router.get("/subscribe", function(req, res) {
-    res.render("users/subscribe");
-});
-
-//subscribe - show form to subscribe new user to mailchimp
-router.get("/newsubscribe", function(req, res) {
-    res.render("users/newsubscribe");
-});
-
 // REGISTER - add new user to DB
 router.post("/register", function(req, res) {
     logger.debug("In User Register");
@@ -149,40 +139,88 @@ router.post("/register", function(req, res) {
 });
 
 
-// All user routes other than those above start here; blocks user actions by role_sc
-router.use(middleware.isLoggedIn, function(req, res, next) {
-    // logger.debug("went to all user routes");
-    if (res.locals.currentUser.role == 'role_sc') {
+// List Users (all or by school)
+router.get("/", middleware.isLoggedIn,
+    function(req, res, next) {
+        if (res.locals.currentUser.role == 'role_sc') {
+            // logger.debug("skipping to next users handler");
+            next();
+        }
+        else { // list all students
+            // logger.debug("after next");
+            User.find({}, { name: 1, email: 1, username: 1, role: 1, password: 1, schoolCode: 1 })
+                .populate('school', { _id: 0, name: 1 })
+                .sort({ name: 1 })
+                .exec(function(err, allUsers) {
+                    if (err) {
+                        logger.error(err);
+                    }
+                    else {
+                        // logger.debug("allUsers=" + allUsers);
+                        res.render("users/index", {
+                            users: allUsers
+                        });
+                    }
+                });
+        }
+    },
+    function(req, res) { // list users for school
+        User.find({ schoolCode: res.locals.currentUser.schoolCode }, { name: 1, email: 1, username: 1, phone: 1 })
+            .sort({ name: 1 })
+            .exec(function(err, users) {
+                if (err) {
+                    logger.error(err);
+                }
+                else {
+                    // logger.debug("users=" + users);
+                    res.render("users/bySchool", {
+                        users: users
+                    });
+                }
+            });
+    }
+);
+
+
+// Render edit user form (for user ending )
+router.get("/:id/editself", middleware.isLoggedIn, function(req, res) {
+    if (res.locals.currentUser.role != 'role_sc') {
         res.redirect("back");
     }
-    else {
-        // logger.debug("going to next user route");
-        next('route');
-    }
-});
-
-//INDEX - show all users
-router.get("/", function(req, res) {
-
-    User.find({}, { name: 1, email: 1, username: 1, role: 1, password: 1, schoolCode: 1 })
-        .populate('school', { _id: 0, name: 1 })
-        .sort({ name: 1 })
-        .exec(function(err, allUsers) {
+    User.findById(req.params.id, { name: 1, email: 1, username: 1, phone: 1, schoolCode: 1 })
+        .exec(function(err, foundUser) {
             if (err) {
                 logger.error(err);
             }
             else {
-                // logger.debug("allUsers=" + allUsers);
-                res.render("users/index", {
-                    users: allUsers
+                res.render("users/editSelf", {
+                    user: foundUser
                 });
             }
         });
 });
 
+
+// User routes other than those above start here; blocks user actions by role_sc
+// router.use(middleware.isLoggedIn, function(req, res, next) {
+//     // logger.debug("went to all user routes");
+//     if (res.locals.currentUser.role == 'role_sc') {
+//         res.redirect("back");
+//     }
+//     else {
+//         // logger.debug("going to next user route");
+//         next('route');
+//     }
+// });
+
+
 //CREATE - add new user to DB
-router.post("/", function(req, res) {
+router.post("/", middleware.isLoggedIn, function(req, res) {
     // get data from form and add to users collection
+
+    if (res.locals.currentUser.role != 'role_wa') {
+        res.redirect("back");
+    }
 
     var newUser = {
         username: shared.myTrim(req.body.username.toLowerCase()),
@@ -212,12 +250,18 @@ router.post("/", function(req, res) {
 });
 
 //NEW - show form to create new user
-router.get("/new", function(req, res) {
+router.get("/new", middleware.isLoggedIn, function(req, res) {
+    if (res.locals.currentUser.role != 'role_wa') {
+        res.redirect("back");
+    }
     res.render("users/new");
 });
 
 // Find user and render edit user form
-router.get("/:id/edit", function(req, res) {
+router.get("/:id/edit", middleware.isLoggedIn, function(req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        res.redirect("back");
+    }
     User.findById(req.params.id, function(err, foundUser) {
         if (err) {
             logger.error(err);
@@ -231,6 +275,9 @@ router.get("/:id/edit", function(req, res) {
 });
 
 router.get("/stats", function(req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        res.redirect("back");
+    }
     var stats = {};
     async.waterfall([
         getCountNoPw,
@@ -271,16 +318,18 @@ router.get("/stats", function(req, res) {
 });
 
 // Update user in database
-router.put("/:id", function(req, res) {
+router.put("/:id", middleware.isLoggedIn, function(req, res) {
+    logger.debug("req.body=" + JSON.stringify(req.body));
     var newData = {
         name: shared.myTrim(req.body.name),
-        schoolCode: shared.myTrim(req.body.schoolCode),
-        role: shared.myTrim(req.body.role),
-        email: shared.myTrim(req.body.email),
         phone: shared.myTrim(req.body.phone)
     };
+
     if (res.locals.currentUser.role == "role_wa") { // only admin can update key fields
         newData.username = shared.myTrim(req.body.username.toLowerCase());
+        newData.schoolCode = shared.myTrim(req.body.schoolCode);
+        newData.role = shared.myTrim(req.body.role);
+        newData.email = shared.myTrim(req.body.email);
     }
 
     User.findByIdAndUpdate(req.params.id, {
@@ -310,7 +359,13 @@ router.delete("/:userId", middleware.isLoggedIn, function(req, res) {
             return res.redirect("back");
         }
         req.flash("success", "Deleted " + user.name);
-        res.redirect("back");
+        if (res.locals.currentUser.role == "role_sc") {
+            req.logout();
+            res.redirect('/login');
+        }
+        else {
+            res.redirect("back");
+        }
     });
 });
 

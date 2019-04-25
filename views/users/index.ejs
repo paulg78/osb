@@ -35,7 +35,7 @@
                     <td><%= user.username %></td>
                     <td><%= user.hasPw %></td>
                     <td><%= user.role %></td>
-                    <% if(currentUser.role == "role_wa"){ %>
+                    <% if(currentUser.role == "role_wa" || user.role == "role_sc" || currentUser.username == user.username){ %>
                         <td>
                             <form style="display: inline" action="/users/<%=user._id%>?_method=DELETE" method="POST">
                                 <a href="/users/<%=user._id%>/edit" class="btn btn-xs btn-info">Edit</a>
@@ -174,7 +174,6 @@ $(function(){
 });
 
 $(".delUserBtn").on('click', function (e) {
-    // if (confirm("Ready to delete " + student.fullName + ". Click cancel or OK.") == true
     var tds = $(this).parent().parent().siblings();
     if (confirm("Ready to delete " + tds[0].innerText + ".  Click Cancel or OK.") != true) {
         e.preventDefault();
