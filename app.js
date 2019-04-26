@@ -142,13 +142,17 @@ app.use("/slots", slotRoutes);
 //   logger.debug("Server running on port " + port + ", IP " + ip);
 // });
 
-if (process.env.ONHEROKU) {
-  logger.debug("Running on Heroku");
-}
-else {
-  logger.debug("Not running on Heroku");
-}
+// if (process.env.ONHEROKU) {
+  //   logger.debug("Running on Heroku");
+  // }
+  // else {
+  //   logger.debug("Not running on Heroku");
+  // }
 
-app.listen(process.env.PORT, process.env.IP, function() {
-  logger.debug("Server running on port " + process.env.PORT + ", IP " + process.env.IP);
+// app.listen(process.env.PORT, process.env.IP, function() {
+//   logger.debug("Server running on port " + process.env.PORT + ", IP " + process.env.IP);
+// });
+
+app.listen(process.env.PORT || 3000, function(){
+  console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
 });
