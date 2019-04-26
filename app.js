@@ -134,14 +134,21 @@ app.use("/schools", schoolRoutes);
 app.use("/days", dayRoutes);
 app.use("/slots", slotRoutes);
 
-var ip = process.env.IP || '127.0.0.1',
-  port = process.env.PORT || 3000;
-logger.debug("ip=" + ip + ", port=" + port);
+// var ip = process.env.IP || '127.0.0.1',
+//   port = process.env.PORT || 3000;
+// logger.debug("ip=" + ip + ", port=" + port);
 
-app.listen(port, ip, function() {
-  logger.debug("Server running on port " + port + ", IP " + ip);
+// app.listen(port, ip, function() {
+//   logger.debug("Server running on port " + port + ", IP " + ip);
+// });
+
+if (process.env.ONHEROKU) {
+  logger.debug("Running on Heroku");
+}
+else {
+  logger.debug("Not running on Heroku");
+}
+
+app.listen(process.env.PORT, process.env.IP, function() {
+  logger.debug("Server running on port " + process.env.PORT + ", IP " + process.env.IP);
 });
-
-// app.listen(process.env.PORT, process.env.IP, function() {
-      //   logger.debug("Server running on port " + process.env.PORT + ", IP " + process.env.IP);
-      // });
