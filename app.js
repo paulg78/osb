@@ -136,7 +136,12 @@ app.use("/slots", slotRoutes);
 
 var ip = process.env.IP || '127.0.0.1',
   port = process.env.PORT || 3000;
+logger.debug("ip=" + ip + ", port=" + port);
 
 app.listen(port, ip, function() {
   logger.debug("Server running on port " + port + ", IP " + ip);
 });
+
+// app.listen(process.env.PORT, process.env.IP, function() {
+      //   logger.debug("Server running on port " + process.env.PORT + ", IP " + process.env.IP);
+      // });
