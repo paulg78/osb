@@ -25,7 +25,6 @@ router.get("/", function(req, res) {
 
     async.waterfall([
         getSchools,
-        getStudentCountBySchool,
         getSchedStudentCountBySchool,
         getServedCountBySchool,
     ], function(err, schools) {
@@ -41,41 +40,9 @@ router.get("/", function(req, res) {
         School.find().sort({
                 schoolCode: 1
             })
+            .populate('nbrStudents')
+            .populate('nbrUsers')
             .exec(function(err, schools) {
-                callback(err, schools);
-            });
-    }
-
-    function getStudentCountBySchool(schools, callback) {
-        // logger.debug("Getting student count by school");
-        Student.aggregate([{
-                $group: {
-                    _id: '$schoolCode',
-                    count: {
-                        $sum: 1
-                    }
-                }
-            }, {
-                $sort: {
-                    _id: 1
-                }
-            }])
-            .exec(function(err, schoolCounts) {
-                var i = 0;
-                var len = schoolCounts.length;
-                schools.forEach(function(school) {
-                    while (i < len && schoolCounts[i]._id < school.schoolCode) {
-                        i++;
-                        // logger.debug("i=" + i);
-                    }
-                    if (i < len && school.schoolCode == schoolCounts[i]._id) {
-                        school.count = schoolCounts[i].count;
-                        // logger.debug("school.schoolCode=" + school.schoolCode + ", student count=" + school.count);
-                    }
-                    else {
-                        school.count = 0;
-                    }
-                });
                 callback(err, schools);
             });
     }

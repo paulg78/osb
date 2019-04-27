@@ -10,9 +10,10 @@
     </header>
     <%
     var unasgn, unsched,
+        userTot=0,
         qTot=0,
-        unasgnTot=0,
-        unschedTot=0,
+        filledTot=0,
+        schedTot=0,
         servedTot=0;
     %>
     <table id="schoolTable" class="table table-striped tablesorter">
@@ -20,10 +21,11 @@
             <tr>
                 <th>Name</th>
                 <th>School Code</th>
+                <th>#Users</th>                
                 <th>District</th>
                 <th>Quota</th>
-                <th>Quota Unassigned</th>
-                <th>Quota Unscheduled</th>
+                <th>Percent Filled</th>
+                <th>Percent Scheduled</th>
                 <th>Students Served</th>
             </tr>
         </thead>
@@ -31,19 +33,19 @@
             <% schools.forEach(function(school){ %>
                 <tr>
                     <%
-                    unasgn= school.quota - school.count;
-                    unsched= school.quota - school.schedCount;
+                    userTot+=school.nbrUsers;
                     qTot+=school.quota;
-                    unasgnTot+=unasgn;
-                    unschedTot+=unsched;
+                    filledTot+=school.nbrStudents;
+                    schedTot+=school.schedCount;
                     servedTot+=school.servedCount;
                     %>
                     <td><%= school.name %></td>
-                    <td><%= school.schoolCode %></td>                    
+                    <td><%= school.schoolCode %></td> 
+                    <td><%= school.nbrUsers %></td>                    
                     <td><%= school.district %></td>
                     <td><%= school.quota %></td>
-                    <td><%= unasgn %></td>
-                    <td><%= unsched %></td>
+                    <td><%= (school.nbrStudents * 100 / school.quota).toFixed(1) %></td>
+                    <td><%= (school.schedCount * 100 / school.quota).toFixed(1) %></td>
                     <td><%= school.servedCount %></td>
                     <td>
                         <form style="display: inline" action="/schools/<%=school._id%>?_method=DELETE" method="POST">
@@ -58,22 +60,24 @@
              <tr>
                 <td>Totals</td>
                 <td></td>
+                <th>#Users</th>                                
+                <td></td>                
                 <td>Quota</td>
-                <td>Quota Unassigned</td>
-                <td>Quota Unscheduled</td>
+                <td>Percent Filled</td>
+                <td>Percent Scheduled</td>
                 <td>Students Served</td>
-                <td>
-                </td>
+                <td></td>
             </tr>
              <tr>
                 <td></td>
                 <td></td>
+                <th><%= userTot %></th>                                
+                <td></td>                
                 <td><%= qTot %></td>
-                <td><%= unasgnTot %></td>
-                <td><%= unschedTot %></td>
+                <td><%= (filledTot / qTot).toFixed(1) %></td>
+                <td><%= (schedTot / qTot).toFixed(1) %></td>
                 <td><%= servedTot %></td>
-                <td>
-                </td>
+                <td></td>
             </tr>
         </tfoot>
     </table>

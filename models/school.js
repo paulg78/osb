@@ -28,4 +28,11 @@ schoolSchema.virtual('nbrStudents', {
     count: true
 });
 
+schoolSchema.virtual('nbrUsers', {
+    ref: 'User',
+    localField: 'schoolCode',
+    foreignField: 'schoolCode',
+    count: true
+});
+
 module.exports = mongoose.model("School", schoolSchema);

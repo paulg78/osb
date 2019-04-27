@@ -208,6 +208,7 @@ router.get("/:dateSched", middleware.isLoggedIn, function(req, res) {
                 Student.find({ slot: { $in: foundDay.slots } })
                     .populate('slot', { _id: 0, sdate: 1 })
                     .populate('school', { _id: 0, name: 1 })
+                    .populate('addedBy', { _id: 0, name: 1 })
                     .exec(
                         function(err, queryResponse) {
                             if (err) {
