@@ -23,6 +23,11 @@ router.get("/help", function(req, res) {
     res.render("help");
 });
 
+//show help
+router.get("/osbInfo", function(req, res) {
+    res.render("osbInfo");
+});
+
 router.post('/login', function(req, res, next) {
     // logger.debug("at login, req.body=" + req.body.username + "-" + req.body.password);
     passport.authenticate('local', function(err, user, info) {
