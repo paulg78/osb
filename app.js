@@ -134,6 +134,7 @@ app.use("/schools", schoolRoutes);
 app.use("/days", dayRoutes);
 app.use("/slots", slotRoutes);
 
+console.log('process.env.PRODSERVER=' + process.env.PRODSERVER);
 if (process.env.PRODSERVER == 'lightsail') { // has to be 3000 for lightsail
   app.listen(3000, function() {
     console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);

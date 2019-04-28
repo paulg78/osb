@@ -1,0 +1,27 @@
+#!/bin/bash
+set -e
+
+### Configuration ###
+APP_DIR=/opt/bitnami/apps
+GIT_URL=git@github.com:paulg78/osb.git
+
+### Automation steps ###
+
+set -x
+
+# Pull latest code from github
+if [[ -e $APP_DIR/osb ]]; then
+  cd $APP_DIR/osb
+  git pull
+else
+  git clone $GIT_URL $APP_DIR/osb
+  cd $APP_DIR/osb
+fi
+
+# Install dependencies
+npm install --production
+npm prune --production
+
+# restart osb
+forever stop app.js
+forever start app.js
