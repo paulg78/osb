@@ -23,7 +23,19 @@
 
   <script>
     $(document).ready(function() {
-        $('#osbInfoText').summernote();
+        $('#osbInfoText').summernote({
+  toolbar: [
+    ['style', ['style', 'bold', 'italic', 'underline', 'clear']],
+    ['font', ['fontname']],    
+    ['fontsize', ['fontsize']],
+    ['color', ['color']],
+    ['para', ['ul', 'ol', 'paragraph']],
+    ['height', ['height']],
+    ['insert', ['link', 'picture']],    
+    ['view', ['codeview']],
+    ['help', ['help']]
+  ]
+});
     });
   </script>
 </body>
