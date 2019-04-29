@@ -4,6 +4,7 @@ var passport = require("passport");
 var User = require("../models/user");
 var School = require("../models/school");
 var shared = require("../shared");
+var middleware = require("../middleware");
 
 /* global logger */
 
@@ -23,9 +24,55 @@ router.get("/help", function(req, res) {
     res.render("help");
 });
 
-//show help
+//show OSB Info
 router.get("/osbInfo", function(req, res) {
-    res.render("osbInfo");
+    var fs = require('fs');
+    fs.readFile('osbInfo.txt', function(err, txt) {
+        if (err) {
+            req.flash('error', "Error reading OSB info " + err);
+            res.redirect('back');
+        }
+        else {
+            // logger.debug("txt=" + txt);
+            res.render("osbInfo", { osbInfo: txt });
+        }
+    });
+});
+
+
+//show OSB Info Edit form
+router.get("/editOsbInfo", middleware.isLoggedIn, function(req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect('back');
+    }
+    var fs = require('fs');
+    fs.readFile('osbInfo.txt', function(err, txt) {
+        if (err) {
+            req.flash('error', "Error reading OSB info " + err);
+            res.redirect('back');
+        }
+        else {
+            // logger.debug("txt=" + txt);
+            res.render("editOsbInfo", { osbInfo: txt });
+        }
+    });
+});
+
+// Save OSB Info
+router.post("/osbInfo", function(req, res) {
+    var fs = require('fs');
+    // logger.debug('req.body.osbInfoText=' + req.body.osbInfoText);
+    // delete first char (an extraneous comma)
+    fs.writeFile('osbInfo.txt', req.body.osbInfoText.toString().substr(1), function(err) {
+        if (err) {
+            req.flash('error', "Error saving text " + err);
+            res.redirect('back');
+        }
+        else {
+            req.flash('success', "OSB Info updated.");
+            res.redirect("osbInfo");
+        }
+    });
 });
 
 router.post('/login', function(req, res, next) {

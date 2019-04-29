@@ -1,4 +1,11 @@
 <% include ./partials/header %>
 
-<h1>OSB Info Page</h1>
+<div id="osbInfo"></div>
+
+<%- osbInfo %>
+
+<% if(currentUser.role != 'role_sc'){ %>
+  <a class="btn btn-primary" href="/editOsbInfo">Edit OSB Info</a>
+  <% } %>
+   
 <% include ./partials/footer %>
