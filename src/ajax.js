@@ -9,14 +9,14 @@ $('#newStudentForm').submit(function(e) {
         data: studentStr,
         success: function(result) {
             // console.log('Ajax post returned success');
-            if (result.student != null) {
+            if (result.student) {
                 $('#studentList').append(
                     `
             <tr>
                 <td>${result.student.fname}</td>
                 <td>${result.student.lname}</td>
                 <td>${result.student.grade}</td>
-                <td></td>                
+                <td>${$('#currUser')[0].innerText}</td>                
                 <td></td>
                 <td>no</td>
                 <td>
@@ -34,13 +34,13 @@ $('#newStudentForm').submit(function(e) {
                 $('#newStudentForm').find('.form-control').first().focus();
             }
             else {
-                if (result.msg != null) {
+                if (result.msg) {
                     $('#addMsg').removeClass('failMsg successMsg');
                     $('#addMsg').addClass('failMsg');
                     $('#addMsg').text(result.msg);
                 }
             }
-            if (result.remaining != null) {
+            if (result.remaining) {
                 $('#remaining').text(result.remaining);
             }
         },

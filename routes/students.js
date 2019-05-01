@@ -8,6 +8,82 @@ var middleware = require("../middleware");
 var async = require('async');
 /* global logger */
 
+
+// show find/list students form
+// List Students (all or by school)
+router.get("/showFind", middleware.isLoggedIn,
+    function(req, res, next) {
+        if (res.locals.currentUser.role == 'role_sc') {
+            res.redirect("back");
+        }
+        else {
+            res.render("students/find");
+        }
+    });
+
+// Return list of students per find criteria
+router.get("/find", middleware.isLoggedIn, function(req, res) {
+    if (res.locals.currentUser.role == 'role_sc') {
+        return res.redirect("back");
+    }
+
+    function studentRay(students) {
+        var studRay = [];
+        // had to brute force this because school name wouldn't populate
+        students.forEach(function(student) {
+            studRay.push({
+                fname: student.fname,
+                lname: student.lname,
+                schoolName: student.school ? student.school.name : '',
+                grade: student.grade,
+                scName: student.addedBy ? student.addedBy.name : '',
+                sdate: student.slot ? student.slot.sdate : '',
+                served: student.served
+            });
+        });
+        return studRay;
+    }
+
+    // search on schoolCode or last name
+    if (req.query.schoolCode) {
+        logger.debug('schoolCode=' + req.query.schoolCode);
+        School.findOne({
+                schoolCode: req.query.schoolCode
+            }, { _id: 0, schoolCode: 1, name: 1 })
+            .populate({ path: 'students', populate: { path: 'school', select: 'name' } })
+            .populate({ path: 'students', populate: { path: 'slot', select: 'sdate' } })
+            .populate({ path: 'students', populate: { path: 'addedBy', select: 'name' } })
+            .exec(function(err, qrySchool) {
+                if (err) {
+                    logger.error("error finding school/students: " + err.message);
+                    res.status(500).send(err.message);
+                }
+                else {
+                    res.json(studentRay(qrySchool.students));
+                }
+            });
+    }
+    else {
+        logger.debug('lname=' + req.query.lastName);
+        // could return a lot of matches so limit to 20
+        Student.find({ lname: { $regex: new RegExp('.*' + req.query.lastName + '.*'), $options: 'i' } }, { _id: 0 })
+            .limit(20)
+            .sort({ "lname": 1, "fname": 1 })
+            .populate('slot', { _id: 0, sdate: 1 })
+            .populate('school', { name: 1 })
+            .populate('addedBy', { _id: 0, name: 1 })
+            .exec(function(err, students) {
+                if (err) {
+                    logger.error("error finding students: " + err.message);
+                    res.status(500).send(err.message);
+                }
+                else {
+                    res.json(studentRay(students));
+                }
+            });
+    }
+});
+
 // List Students (all or by school)
 router.get("/", middleware.isLoggedIn,
     function(req, res, next) {
@@ -45,9 +121,6 @@ router.get("/", middleware.isLoggedIn,
             }, { _id: 0, name: 1, quota: 1, schoolCode: 1 })
             .populate({ path: 'students', populate: { path: 'slot', select: 'sdate' } })
             .populate({ path: 'students', populate: { path: 'addedBy', select: 'name' } })
-            // A select like this also works but schoolCode, the foreign key, is automatically included, even though it isn't in the select
-            // .populate({ path: 'students', select: 'fname grade slot served', populate: { path: 'slot', select: 'sdate' } })
-
             .exec(function(err, qrySchool) {
                 if (err) {
                     logger.error(err.errmsg);

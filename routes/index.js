@@ -117,8 +117,8 @@ router.get('/requestpwresetData', function(req, res) {
     logger.debug("req.query.schoolCode=" + req.query.schoolCode);
 
     User.findOne({
-            email: req.query.email.toLowerCase(),
-            schoolCode: req.query.schoolCode
+            schoolCode: req.query.schoolCode,
+            email: req.query.email.toLowerCase()
         }, { _id: 0, username: 1, schoolCode: 1 })
         .populate({ path: 'school', select: 'name' })
         .exec(function(err, user) {
@@ -182,8 +182,8 @@ router.get('/registerData', function(req, res) {
         logger.debug("school=" + school);
         // verify user not yet registered
         User.findOne({
-            email: email,
-            schoolCode: req.query.schoolCode
+            schoolCode: req.query.schoolCode,
+            email: email
         }, function(err, user) {
             if (err) {
                 var errmsg = "System error on user lookup: " + email + "-" + req.query.schoolCode;
@@ -222,8 +222,8 @@ router.get('/backToregister/:email/:schoolCode', function(req, res) {
 router.post('/register', function(req, res) {
 
     User.findOne({
-        email: req.body.email.toLowerCase(),
-        schoolCode: req.body.schoolCode
+        schoolCode: req.body.schoolCode,
+        email: req.body.email.toLowerCase()
     }, { username: 1 }, function(err, user) {
         if (err) {
             req.flash('error', "System error on user lookup " + req.body.email + "-" + req.body.schoolCode);

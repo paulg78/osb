@@ -47,7 +47,7 @@ if (qrySchool.students) {
     <h2><%=qrySchool.name + " -- Allotment: " + qrySchool.quota + ",  Remaining: "%><span id='remaining'><%= (qrySchool.quota - nbrStudents) %></h2>
     <% if (qrySchool.quota - nbrStudents > 0) { %>
         <div style="width: 100%; margin: 25px auto;">
-            <form action="/students" method="POST" class="form-inline hidden-print" id=newStudentForm>
+            <form class="form-inline hidden-print" id=newStudentForm>
                 <h3>Add Student&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="addMsg"></span></h3>
                 <div class="form-group">
                     <input id="fname" class="form-control" type="text" name="firstName" placeholder="first name*">

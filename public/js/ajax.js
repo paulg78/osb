@@ -11,21 +11,21 @@ $('#newStudentForm').submit(function (e) {
         data: studentStr,
         success: function success(result) {
             // console.log('Ajax post returned success');
-            if (result.student != null) {
-                $('#studentList').append('\n            <tr>\n                <td>' + result.student.fname + '</td>\n                <td>' + result.student.lname + '</td>\n                <td>' + result.student.grade + '</td>\n                <td></td>                \n                <td></td>\n                <td>no</td>\n                <td>\n                    <form style="display: inline">\n                        <a href="/students/' + result.student._id + '/edit" class="btn btn-xs btn-primary">Edit</a>\n                    </form>\n                </td>\n            </tr>\n                ');
+            if (result.student) {
+                $('#studentList').append('\n            <tr>\n                <td>' + result.student.fname + '</td>\n                <td>' + result.student.lname + '</td>\n                <td>' + result.student.grade + '</td>\n                <td>' + $('#currUser')[0].innerText + '</td>                \n                <td></td>\n                <td>no</td>\n                <td>\n                    <form style="display: inline">\n                        <a href="/students/' + result.student._id + '/edit" class="btn btn-xs btn-primary">Edit</a>\n                    </form>\n                </td>\n            </tr>\n                ');
                 $('#addMsg').removeClass('failMsg successMsg');
                 $('#addMsg').addClass('successMsg');
                 $('#addMsg').text(result.student.fname + " " + result.student.lname + " added.");
                 $('#newStudentForm').find('.form-control').val("");
                 $('#newStudentForm').find('.form-control').first().focus();
             } else {
-                if (result.msg != null) {
+                if (result.msg) {
                     $('#addMsg').removeClass('failMsg successMsg');
                     $('#addMsg').addClass('failMsg');
                     $('#addMsg').text(result.msg);
                 }
             }
-            if (result.remaining != null) {
+            if (result.remaining) {
                 $('#remaining').text(result.remaining);
             }
         },

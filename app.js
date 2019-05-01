@@ -31,22 +31,23 @@ var
   userRoutes = require("./routes/users");
 
 console.log("process.env.DATABASEURL='" + process.env.DATABASEURL + "'");
-console.log("process.env.FORCESSL='" + process.env.FORCESSL + "'");
 console.log("process.env.APPLOGLEVEL='" + process.env.APPLOGLEVEL + "'");
 
 mongoose.connect(process.env.DATABASEURL, { useNewUrlParser: true });
 
-if (process.env.FORCESSL == 'y') {
-  logger.debug("https redirection enabled");
-  // redirect http to https
-  var forceSsl = function(req, res, next) {
-    if (req.headers['x-forwarded-proto'] !== 'https') {
-      return res.redirect(['https://', req.get('Host'), req.url].join(''));
-    }
-    return next();
-  };
-  app.use(forceSsl);
-}
+// force SSL no longer needed; since doing it with apache on AWS lightsail
+// console.log("process.env.FORCESSL='" + process.env.FORCESSL + "'");
+// if (process.env.FORCESSL == 'y') {
+//   logger.debug("https redirection enabled");
+//   // redirect http to https
+//   var forceSsl = function(req, res, next) {
+//     if (req.headers['x-forwarded-proto'] !== 'https') {
+//       return res.redirect(['https://', req.get('Host'), req.url].join(''));
+//     }
+//     return next();
+//   };
+//   app.use(forceSsl);
+// }
 
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({

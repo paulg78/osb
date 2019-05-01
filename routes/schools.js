@@ -20,6 +20,22 @@ router.use(middleware.isLoggedIn, function(req, res, next) {
     }
 });
 
+// Get list of schools for dropdown control
+router.get("/list", function(req, res) {
+    School.find({}, { _id: 0, name: 1, schoolCode: 1 })
+        .exec(function(err, schools) {
+            if (err) {
+                logger.error("error finding schools: " + err.message);
+                res.status(500).send(err.message);
+            }
+            else {
+                // logger.debug("schools: " + schools);
+                res.json(JSON.stringify(schools));
+            }
+        });
+});
+
+
 //INDEX - list schools
 router.get("/", function(req, res) {
 

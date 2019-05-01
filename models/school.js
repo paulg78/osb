@@ -18,7 +18,7 @@ schoolSchema.virtual('students', {
     localField: 'schoolCode',
     foreignField: 'schoolCode',
     justOne: false,
-    options: { sort: { fname: 1, lname: 1 } }
+    options: { sort: { lname: 1, fname: 1 } }
 });
 
 schoolSchema.virtual('nbrStudents', {

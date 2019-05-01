@@ -1,0 +1,47 @@
+<% include ../partials/header %>
+<!-- tablesorter files -->
+
+    <h2>List Students by School or Last Name</h2>
+              
+    <div id="schoolSel" class="form-group form-inline hidden-print">
+        <label>School:</label>
+        <select id="schoolList" name="schoolCode">
+            <option value="" selected>Select school</option>
+        </select>
+    </div>
+
+    <form class="form-inline hidden-print" id=findStudentForm>
+        <div class="form-group">
+            <label>Last name (or partial name, case insensitive):</label>                    
+            <input id="lname" class="form-control" type="text" name="lastName" placeholder="last name">
+        </div>
+
+        <div class="form-group">
+            <button type=submit class="btn btn-md btn-primary btn-block">Find by Name</button>
+        </div>
+    </form>
+            
+    <table id="studentTable" class="table table-striped tablesorter">
+        <thead>
+            <tr>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>School</th>
+                <th>Grade</th>
+                <th>Added By</th>             
+                <th class="sorter-shortDate dateFormat-ddmmyyyy">Scheduled</th>
+                <th>Served</th>
+            </tr>
+        </thead>
+        <tbody id='studentList'></tbody>
+    </table>
+
+<script src="/scripts/getSchools.js"></script>
+<script src="/js/ajaxFindStudents.js"></script>
+<script>
+$(document).ready(function() {
+    getSchools();
+});
+</script>
+
+<% include ../partials/footer %>
