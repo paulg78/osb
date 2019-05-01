@@ -1,12 +1,12 @@
 <% include ../partials/header %>
     <div class="row">
-        <h1 style="text-align: center">Edit School Quota</h1>
+        <h1 style="text-align: center">Edit School</h1>
         <div style="width: 30%; margin: 25px auto;">
             <form action="/schools/<%=school._id%>?_method=PUT" method="POST">
                 <h2><%= school.name %></h2>
                 <div class="form-group">
                     <label>School Code:</label>
-                    <input class="form-control" type="text" name="schoolCode" value="<%= school.schoolCode %>">
+                    <input  id="schoolCode" class="form-control" type="text" name="schoolCode" value="<%= school.schoolCode %>">
                 </div>                
                 <div class="form-group">
                     <label>School Name:</label>
@@ -25,4 +25,12 @@
             </form>
         </div>
     </div>
+    
+<script>
+    $(document).ready(function() {
+        if ("<%=currentUser.role%>" != "role_wa") {
+            document.getElementById("schoolCode").disabled = true;
+        }
+    })
+</script>    
 <% include ../partials/footer %>

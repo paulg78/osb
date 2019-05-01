@@ -24,8 +24,8 @@
                     <% if(currentUser.username == user.username){ %>
                         <td>
                             <form style="display: inline" action="/users/<%=user._id%>?_method=DELETE" method="POST">
-                                <a href="/users/<%=user._id%>/editSelf" class="btn btn-xs btn-info">Edit</a>
-                                <button class="delUserBtn btn btn-xs btn-danger">DEL</button>
+                                <a href="/users/<%=user._id%>/editSelf" class="btn btn-xs btn-primary">Edit</a>
+                                <button class="delUserBtn btn btn-xs btn-danger">DELETE</button>
                             </form>
                         </td>
                     <% }; %>

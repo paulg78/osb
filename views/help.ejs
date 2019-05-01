@@ -1,42 +1,53 @@
 <% include ./partials/header %>
 <h2>Menu Options</h2>
 <h3 style="padding-left: 30px;">Before Login (Top Right)</h3>
-<p style="padding-left: 60px;"><strong>Login</strong> -- Your initial username is the PIN you received from the Assistance League. You must set a password before you can login. If you like, you may change your username.</p>
-<p style="padding-left: 60px;"><strong>Set or Reset Username/Password</strong> -- You can set your initial password and change your username/password using the PIN and email address you received from the Assistance League. Enter your PIN and email address. Then press enter/return or click
-    <button class="btn btn-xs btn-primary">Submit</button>.
-    &nbsp;On the next page, you will have the option to change your username and password.</p>
+<p style="padding-left: 60px;"><strong>Login</strong> -- Your initial username is the school (work) email address you used to register. You are enabled for login after you register and set a password. </p>
+<p style="padding-left: 60px;"><strong>Set/Reset Username/Password</strong> -- You can set or change your username/password using the email address and school code you used to register. Enter your email address and school code. &nbsp;On the next page, you can change your username and password.</p>
+<p style="padding-left: 60px;"><strong>Register</strong> -- Enter your school (work) email address and school code to begin the registration process. On the next page, enter your name and phone number to go to the page that enables you to set a username and password.</p>    
 <h3 style="padding-left: 30px;">After Login (Top Left and Right)</h3>
 <div class="role_al role_wa">
     <p style="padding-left: 60px;"><strong>*Upload Schools</strong> -- Upload schools from a .csv file exported from the OSB Data spreadsheet.</p>
-    <p style="padding-left: 60px;"><strong>*Upload Users</strong> -- Upload school counselors from a .csv file exported from the OSB Data spreadsheet. Produces a file that can be used to upload new school counselors into MailChimp.</p>
     <p style="padding-left: 60px;"><strong>*Schools</strong> -- Goes to Schools page. See detailed help below.</p>
     <p style="padding-left: 60px;"><strong>*Users</strong> -- Goes to Users page. See detailed help below. </p>
     <p style="padding-left: 60px;"><strong>*Days</strong> -- Goes to Days page. See detailed help below.</p>
+    <p style="padding-left: 60px;"><strong>*Find Students</strong> -- List students by school or by full/partial last name.</p>    
     <p style="padding-left: 60px;"><span style="background-color: yellow;"><strong>*</strong> starred menu options are for AL users only. Yellow highlights identify AL variations.</span></p>
 </div>
-<p style="padding-left: 60px;"><strong>Students</strong> -- Lists all students entered for your school. From this page, you can add students, schedule them, and print passports (see detailed help for the Students Page below).<span class="role_al role_wa" style="background-color: yellow">For Assistance League, this menu option lists all students in the database. Assistance League users can can view and check in students but cannot edit or delete students.</span></p>
+<div>
+<p style="padding-left: 60px;"><strong>Students</strong> -- Lists all students entered for your school. From this page, you can add students, schedule them, and print passports (see detailed help for the Students Page below).<span class="role_al role_wa" style="background-color: yellow">AL users do not have this option but can list students by school using Find Student.</span></p>
+<p style="padding-left: 60px;"><strong>School Contacts for OSB</strong> -- Lists the people (typically school counselors) who are registered to support Operation School Bell for your school. <strong>If you see someone on this list who should not be registered for your school please let us know by emailing admin@schoolbell.us.</strong><span class="role_al role_wa" style="background-color: yellow;">AL users do not have this option but can list all users and filter by school.</span></p>
+<p style="padding-left: 60px;"><strong>OSB Info</strong> -- Information about Operation School Bell.<span class="role_al role_wa" style="background-color: yellow;">AL users are enabled to edit OSB Info.</span></p>
 <p style="padding-left: 60px;"><strong>Logout</strong> -- Signs you out and goes to the Operation School Bell Initial Page.</p>
-
+</div>
 <div class="role_al role_wa">
     <h2>*Schools Page</h2>
     <p style="padding-left: 30px;">Lists all schools in the database.</p>
     <p style="padding-left: 30px;"><strong>Sort --&nbsp;</strong>Click column heading to sort; each click toggles between ascending and descending order. To sort on multiple columns, click a column and then shift click on another column.</p>
-        <button style="margin-left: 30px;" class="btn btn-xs btn-info">Edit</button> -- can only edit allotment. Changing a school name would cause database inconsistency.
+        <button style="margin-left: 30px;" class="btn btn-xs btn-primary">Edit</button> -- Can change fields other than school code, which would cause database inconsistency.
     <h2>*Users Page</h2>
     <p style="padding-left: 30px;">Lists all users in the database.</p>
     <p style="padding-left: 30px;"><strong>Sort --&nbsp;</strong>Click column heading to sort; each click toggles between ascending and descending order. To sort on multiple columns, click a column and then shift click on another column.</p>
     <p style="padding-left: 30px;"><strong>Filter --&nbsp;</strong>Click the grey bar under the heading; select from a dropdown for school or role. Type in boxes to filter by other fields.</p>
+    <p style="margin-left: 30px;">
+    <button class="btn btn-xs btn-primary">Edit</button>
+     &nbsp;-- AL users are enabled to change name and phone number for themselves and for users with the school counselor role.
+    </p>
+    <p></p>
+    <p style="margin-left: 30px;">
+        <button class="btn btn-xs btn-danger">Delete</button>
+         &nbsp;-- AL users are enabled to delete themselves and users with the school counselor role.
+    </p>
     <h2>*Days Page</h2>
     <p style="padding-left: 30px;">Lists the scheduled shopping days for the current year.</p>
     <p style="padding-left: 30px;">
         <button class="btn btn-xs btn-primary">Schedule</button>
-         &nbsp;-- goes to Fitting Schedule Page for a specific day. The schedule button for </strong><strong style="background-color: #dff0d8;">Next Available Day</strong> goes to the first day on or after the current date that has available openings.</strong>
+         &nbsp;-- goes to student list or Fitting Schedule Page for a specific day. The schedule button for </strong><strong style="background-color: #dff0d8;">Next Available Day</strong> goes to the first day on or after the current date that has available openings.</strong>
     </p>
     <p style="padding-left: 30px;">
-        <button class="btn btn-xs btn-primary">Students Scheduled</button>
-         &nbsp;-- goes to Students Page filtered for a specific day.
+        <button class="btn btn-xs btn-primary">Students</button>
+         &nbsp;-- goes to student list for a specific day.
     </p>
-
+    <p style="padding-left: 30px;"><strong>Filter --&nbsp;</strong>Click the grey bar under the heading; select from a dropdown for school or served. Type in boxes to filter by other fields.</p>
     <h2>*Fitting Schedule Page</h2>
     <p style="padding-left: 30px;">The number in parenthesis after each time indicates how many openings are still available at that time. The number in parenthesis after each student name indicates grade level.</p>
     <p></p>
@@ -57,8 +68,7 @@
     </p>
 </div>
 <h2>Students Page</h2>
-<p style="padding-left: 30px;">The heading shows the number of fittings allotted to your school and the number of additional students you can enter within your allotment.</p>
-<p class="role_al role_wa" style="padding-left: 30px;"><span style="background-color: yellow;">For AL users: <strong>All students</strong> in the database are listed. Allotments are not shown on the students page; AL users can see allotments on the schools page.</span></p>
+<p style="padding-left: 30px;">The heading shows the number of fittings allotted to your school and the number remaining (allotment minus the number of students already entered).<span class="role_al role_wa" style="background-color: yellow;">AL users can list students using Find students and can view allotments on the schools page.</span></p>
 <h3 style="padding-left: 30px;">Add Student</h3>
 <ol start="1" style="margin: 0px 40px;">
     <li>Fill in data; first name, last name, and grade (K or 1-12) are required.</li>
@@ -74,20 +84,31 @@
      &nbsp;-- goes to the Passport Print page; Each student needs a passport to shop.
 </p>
 <p style="padding-left: 30px;"><strong>Sort --&nbsp;</strong>Click column heading to sort; each click toggles between ascending and descending order. To sort on multiple columns, click a column and then shift click on another column.</p>
-<p class="role_al role_wa" style="padding-left: 30px;"><span style="background-color: yellow;"><strong>Filter (Assistance League only) --&nbsp;</strong>Click the grey bar under the heading; select from a dropdown for school or served. Type in boxes to filter by other fields.</span></p>
 <p style="padding-left: 30px;"><strong>Served Column --&nbsp;</strong>The Assistance League will update this field, usually by the end of each day during Operation School Bell. Values:</p>
 <p style="padding-left: 50px;"><span class="bg-success">Yes</span>: Student received clothing.</p>
 <p style="padding-left: 50px;">no: Student has not yet received clothing.</p>
-<p style="padding-left: 50px;"><span class="bg-danger">NO</span>: Student has not received clothing and the scheduled date has passed.</p>
+<p style="padding-left: 50px;"><span class="bg-danger">NO</span>: Student has not received clothing and the scheduled date has passed.<span class="role_al role_wa" style="background-color: yellow;">AL users do not see the NO value since it is intended to alert counselors of a missed fitting.</span></p>
 <h2>Edit Student Page</h2>
-<p>You can change name and grade. If a student has not yet been served, you can schedule or reschedule their fitting. When you are finished making changes, press enter/return or click&nbsp;
-    <button class="btn btn-xs btn-primary">Save</button>
+<p style="padding-left: 30px;">You can change name and grade. If a student has not yet been served, you can schedule, unschedule, or reschedule their fitting. To schedule, select a date and then a time. The available times are listed with the <strong>number of slots in parenthesis</strong>, in case you need to pick a time with multiple slots available. When you are finished making changes, press enter/return or click&nbsp;
+    <button class="btn btn-xs btn-primary">Save changes</button>
      &nbsp;to update student in the database.
 </p>
 <p>
     <button style="margin-left: 30px;" class="btn btn-xs btn-danger">Delete Student</button>
      &nbsp;-- presents confirmation dialog box and deletes student if confirmed.
 </p>
+<h2>School Contacts for OSB</h2>
+<p style="padding-left: 30px;">Lists the people who can schedule students from your school for OSB. <strong>If you see someone on this list who should not be registered for your school please let us know by emailing admin@schoolbell.us.</strong></p>
+<p style="margin-left: 30px;">
+    <button class="btn btn-xs btn-primary">Edit</button>
+     &nbsp;-- goes to the Edit Page where you can update your name or phone number. You cannot change your email address or school code; if either are incorrect you can delete yourself and re-register with the correct email address and school code.
+</p>
+<p></p>
+<p style="margin-left: 30px;">
+    <button class="btn btn-xs btn-danger">Delete</button>
+     &nbsp;-- deletes the user you are logged in as. You would do this if you are no longer supporting OSB for your school or if you accidentally entered an incorrect email address or school code when your registered. Presents a confirmation dialog box and deletes your registration if confirmed.
+</p>
+
 <h2>Questions or Feedback</h2>
     <h4>Send Email to admin@schoolbell.us</h4>
 <% include ./partials/footer %>

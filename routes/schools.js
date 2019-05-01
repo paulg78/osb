@@ -196,11 +196,15 @@ router.get("/:id/edit", function(req, res) {
 
 router.put("/:id", function(req, res) {
     var newData = {
-        schoolCode: shared.myTrim(req.body.schoolCode),
         name: shared.myTrim(req.body.name),
         district: req.body.district,
         quota: req.body.quota
     };
+
+    // only allow website admin to change a school code
+    if (res.locals.currentUser.role == 'role_wa') {
+        newData.schoolCode = shared.myTrim(req.body.schoolCode);
+    }
 
     School.findByIdAndUpdate(req.params.id, {
         $set: newData
