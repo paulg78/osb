@@ -32,7 +32,7 @@ function getData(event) {
 
 // Method that reads and parses a .csv file into a 2D array
 function upload(evt, callbackfunction) {
-    console.log("uploading file");
+    // console.log("uploading file");
     if (!browserSupportFileUpload()) {
         alert('The File APIs are not fully supported in this browser!');
     }

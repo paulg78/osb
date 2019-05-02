@@ -1,4 +1,6 @@
-var express = require("express"),
+var
+  compression = require('compression'),
+  express = require("express"),
   app = express(),
   bodyParser = require("body-parser"),
   mongoose = require("mongoose"),
@@ -49,6 +51,7 @@ mongoose.connect(process.env.DATABASEURL, { useNewUrlParser: true, useFindAndMod
 //   app.use(forceSsl);
 // }
 
+app.use(compression());
 app.enable('trust proxy');
 app.use(bodyParser.urlencoded({
   extended: true

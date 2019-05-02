@@ -47,19 +47,19 @@ router.get("/find", middleware.isLoggedIn, function(req, res) {
     // search on schoolCode or last name
     if (req.query.schoolCode) {
         logger.debug('schoolCode=' + req.query.schoolCode);
-        School.findOne({
-                schoolCode: req.query.schoolCode
-            }, { _id: 0, schoolCode: 1, name: 1 })
-            .populate({ path: 'students', populate: { path: 'school', select: 'name' } })
-            .populate({ path: 'students', populate: { path: 'slot', select: 'sdate' } })
-            .populate({ path: 'students', populate: { path: 'addedBy', select: 'name' } })
-            .exec(function(err, qrySchool) {
+
+        Student.find({ schoolCode: req.query.schoolCode }, { _id: 0 })
+            .sort({ "lname": 1, "fname": 1 })
+            .populate('slot', { _id: 0, sdate: 1 })
+            .populate('school', { name: 1 })
+            .populate('addedBy', { _id: 0, name: 1 })
+            .exec(function(err, students) {
                 if (err) {
-                    logger.error("error finding school/students: " + err.message);
+                    logger.error("error finding students: " + err.message);
                     res.status(500).send(err.message);
                 }
                 else {
-                    res.json(studentRay(qrySchool.students));
+                    res.json(studentRay(students));
                 }
             });
     }
@@ -497,7 +497,7 @@ router.put("/:id", function(req, res) {
                                     callback(err);
                                 }
                                 else {
-                                    console.log("overfilled slot._id=" + slot._id + "; avCnt=" + slot.avCnt);
+                                    // logger.debug("overfilled slot._id=" + slot._id + "; avCnt=" + slot.avCnt);
                                     callback({
                                         message: "Selected slot (" +
                                             new Date(req.body.timeSched).

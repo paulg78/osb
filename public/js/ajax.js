@@ -30,7 +30,7 @@ $('#newStudentForm').submit(function (e) {
             }
         },
         error: function error(err) {
-            console.log('Ajax post returned error: ' + err.responseText);
+            // console.log('Ajax post returned error: ' + err.responseText);
             $('#addMsg').removeClass('failMsg successMsg');
             $('#addMsg').addClass('failMsg');
             $('#addMsg').text(err.message);
