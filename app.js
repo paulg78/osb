@@ -33,7 +33,7 @@ var
 console.log("process.env.DATABASEURL='" + process.env.DATABASEURL + "'");
 console.log("process.env.APPLOGLEVEL='" + process.env.APPLOGLEVEL + "'");
 
-mongoose.connect(process.env.DATABASEURL, { useNewUrlParser: true });
+mongoose.connect(process.env.DATABASEURL, { useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true });
 
 // force SSL no longer needed; since doing it with apache on AWS lightsail
 // console.log("process.env.FORCESSL='" + process.env.FORCESSL + "'");
