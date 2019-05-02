@@ -338,8 +338,7 @@ function getRemaining(schoolCode, callbackfunction) {
                     callbackfunction(0);
                 }
                 else {
-                    logger.debug("getRemaining: qrySchool=" + qrySchool);
-                    logger.debug("qrySchool.nbrStudents=" + qrySchool.nbrStudents);
+                    // logger.debug("getRemaining: qrySchool=" + qrySchool);          // logger.debug("qrySchool.nbrStudents=" + qrySchool.nbrStudents);
                     callbackfunction(qrySchool.quota - qrySchool.nbrStudents);
                 }
             }

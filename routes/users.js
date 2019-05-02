@@ -24,13 +24,14 @@ router.post("/register", function(req, res) {
     logger.debug("req.body.schoolName=" + req.body.schoolName);
     logger.debug("req.body.email=" + req.body.email);
 
+    var email = shared.myTrim(req.body.email).toLowerCase();
     var newUser = {
-        username: req.body.email,
+        username: email,
         name: shared.myTrim(req.body.name),
         phone: shared.myTrim(req.body.phone),
         role: "role_sc",
         schoolCode: req.body.schoolCode,
-        email: shared.myTrim(req.body.email).toLowerCase()
+        email: email
     };
 
     const ehash = emailHash(newUser.email);
@@ -41,14 +42,8 @@ router.post("/register", function(req, res) {
         createUser
     ], function(err, MCresult, status) {
         if (err) {
-            // logger.debug("user save error=" + err.message);
-            if (err.message.indexOf("E11000") >= 0) { // duplicate key error
-                req.flash('error', "Sorry, that username is already in use. Please make up another one and try again.");
-            }
-            else {
-                req.flash('error', "System error on user create.");
-                logger.error("System error on user create: " + err.message);
-            }
+            req.flash('error', "System error on user create.");
+            logger.error("System error on user create: " + err.message);
             return res.redirect("back");
         }
         res.render('users/registerComplete', {
@@ -127,15 +122,26 @@ router.post("/register", function(req, res) {
         // Create a new user in DB
         User.create(newUser, function(err) {
             if (err) {
-                callback(err, MCresult, status);
+                if (err.message.indexOf("E11000") >= 0) { // duplicate username (can happen with counselor supporting more than one school); need to make up a unique username and try again
+                    newUser.username += "-" + newUser.schoolCode;
+                    User.create(newUser, function(err2) {
+                        // logger.debug("callback err2");
+                        callback(err2, MCresult, status);
+                    });
+                }
+                else {
+                    req.flash('error', "System error on user create.");
+                    logger.error("System error on user create: " + err.message);
+                    // logger.debug("callback err");
+                    callback(err, MCresult, status);
+                }
             }
             else {
-                logger.debug("created user, username=" + newUser.username);
+                // logger.debug("callback null");
                 callback(null, MCresult, status);
             }
         });
     }
-
 });
 
 

@@ -147,8 +147,7 @@ router.get('/requestpwresetData', function(req, res) {
 router.get('/register', function(req, res) {
     res.render('register', {
         email: '',
-        schoolCode: '',
-        errmsg: ''
+        schoolCode: ''
     });
 });
 

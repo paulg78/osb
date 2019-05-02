@@ -3,20 +3,17 @@
     <div class="row">
         <h2 style="text-align: center">Set Username/Password</h1>
         <% if (school) {%>
-            <h3 style="text-align: center">for School <span style="color:blue;"></spanstyle><%= school %></span></h2>
+            <h3 style="text-align: center">for <span style="color:blue;"></spanstyle><%= school %></span></h2>
             <% } %>
         <div style="width: 30%; margin: 25px auto;">
             <form action="/resetpw" method="post">
                 <div class="form-group">
                     <h4>Username:</h4>
                     <input class="form-control" type="text" name="newUsername" value="<%= username %>">
-                    <br>
-                    <p>Your initial username is your email address.</p> 
-                    <p>You may keep that username or change it.</p>
+                    <p>Your initial username is your email address*.</p> 
                     <p>Username must be unique so if you change it, make up something other people would be unlikely to use.</p>
-                    <p>If you support multiple schools for OSB, you will need a unique username for each school.</p>
-                    <br>
-                </div>
+                    <p>*If you support multiple schools using the same email address, school code is appended to make the initial username unique.</p>
+                 </div>
                 <h4>Please enter new password:</h4>
                 <div class="form-group">
                     <input class="form-control" type="password" name="password" placeholder="new password">
