@@ -40,7 +40,7 @@ $('#newStudentForm').submit(function(e) {
                     $('#addMsg').text(result.msg);
                 }
             }
-            if (result.remaining) {
+            if (result.remaining != null) {
                 $('#remaining').text(result.remaining);
             }
         },
