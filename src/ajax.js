@@ -9,6 +9,7 @@ $('#newStudentForm').submit(function(e) {
         data: studentStr,
         success: function(result) {
             // console.log('Ajax post returned success');
+            $('#flashmsg').hide();
             if (result.student) {
                 $('#studentList').append(
                     `

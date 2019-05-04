@@ -11,6 +11,7 @@ $('#newStudentForm').submit(function (e) {
         data: studentStr,
         success: function success(result) {
             // console.log('Ajax post returned success');
+            $('#flashmsg').hide();
             if (result.student) {
                 $('#studentList').append('\n            <tr>\n                <td>' + result.student.fname + '</td>\n                <td>' + result.student.lname + '</td>\n                <td>' + result.student.grade + '</td>\n                <td>' + $('#currUser')[0].innerText + '</td>                \n                <td></td>\n                <td>no</td>\n                <td>\n                    <form style="display: inline">\n                        <a href="/students/' + result.student._id + '/edit" class="btn btn-xs btn-primary">Edit</a>\n                    </form>\n                </td>\n            </tr>\n                ');
                 $('#addMsg').removeClass('failMsg successMsg');
