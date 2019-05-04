@@ -49,6 +49,7 @@ if (qrySchool.students) {
         <div style="width: 100%; margin: 25px auto;">
             <form class="form-inline hidden-print" id=newStudentForm>
                 <h3>Add Student&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="addMsg"></span></h3>
+                <span id=newStudCtrl>
                 <div class="form-group">
                     <input id="fname" class="form-control" type="text" name="firstName" placeholder="first name*">
                 </div>
@@ -67,6 +68,7 @@ if (qrySchool.students) {
                 <div class="form-group">
                     <button type=submit class="btn btn-md btn-primary btn-block">Save</button>
                 </div>
+                </span>
             </form>
             <p></p>
     <% } %>

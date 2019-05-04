@@ -25,8 +25,9 @@ $('#newStudentForm').submit(function (e) {
                     $('#addMsg').text(result.msg);
                 }
             }
-            if (result.remaining != null) {
-                $('#remaining').text(result.remaining);
+            $('#remaining').text(result.remaining);
+            if (result.remaining == '0') {
+                $('#newStudCtrl').hide();
             }
         },
         error: function error(err) {
