@@ -25,6 +25,7 @@ function dateTimeString(d) {
 
 <script>
 $(document).ready(function() {
+    $("#year").text(new Date().getFullYear());
     $("#hdgName").text('<%= student.fname + " " + student.lname %>');
     $("#name").text('<%= student.fname + " " + student.lname %>');
     $("#grade").text('<%= student.grade %>');
