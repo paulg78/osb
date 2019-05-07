@@ -17,6 +17,23 @@ function timeString(d) {
     return h + ":" + m + " " + ap;
 }
 %>
+
+<style>
+.slot-time {
+    font-size: 1.25em;
+    font-weight: bold;
+}
+.availSlots,
+.availDelim
+{
+    font-size: 1.25em;
+}
+.solidborder {
+    border-style: solid;
+    border-width: 1px;
+}
+</style>
+
 <div class="container">
     <div class="row">
         <div class="col-sm-12">
@@ -30,8 +47,8 @@ function timeString(d) {
                         <span class="availDelim">)</span>
                     <ul class="list-group">
                         <% sched[i].students.forEach(function(student){ %>
-                                <li class="list-group-item schedStud">
-                                    <span name="studentText"><%= student.fullName + "(" + student.grade + ")" %></span>
+                                <li class="list-group-item" style="padding: 2px 10px;">
+                                    <span name="studentText"><%= student.fullName + " (" + student.grade + ")" %></span>
                                     <span name="studentId" class="hidden"><%= student._id %></span>
                                 </li>
                         <% }) %>

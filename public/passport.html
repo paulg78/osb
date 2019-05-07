@@ -1,0 +1,89 @@
+<style>
+td {
+    padding: 5px;
+    text-align: left;
+}
+.hidden-print{
+    padding: 5px;
+    color: blue;
+    /*color: #555;*/
+    border: 2px solid #ccc;
+    border-radius: 4px;
+}
+</style>
+<img src="../../../stylesheets/AlLogo-whitebg.jpg" style="width:120px;height:120px;margin-left:7%">
+<div class="row">
+    <h2 style="text-align: center">Passport for <span id='hdgName'></span></h2>
+    <h3 style="text-align: center">Operation School Bell&reg; 2018</h3>
+    <div style="width: 85%; margin: 25px auto;">
+        <h4 style="text-align: center">This is your ticket for shopping at Kohl&rsquo;s on 3110 North Powers Blvd !</h4>
+        <p><strong>Please register at the Assistance League desk at your scheduled date/time. If you are a high school student, you may register and shop on your own (with a signed passport and school ID card); If you are in a grade K-8, your parent or guardian must be with you to register.</strong><br>
+        (Por favor, reg&iacute;strese en el mostrador de la Liga de Asistencia en su fecha / hora programada. Si usted es un estudiante de secundaria, puede registrarse y comprar por su cuenta (con un pasaporte firmado y una tarjeta de identificaci&oacute;n de la escuela); Si est&aacute; en un grado K-8, su padre o tutor debe estar con usted para registrarse.)</p>
+        <p id="parentShopText" class="hidden hidden-print"><strong>** School counselor recommends parent be permitted to shop without the student.</strong> (El consejero de la escuela recomienda que se le permita a los padres comprar sin el estudiante.)</p>
+        <table>
+            <tr>
+                <td>Student:</td>
+                <td><strong><span id='name'></span></strong></td>
+                <td>Grade:</td>
+                <td><strong><span id='grade'></span></strong></td>
+            </tr>
+            <tr>
+                <td>School:</td>
+                <td><strong><span id='schoolName'></span></strong></td>
+                <td>Counselor:</td>
+                <td><strong><span id='user'></span></strong></td>
+            </tr>
+            <tr>
+                <td colspan="2">Date/Time of Registration (Fecha/hora del registro):</td>
+                <td colspan="2"><strong><span id='sched'></span></strong></td>
+            </tr>
+        </table>
+        <div class="form-group hidden-print">
+            <div class="checkbox">
+                <label><input id="parentShopCB" type="checkbox" name="parentShopOK" value="n">
+                    <span style="font-size: 1.25em;"><i>Check box for special case: Allow parent to shop for the student. (Normally the student should shop.)</i></span>
+                </label>
+            </div>
+            <button class="btn btn-md btn-primary" onclick="myFunction()">Print Passport / Parent Information</button>
+            <a href="/students">&nbsp;&nbsp;<strong>Go back to student list</strong></a>
+            <br>
+        </div>
+        <p><strong>NOTE: Be sure to arrive before the registration desk closes (5:00 p.m. on weekdays and 10:30 a.m. on Saturdays).&nbsp;
+        (Aseg&uacute;rese de llegar antes de que se cierre el mostrador de registro (5:00 p.m. los d&iacute;as laborables y 10:30 a.m. los s&aacute;bados.))
+        </strong></p>
+        <br>
+        <p>My child may be photographed for Assistance League of Colorado Springs promotional purposes.&nbsp;
+        (Mi hijo puede ser fotografiado por La Liga de Asistencia de Colorado Springs con prop&oacute;sitos promocionales.)</p>
+        <p><strong>Parent/guardian signature (firma de padre/guardi&aacute;n):</strong>&nbsp;___________________________</p>
+        <br>
+        <p>My child will choose clothing that conforms to school Dress Codes. Clothing cannot be returned or exchanged.&nbsp;
+        (Mi hijo elegir&aacute; ropa que se ajusta a los c&oacute;digos de vestimenta de la escuela. La ropa no puede ser devuelta o intercambiada.)
+        </p>
+        <p><strong>Parent/guardian signature (firma de padre/guardi&aacute;n):</strong>&nbsp;___________________________</p>
+        <br>
+        <p><strong>Operation School Bell is held only at the Kohl&rsquo;s located at 3110 N. Powers.</strong>
+        (Operaci&oacute;n Escuela Bell se lleva a cabo solamente en el Kohl situado en 3110 N. Powers.)</p>
+    </div>
+</div>
+<p style="page-break-before: always"></p>
+<img src="../../../stylesheets/AlLogo-whitebg.jpg" style="width:120px;height:120px;margin-left:7%">
+<div class="row">
+    <h2 style="text-align: center">Parent Information</h2>
+    <h3 style="text-align: center">Operation School Bell&reg; 2018</h3>
+    <div style="width: 85%; margin: 25px auto;">
+        <p>Assistance League&reg; of Colorado Springs is a nonprofit organization that helps students and families in El Paso County. &nbsp;This year, we will again be partnering with Kohl&rsquo;s at 3110 N. Powers Blvd to provide school clothing for students in kindergarten through twelfth grades.</p>
+        <p>Please try to arrive at your scheduled time, as you will not be able to shop if you arrive after 5:00 p.m. (weekdays) or 10:30 a.m. (Saturdays) on your scheduled day.  If you are unable to shop on your scheduled day, please contact your school counselor to reschedule. </p>
+        <ul>
+        <li>There will be a yellow plastic figure at the north door where you will enter and register. Only students who have a schoolbell passport signed by a parent or guardian will be served. <strong>Siblings will not be served unless their school has provided a Passport for them.</strong></li>
+        <li>Students shopping must wear the wristband given to them to designate their money allotment.</li>
+        <li>Only school clothing may be purchased for students. &nbsp;No hats, jewelry, or purses may be purchased. </li>
+        <li>Schoolbell-specific cash registers will be at the south end of the store; you may only check out with these designated cashiers. &nbsp;You may not use any coupons for your School Bell purchases or receive Kohl&rsquo;s Cash. If you are under your allotted amount, you may only return to the shopping floor <strong>one time</strong> to add items to your purchase. &nbsp;If your purchase exceeds the designated amount, it will be your decision whether to pay any extra amount, up to $20.00, or not purchase all the clothing selected.</li>
+        <li>You will need to shop carefully as no items can be exchanged. &nbsp;You will not receive a receipt for the purchase.</li>
+        </ul>
+        <p>Kohl&rsquo;s employees will not be able to answer specific questions concerning Operation School Bell. You may call the store on Sep 10-13, 17-20, 24-27, Oct 1-4 between 3:00 and 5:00 p.m. or Sep 15, 22, 29 between &nbsp;8:00 and 10:00 a.m. to talk to a volunteer from Assistance League.</p>
+        <p>&nbsp;</p>
+        <h4 style="text-align: center">Operation School Bell clothing is purchased by the Assistance League of Colorado Springs.</h4>
+        <p style="text-align: center"><strong>assistanceleague.org/colorado-springs</strong></p>
+        <p>&nbsp;</p>
+    </div>
+</div>
