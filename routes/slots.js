@@ -58,7 +58,7 @@ router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function(req, res) {
             }
             else {
                 // logger.debug("schedStudCounts=" + JSON.stringify(schedStudCounts));
-                Slot.find({}, { avCnt: 1, max:1 })
+                Slot.find({}, { avCnt: 1, max: 1 })
                     .sort({
                         _id: 1,
                     })
@@ -82,7 +82,7 @@ router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function(req, res) {
                                     studentCount = schedStudCounts[j].count;
                                 }
                                 if (studentCount != slots[i].max - slots[i].avCnt) {
-                                    logger.info("count mismatch id=" + slots[i]._id + ", student count=" + studentCount + ", slot count=" + slots[i].max - slots[i].avCnt);
+                                    logger.info("count mismatch id=" + slots[i]._id + ", student count=" + studentCount + ", slot count=" + (slots[i].max - slots[i].avCnt));
                                     nbrMismatch++;
                                     if (req.params.fixflag == "y") { // fix avCnt in Slot
                                         logger.info("fixing avCnt to match number of students scheduled");

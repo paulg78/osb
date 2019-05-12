@@ -433,10 +433,57 @@ router.get("/:id/printPass", middleware.isLoggedIn, function(req, res) {
 });
 
 
-function fillSlots(slotRequest) {
+function updateNewSlot(nbrSlots, newTime) {
+    return new Promise((resolve, reject) => {
+        logger.debug("in updateNewSlot");
+        if (newTime) { // there is a new slot
+            Slot.findOneAndUpdate({ sdate: new Date(newTime) }, {
+                $inc: { avCnt: -nbrSlots }
+            }, {
+                projection: { _id: 1, avCnt: 1 },
+                returnNewDocument: false // returns avCnt before decrement, true doesn't seem to work
+            }, function(err, slot) {
+                logger.debug("slot before update=" + slot);
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    if (slot.avCnt <= 0) { // slot is over-filled (avCnt is one more than actual)
+                        // restore original since slot is full and student won't be added
+                        Slot.findByIdAndUpdate(slot._id, {
+                                $inc: { avCnt: nbrSlots }
+                            },
+                            function(err) {
+                                if (err) {
+                                    reject(err);
+                                }
+                                else {
+                                    logger.debug("overfilled slot._id=" + slot._id + "; avCnt=" + slot.avCnt);
+                                    reject({
+                                        message: "Selected slot (" +
+                                            new Date(newTime).
+                                        toLocaleDateString("en-US", { year: '2-digit', month: '2-digit', day: 'numeric', hour: '2-digit', minute: '2-digit' }) +
+                                        ") filled before you saved changes."
+                                    });
+                                }
+                            });
+                    }
+                    else {
+                        resolve(slot._id);
+                    }
+                }
+            });
+        }
+        else {
+            resolve(null);
+        }
+    });
+}
+
+
+function fillSlots(newSlotId, slotRequest) {
     return new Promise((resolve, reject) => {
         async.waterfall([
-            updateNewSlot,
             updateStudent,
             updateOldSlot
         ], function(err) {
@@ -449,52 +496,7 @@ function fillSlots(slotRequest) {
             }
         });
 
-        function updateNewSlot(callback) {
-            logger.debug("in updateNewSlot");
-            if (slotRequest.newTime) { // there is a new slot
-                Slot.findOneAndUpdate({ sdate: new Date(slotRequest.newTime) }, {
-                    $inc: { avCnt: -1 }
-                }, {
-                    projection: { _id: 1, avCnt: 1 },
-                    returnNewDocument: false // returns avCnt before decrement, true doesn't seem to work
-                }, function(err, slot) {
-                    logger.debug("slot before update=" + slot);
-                    if (err) {
-                        callback(err);
-                    }
-                    else {
-                        if (slot.avCnt <= 0) { // slot is over-filled (avCnt is one more than actual)
-                            // restore original since slot is full and student won't be added
-                            Slot.findByIdAndUpdate(slot._id, {
-                                    $inc: { avCnt: 1 }
-                                },
-                                function(err) {
-                                    if (err) {
-                                        callback(err);
-                                    }
-                                    else {
-                                        logger.debug("overfilled slot._id=" + slot._id + "; avCnt=" + slot.avCnt);
-                                        callback({
-                                            message: "Selected slot (" +
-                                                new Date(slotRequest.newTime).
-                                            toLocaleDateString("en-US", { year: '2-digit', month: '2-digit', day: 'numeric', hour: '2-digit', minute: '2-digit' }) +
-                                            ") filled before you saved changes."
-                                        });
-                                    }
-                                });
-                        }
-                        else {
-                            callback(null, slot._id);
-                        }
-                    }
-                });
-            }
-            else {
-                callback(null, null);
-            }
-        }
-
-        function updateStudent(newSlotId, callback) {
+        function updateStudent(callback) {
             logger.debug("in updateStudent with newSlotId=" + newSlotId + ", student id=" + slotRequest._id);
             if (slotRequest.unSched == "y") {
                 slotRequest.newData.slot = null;
@@ -589,22 +591,24 @@ router.put("/:id", function(req, res) {
     function failed(err) {
         logger.error(err.message);
         req.flash("error", "Changes not saved: " + err.message);
-        if (err.studNotFound) {
-            res.redirect("/students");
-        }
-        else {
-            res.redirect("back");
-        }
+        // if (err.studNotFound) {
+        //     res.redirect("/students");
+        // }
+        // else {
+        //     res.redirect("back");
+        // }
+        res.redirect("/students");
     }
 
     var result = studentValid(newData);
     if (result == "") {
-        fillSlots({
-            newData: newData,
-            newTime: req.body.timeSched,
-            unSched: req.body.unschedule,
-            _id: req.params.id
-        }).then(filled, failed);
+        updateNewSlot(1, req.body.timeSched)
+            .then(newSlotId => fillSlots(newSlotId, {
+                newData: newData,
+                unSched: req.body.unschedule,
+                _id: req.params.id
+            })).then(filled)
+            .catch(failed);
     }
     else {
         // logger.debug("edit validation error");
