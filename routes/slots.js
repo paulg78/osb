@@ -7,14 +7,12 @@ var middleware = require("../middleware");
 
 
 // Return list of available slots
-router.get("/avail", function(req, res) {
-    // logger.debug("today=" + new Date());
+router.get("/avail/:need", function(req, res) {
+    logger.debug("req.params.need=" + req.params.need);
     // subtract 6 hours to account for mountain time
     const future = Date.now() - 21600000;
-    // var qry = "this.sdate > Date.now() - 21600000 && this.count < this.max";
-    // logger.debug("avail slots qry=" + qry);
-    // Slot.find({ $where: qry }, { _id: 0, sdate: 1, count: 1, max: 1 }).hint("sdate_1")
-    Slot.find({ $and: [{ sdate: { $gt: future } }, { avCnt: { $gt: 0 } }] }, { _id: 0, sdate: 1, avCnt: 1 })
+
+    Slot.find({ $and: [{ sdate: { $gt: future } }, { avCnt: { $gt: req.params.need - 1 } }] }, { _id: 0, sdate: 1, avCnt: 1 })
         .exec(function(err, slots) {
             if (err) {
                 logger.error("error finding avail slots: " + err.message);
@@ -30,9 +28,9 @@ router.get("/avail", function(req, res) {
 
 // in slots, find and optionally fix counts that don't match actual number of students scheduled
 router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function(req, res) {
-    if (res.locals.currentUser.role != 'role_wa') {
-        return res.redirect("back");
-    }
+    // if (res.locals.currentUser.role != 'role_wa') {
+    //     return res.redirect("back");
+    // }
     logger.info("Starting checkCounts with fixflag=" + req.params.fixflag);
     Student.aggregate([{
             $match: {

@@ -72,54 +72,62 @@ if (qrySchool.students) {
             </form>
             <p></p>
     <% } %>
+    
      <table id="studentTable" class="table table-striped tablesorter">
          <thead>
-             <tr>
-             <th>First Name</th>
-             <th>Last Name</th>
-             <th>Grade</th>
-             <th>Added By</th>             
-             <th class="sorter-shortDate dateFormat-ddmmyyyy">Scheduled</th>
-             <th>Served</th>
-             </tr>
+            <tr>
+                <th style="width:25px" class="sorter-false"><button id="schedGrp" type="submit">Sch</button></th>        
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Grade</th>
+                <th>Added By</th>             
+                <th class="sorter-shortDate dateFormat-ddmmyyyy">Scheduled</th>
+                <th>Served</th>
+            </tr>
         </thead>
     <tbody id='studentList'>
     <% if (qrySchool.students) { %>        
-     <% qrySchool.students.forEach(function(student){ %>
-        <tr>
-            <td><%= student.fname %></td>
-            <td><%= student.lname %></td>
-            <td><%= student.grade %></td>
-            <td>
-              <% if (student.addedBy) { %>            
-                  <%= student.addedBy.name %>
-                  <% } %>                  
-            </td>
-            <% if (student.slot && student.slot.sdate) { %>
-                <td><%= dateString(student.slot.sdate) %></td>
-            <% } else { %>
-                <td></td>
-                <% } %>
-            <td>
-                <% if (student.served) { %>
-                    <p class="bg-success">Yes</p>
-                <% } else if (student.slot != null && missed(student.slot.sdate)) { %>
-                        <p class="bg-danger">NO</p>
+        <% qrySchool.students.forEach(function(student){ %>
+            <tr>
+                <td>
+                    <% if (!student.served) { %>                    
+                        <input type="checkbox" name="cb" value="">
+                    <% } %>                    
+                </td>
+                <td class='fname'><%= student.fname %></td>
+                <td class='lname'><%= student.lname %></td>
+                <td><%= student.grade %></td>
+                <td>
+                  <% if (student.addedBy) { %>            
+                      <%= student.addedBy.name %>
+                      <% } %>                  
+                </td>
+                <% if (student.slot && student.slot.sdate) { %>
+                    <td><%= dateString(student.slot.sdate) %></td>
                 <% } else { %>
-                        <p>no</p>
-                <% } %>
-            </td>
-            <td class="hidden-print">
-            <form style="display: inline">
-                <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-primary">Edit</a>
-                <% if (!student.served && student.slot != null && !missed(student.slot.sdate)) { %>
-                    <a href="/students/<%=student._id%>/printPass" class="btn btn-xs btn-primary">Passport</a>
-                <% } %>
-            </form>
-            </td>
-        </tr>
-    <% }); %>
-   <% } %>
+                    <td></td>
+                    <% } %>
+                <td>
+                    <% if (student.served) { %>
+                        <p class="bg-success">Yes</p>
+                    <% } else if (student.slot != null && missed(student.slot.sdate)) { %>
+                            <p class="bg-danger">NO</p>
+                    <% } else { %>
+                            <p>no</p>
+                    <% } %>
+                </td>
+                <td class="hidden studId"><%=student._id%></td>
+                <td class="hidden-print">
+                <form style="display: inline">
+                    <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-primary">Edit</a>
+                    <% if (!student.served && student.slot != null && !missed(student.slot.sdate)) { %>
+                        <a href="/students/<%=student._id%>/printPass" class="btn btn-xs btn-primary">Passport</a>
+                    <% } %>
+                </form>
+                </td>
+            </tr>
+        <% }); %>
+    <% } %>
   </tbody>
  </table>
 <script src="/js/ajax.js"></script>
@@ -136,6 +144,18 @@ $(document).ready(function() {
     $('#lname').change(function() {
         $('#lname').css('color','black');
     });
+    
+	$("table").on("click", "#schedGrp", function() {
+        var selNames = [];
+        var selIds = [];
+        $.each($("input[name='cb']:checked"), function() {
+            selIds.push($(this).parent().siblings(".studId")[0].innerText);
+            selNames.push($(this).parent().siblings(".fname")[0].innerText + " " + $(this).parent().siblings(".lname")[0].innerText);
+            });
+        if (selIds.length > 0) {
+            window.location.href = "/students/schedGrp?group=" + encodeURIComponent(JSON.stringify({ids: selIds, names: selNames}));     
+        }
+	});    
 });
 
 $(function(){

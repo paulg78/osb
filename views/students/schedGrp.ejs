@@ -1,0 +1,82 @@
+<% include ../partials/header %>
+
+<%
+const group = JSON.parse(groupStr);
+// const ids = encodeURIComponent(JSON.stringify(group.ids));
+
+function dateTimeString(d) {
+    var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    var h=d.getHours();
+    var ap;
+    if (h>12) {
+        h=h-12;
+        ap="PM";
+    }
+    else {
+        ap="AM";
+    }
+    var m = d.getMinutes();
+    if (m==0) {
+        m="00";
+    }
+    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
+}
+%>
+
+    <div class="row">
+        <h1 style="text-align: center">Schedule Group</h1>
+        <div style="width: 50%; margin: 25px auto;">
+            <h3>Students</h3>
+            <% group.names.forEach(function(name){ %>            
+                <h4 style='text-indent: 5%'><%=name%></h4>  
+                <% }); %>
+            <form action="/students/group/<%=groupStr%>?_method=PUT" method="POST">
+
+                        <div class="form-group">
+                            <div class="checkbox">
+                                  <label><input id="unschedCB" type="checkbox" name="unschedule" value="y"><span style="font-size: 1.25em;">Check box to unschedule Students</span></label>
+                            </div>
+                        </div>
+
+
+                    <div id="schedForm" class="form-group">
+                        <label style="font-size: 1.25em;">Schedule students:</label>
+                        <select id="dateSched" name="dateSched">
+                            <option value="" selected>Select date</option>
+                        </select>
+                        <select id="timeSched" name="timeSched" disabled>
+                            <option value="" selected>Select time</option>
+                        </select>
+                    </div>
+
+                <div class="form-group">
+                    <button id="saveStudBtn" class="btn btn-lg btn-primary">Save changes</button>
+                </div>
+            </form>
+            <a href="/students">Cancel Group Scheduling</a>
+
+        </div>
+    </div>
+    <span class="hidden" id="slotsAvail"></span>
+<script src="/scripts/schedule.js"></script>
+<script>
+$(document).ready(function () {
+    getAvailDates(<%=group.names.length%>);
+    });
+    
+$("#saveStudBtn").on('click', function(e) {
+    this.disabled = true;
+
+    if ($("#unschedCB").is(":not(:checked)") && $("#dateSched").val() != "" && $("#timeSched").val() == "") {
+        alert("Date and Time are required to schedule students.");
+        e.preventDefault();
+        this.disabled = false;
+    }
+    else {
+        this.form.submit();
+    }
+});    
+</script>
+
+<% include ../partials/footer %>
+

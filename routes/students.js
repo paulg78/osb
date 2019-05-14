@@ -152,6 +152,11 @@ router.get("/", middleware.isLoggedIn,
     }
 );
 
+router.get("/schedGrp", middleware.isLoggedIn, function(req, res) {
+    logger.debug('req.query.group=' + req.query.group);
+    res.render("students/schedGrp", { groupStr: req.query.group });
+});
+
 router.get("/stats", middleware.isLoggedIn, function(req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
@@ -481,7 +486,7 @@ function updateNewSlot(nbrSlots, newTime) {
 }
 
 
-function fillSlots(newSlotId, slotRequest) {
+function fillSlot(newSlotId, slotRequest) {
     return new Promise((resolve, reject) => {
         async.waterfall([
             updateStudent,
@@ -574,7 +579,53 @@ function fillSlots(newSlotId, slotRequest) {
 }
 
 
-// Update student/slots in database
+// Update group of student/slots (group schedule)
+router.put("/group/:groupStr", function(req, res) {
+
+    logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
+    logger.debug('req.params.groupStr=' + req.params.groupStr);
+    const group = JSON.parse(req.params.groupStr);
+
+    function filled() {
+        req.flash("success", "Successfully Updated " + group.names + ".");
+        res.redirect("/students");
+    }
+
+    function failed(err) {
+        logger.error(err.message);
+        req.flash("error", "Changes not saved: " + err.message);
+        res.redirect("/students");
+    }
+
+    function fillSlots(newSlotId) {
+        return new Promise((resolve, reject) => {
+            group.ids.forEach(function(id) {
+                fillSlot(newSlotId, {
+                    newData: {},
+                    unSched: req.body.unschedule,
+                    _id: id
+                });
+            });
+        });
+    }
+
+    updateNewSlot(group.ids.length, req.body.timeSched)
+        .then(newSlotId => fillSlots(newSlotId))
+        .then(filled)
+        .catch(failed);
+
+    // This works for a group of one:
+    // updateNewSlot(group.ids.length, req.body.timeSched)
+    //     .then(newSlotId => fillSlot(newSlotId, {
+    //         newData: {},
+    //         unSched: req.body.unschedule,
+    //         _id: group.ids[0]
+    //     })).then(filled)
+    //     .catch(failed);
+});
+
+
+// Update student/slots
 router.put("/:id", function(req, res) {
     var newData = {
         fname: req.body.firstName,
@@ -591,19 +642,13 @@ router.put("/:id", function(req, res) {
     function failed(err) {
         logger.error(err.message);
         req.flash("error", "Changes not saved: " + err.message);
-        // if (err.studNotFound) {
-        //     res.redirect("/students");
-        // }
-        // else {
-        //     res.redirect("back");
-        // }
         res.redirect("/students");
     }
 
     var result = studentValid(newData);
     if (result == "") {
         updateNewSlot(1, req.body.timeSched)
-            .then(newSlotId => fillSlots(newSlotId, {
+            .then(newSlotId => fillSlot(newSlotId, {
                 newData: newData,
                 unSched: req.body.unschedule,
                 _id: req.params.id
@@ -616,7 +661,6 @@ router.put("/:id", function(req, res) {
         res.redirect("back");
     }
 });
-
 
 // Check In
 router.put("/:id/checkIn/:served", function(req, res) {
