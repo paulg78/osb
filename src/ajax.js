@@ -15,13 +15,15 @@ $(document).ready(function() {
                     $('#studentList').append(
                         `
             <tr>
-                <td>${result.student.fname}</td>
-                <td>${result.student.lname}</td>
+                <td><input type="checkbox" name="cb" value=""></td>            
+                <td class='fname'>${result.student.fname}</td>
+                <td class='lname'>${result.student.lname}</td>
                 <td>${result.student.grade}</td>
                 <td>${$('#currUser')[0].innerText}</td>                
                 <td></td>
                 <td>no</td>
-                <td>
+                <td class="hidden studId">${result.student._id}</td>                
+                <td class="hidden-print>
                     <form style="display: inline">
                         <a href="/students/${result.student._id}/edit" class="btn btn-xs btn-primary">Edit</a>
                     </form>

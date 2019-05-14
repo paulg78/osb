@@ -65,7 +65,9 @@ router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function(req, res) {
                             logger.error("checkCounts, finding slots " + err.message);
                         }
                         else {
-                            var nbrMismatch = 0;
+                            var nbrMismatch = 0,
+                                nbrOverbook = 0;
+                            
                             // logger.debug("slots=" + slots);
                             var j = 0;
                             var jlim = schedStudCounts.length;
@@ -94,10 +96,14 @@ router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function(req, res) {
                                             });
                                     }
                                 }
+                                if (studentCount > slots[i].max) {
+                                    logger.info("overbooked id=" + slots[i]._id + ", student count=" + studentCount + ", slot max=" + slots[i].max);
+                                    nbrOverbook++;
+                                }                                
                             }
-                            req.flash("success", "Ending checkCounts/" + req.params.fixflag + ". Nbr count mismatches=" + nbrMismatch);
-                            logger.info("Ending checkCounts. Nbr count mismatches=" + nbrMismatch);
-                            res.redirect("back");
+                            req.flash("success", "Ending checkCounts/" + req.params.fixflag + ". Nbr count mismatches=" + nbrMismatch + ", overbooked=" + nbrOverbook);
+                            logger.info("Ending checkCounts. Nbr count mismatches found=" + nbrMismatch + ", overbooked=" + nbrOverbook);
+                            res.redirect("/login");
                         }
                     });
             }

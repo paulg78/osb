@@ -453,7 +453,7 @@ function updateNewSlot(nbrSlots, newTime) {
                     reject(err);
                 }
                 else {
-                    if (slot.avCnt <= 0) { // slot is over-filled (avCnt is one more than actual)
+                    if (slot.avCnt < nbrSlots) { // slot is over-filled (avCnt is one more than actual)
                         // restore original since slot is full and student won't be added
                         Slot.findByIdAndUpdate(slot._id, {
                                 $inc: { avCnt: nbrSlots }
@@ -522,31 +522,10 @@ function fillSlot(newSlotId, slotRequest) {
                         if (!student) { // student not found; may have been deleted in another window
                             // undo slot update if needed
                             logger.debug("student to update is missing");
-                            if (newSlotId) { // student was added to new slot
-                                logger.debug("undoing slot update");
-                                Slot.findByIdAndUpdate(newSlotId, {
-                                    $inc: { avCnt: 1 }
-                                }, function(err) {
-                                    if (err) {
-                                        logger.error("error on slot undo");
-                                        callback(err);
-                                    }
-                                    else {
-                                        logger.debug("slot undo complete");
-                                        callback({
-                                            studNotFound: true,
-                                            message: "Student not found; may have been deleted."
-                                        });
-                                    }
-                                });
-                            }
-                            else {
-                                logger.debug("no slot undo");
-                                callback({
-                                    studNotFound: true,
-                                    message: "Student not found; may have been deleted."
-                                });
-                            }
+                            callback({
+                                studNotFound: true,
+                                message: "Student not found; may have been deleted."
+                            });
                         }
                         else {
                             callback(null, student.slot, newSlotId);
@@ -581,47 +560,40 @@ function fillSlot(newSlotId, slotRequest) {
 
 // Update group of student/slots (group schedule)
 router.put("/group/:groupStr", function(req, res) {
-
     logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
     logger.debug('req.params.groupStr=' + req.params.groupStr);
+    const unsched = req.body.unschedule;
     const group = JSON.parse(req.params.groupStr);
 
     function filled() {
-        req.flash("success", "Successfully Updated " + group.names + ".");
+        var nameStr = "";
+        for (const name of group.names) {
+            nameStr += ", " + name;
+        }
+        req.flash("success", "Successfully updated" + nameStr.substr(1) + ".");
         res.redirect("/students");
     }
 
     function failed(err) {
         logger.error(err.message);
-        req.flash("error", "Changes not saved: " + err.message);
+        req.flash("error", "Some changes not saved: " + err.message);
         res.redirect("/students");
     }
 
-    function fillSlots(newSlotId) {
-        return new Promise((resolve, reject) => {
-            group.ids.forEach(function(id) {
-                fillSlot(newSlotId, {
-                    newData: {},
-                    unSched: req.body.unschedule,
-                    _id: id
-                });
+    async function fillSlots(newSlotId) {
+        for (const id of group.ids) {
+            await fillSlot(newSlotId, {
+                newData: {},
+                unSched: unsched,
+                _id: id
             });
-        });
+        }
     }
 
     updateNewSlot(group.ids.length, req.body.timeSched)
         .then(newSlotId => fillSlots(newSlotId))
         .then(filled)
         .catch(failed);
-
-    // This works for a group of one:
-    // updateNewSlot(group.ids.length, req.body.timeSched)
-    //     .then(newSlotId => fillSlot(newSlotId, {
-    //         newData: {},
-    //         unSched: req.body.unschedule,
-    //         _id: group.ids[0]
-    //     })).then(filled)
-    //     .catch(failed);
 });
 
 
@@ -635,7 +607,7 @@ router.put("/:id", function(req, res) {
     logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
 
     function filled() {
-        req.flash("success", "Successfully Updated " + newData.fname + " " + newData.lname + ".");
+        req.flash("success", "Successfully updated " + newData.fname + " " + newData.lname + ".");
         res.redirect("/students");
     }
 
