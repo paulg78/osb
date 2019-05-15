@@ -9,7 +9,6 @@ $("#delStudBtn").on('click', function(e) {
 
 $("#saveStudBtn").on('click', function(e) {
     this.disabled = true;
-    console.log('$("#unschedCB").is(":not(:checked)")=' + $("#unschedCB").is(":not(:checked)"));
     if ($("#fname").val().trim() == "" || $("#lname").val().trim() == "") {
         alert("First and last name are required fields");
         e.preventDefault();

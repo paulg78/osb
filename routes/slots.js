@@ -8,7 +8,7 @@ var middleware = require("../middleware");
 
 // Return list of available slots
 router.get("/avail/:need", function(req, res) {
-    logger.debug("req.params.need=" + req.params.need);
+// logger.debug("req.params.need=" + req.params.need);
     // subtract 6 hours to account for mountain time
     const future = Date.now() - 21600000;
 

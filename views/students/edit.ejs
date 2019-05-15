@@ -90,7 +90,9 @@ function dateTimeString(d) {
 <script>
 $(document).ready(function () {
     document.getElementById("gradeSelect").value = "<%=student.grade %>";
-    getAvailDates(1);
+    if (document.getElementById('dateSched')) {
+        getAvailDates(1);
+    }
     });
 </script>
 

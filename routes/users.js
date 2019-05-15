@@ -17,12 +17,12 @@ function emailHash(email) {
 
 // REGISTER - add new user to DB
 router.post("/register", function(req, res) {
-    logger.debug("In User Register");
-    logger.debug("req.body.name=" + req.body.name);
-    logger.debug("req.body.phone=" + req.body.phone);
-    logger.debug("req.body.schoolCode=" + req.body.schoolCode);
-    logger.debug("req.body.schoolName=" + req.body.schoolName);
-    logger.debug("req.body.email=" + req.body.email);
+// logger.debug("In User Register");
+// logger.debug("req.body.name=" + req.body.name);
+// logger.debug("req.body.phone=" + req.body.phone);
+// logger.debug("req.body.schoolCode=" + req.body.schoolCode);
+// logger.debug("req.body.schoolName=" + req.body.schoolName);
+// logger.debug("req.body.email=" + req.body.email);
 
     var email = shared.myTrim(req.body.email).toLowerCase();
     var newUser = {
@@ -57,7 +57,7 @@ router.post("/register", function(req, res) {
 
 
     function checkMailChimp(callback) {
-        logger.debug('Checking Mailchimp with email=' + newUser.email);
+// logger.debug('Checking Mailchimp with email=' + newUser.email);
         request.get({
             uri: MEMBERS_URI + '/' + ehash + '?fields=status',
             json: true,
@@ -76,7 +76,7 @@ router.post("/register", function(req, res) {
 
 
     function updateMailChimp(status, callback) {
-        logger.debug('status=' + status);
+// logger.debug('status=' + status);
         switch (status) {
             case 404: // not on MC list
             case 'subscribed':
@@ -118,7 +118,7 @@ router.post("/register", function(req, res) {
     }
 
     function createUser(MCresult, status, callback) {
-        logger.debug('MCresult=' + MCresult);
+// logger.debug('MCresult=' + MCresult);
         // Create a new user in DB
         User.create(newUser, function(err) {
             if (err) {
@@ -325,7 +325,7 @@ router.get("/stats", function(req, res) {
 
 // Update user in database
 router.put("/:id", middleware.isLoggedIn, function(req, res) {
-    logger.debug("req.body=" + JSON.stringify(req.body));
+// logger.debug("req.body=" + JSON.stringify(req.body));
     var newData = {
         name: shared.myTrim(req.body.name),
         phone: shared.myTrim(req.body.phone)

@@ -186,7 +186,7 @@ router.get("/:id/edit", function(req, res) {
         }
         else {
             //render show template with that school
-            logger.debug("foundSchool=" + foundSchool);
+// logger.debug("foundSchool=" + foundSchool);
             res.render("schools/edit", {
                 school: foundSchool
             });

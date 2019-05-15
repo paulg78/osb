@@ -113,8 +113,8 @@ router.get('/requestpwreset', function(req, res) {
 
 // show username/password reset form for password reset (existing user)
 router.get('/requestpwresetData', function(req, res) {
-    logger.debug("req.query.email=" + req.query.email);
-    logger.debug("req.query.schoolCode=" + req.query.schoolCode);
+// logger.debug("req.query.email=" + req.query.email);
+// logger.debug("req.query.schoolCode=" + req.query.schoolCode);
 
     User.findOne({
             schoolCode: req.query.schoolCode,
@@ -132,7 +132,7 @@ router.get('/requestpwresetData', function(req, res) {
                 return res.redirect('/requestpwreset');
             }
             else {
-                logger.debug("in requestpwreset user=" + user);
+// logger.debug("in requestpwreset user=" + user);
                 res.render('resetpw', {
                     schoolCode: req.query.schoolCode,
                     username: user.username,
@@ -153,8 +153,8 @@ router.get('/register', function(req, res) {
 
 // show second registration form
 router.get('/registerData', function(req, res) {
-    logger.debug("req.query.email=" + req.query.email);
-    logger.debug("req.query.schoolCode=" + req.query.schoolCode);
+// logger.debug("req.query.email=" + req.query.email);
+// logger.debug("req.query.schoolCode=" + req.query.schoolCode);
 
     var email = req.query.email.toLowerCase();
     var tester = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/; // copied from email-validator package code
@@ -178,7 +178,7 @@ router.get('/registerData', function(req, res) {
             req.flash('error', "School not found for School Code " + req.query.schoolCode);
             return res.redirect('back');
         }
-        logger.debug("school=" + school);
+// logger.debug("school=" + school);
         // verify user not yet registered
         User.findOne({
             schoolCode: req.query.schoolCode,
@@ -283,9 +283,9 @@ router.get('/resetpw/:username/:schoolCode/:school', function(req, res) {
 router.post('/resetpw', function(req, res) {
     // logger.debug("req.body.password=" + req.body.password);
     // logger.debug("req.body.confirm=" + req.body.confirm);
-    logger.debug("req.body.username=" + req.body.username);
-    logger.debug("req.body.newUsername=" + req.body.newUsername);
-    logger.debug("req.body.schoolCode=" + req.body.schoolCode);
+// logger.debug("req.body.username=" + req.body.username);
+// logger.debug("req.body.newUsername=" + req.body.newUsername);
+// logger.debug("req.body.schoolCode=" + req.body.schoolCode);
 
     User.findOne({
             username: req.body.username
@@ -310,7 +310,7 @@ router.post('/resetpw', function(req, res) {
             // logger.debug('resetpwRoute=' + resetpwRoute);
 
             if (req.body.password != req.body.confirm) {
-                logger.debug("password mismatch");
+// logger.debug("password mismatch");
                 req.flash('error', "Password confirmation doesn't match first password entered.");
                 return res.redirect(resetpwRoute);
             }

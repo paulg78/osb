@@ -76,7 +76,7 @@ if (qrySchool.students) {
      <table id="studentTable" class="table table-striped tablesorter">
          <thead>
             <tr>
-                <th style="width:25px" class="sorter-false"><button id="schedGrp" type="submit">Sch</button></th>        
+                <th style="width:20px" class="sorter-false"><button id="schedGrp" type="button" class= 'btn-xs btn-primary'>*S</button></th>        
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Grade</th>
@@ -119,9 +119,9 @@ if (qrySchool.students) {
                 <td class="hidden studId"><%=student._id%></td>
                 <td class="hidden-print">
                 <form style="display: inline">
-                    <a href="/students/<%=student._id%>/edit" class="btn btn-xs btn-primary">Edit</a>
+                    <button type="button" class="editBtn btn-xs btn-primary">Edit</button>
                     <% if (!student.served && student.slot != null && !missed(student.slot.sdate)) { %>
-                        <a href="/students/<%=student._id%>/printPass" class="btn btn-xs btn-primary">Passport</a>
+                        <button type="button" class="passBtn btn-xs btn-primary">Passport</button>
                     <% } %>
                 </form>
                 </td>
@@ -143,6 +143,14 @@ $(document).ready(function() {
     });
     $('#lname').change(function() {
         $('#lname').css('color','black');
+    });
+    
+    $(".editBtn").click(function() {
+        window.location.href = "/students/" + $(this).parent().parent().siblings(".studId")[0].innerText + "/edit";
+    });
+    
+    $(".passBtn").click(function() {
+        window.location.href = "/students/" + $(this).parent().parent().siblings(".studId")[0].innerText + "/printPass";
     });
     
 	$("table").on("click", "#schedGrp", function() {
