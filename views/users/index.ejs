@@ -20,6 +20,7 @@
                 <th>UserName</th>
                 <th>PW</th>
                 <th class="filter-select" data-placeholder="All">Role</th>
+                <th data-sorter="false" data-filter="false"></th>
             </tr>
         </thead>
         <tbody>
@@ -28,21 +29,21 @@
                     <td><%= user.name %></td>
                     <td><%= user.email %></td>
                     <td>            
-                    <% if (user.school) { %>
-                        <%= user.school.name %>
+                        <% if (user.school) { %>
+                            <%= user.school.name %>
                         <% } %>
                     </td>
                     <td><%= user.username %></td>
                     <td><%= user.hasPw %></td>
                     <td><%= user.role %></td>
-                    <% if(currentUser.role == "role_wa" || user.role == "role_sc" || currentUser.username == user.username){ %>
-                        <td>
-                            <form style="display: inline" action="/users/<%=user._id%>?_method=DELETE" method="POST">
-                                <a href="/users/<%=user._id%>/edit" class="btn btn-xs btn-info">Edit</a>
-                                <button class="delUserBtn btn btn-xs btn-danger">DEL</button>
-                            </form>
-                        </td>
-                    <% }; %>
+                    <td>
+                        <% if(currentUser.role == "role_wa" || user.role == "role_sc" || currentUser.username == user.username){ %>
+                                <form style="display: inline" action="/users/<%=user._id%>?_method=DELETE" method="POST">
+                                    <a href="/users/<%=user._id%>/edit" class="btn btn-xs btn-primary">Edit</a>
+                                    <button type="submit" class="delUserBtn btn btn-xs btn-danger">DEL</button>
+                                </form>
+                        <% }; %>
+                    </td>
                 </tr>
             <% }); %>
         </tbody>
