@@ -1,7 +1,10 @@
 <% include ../partials/header %>
-
+<style>
+input[type=checkbox] {
+    transform: scale(1.5);
+}
+</style>
 <%
-
 function dateTimeString(d) {
     var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
     var h=d.getHours();
@@ -19,7 +22,6 @@ function dateTimeString(d) {
     }
     return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
 }
-
 %>
 
     <div class="row">

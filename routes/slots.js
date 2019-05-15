@@ -28,9 +28,9 @@ router.get("/avail/:need", function(req, res) {
 
 // in slots, find and optionally fix counts that don't match actual number of students scheduled
 router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function(req, res) {
-    // if (res.locals.currentUser.role != 'role_wa') {
-    //     return res.redirect("back");
-    // }
+    if (res.locals.currentUser.role != 'role_wa') {
+        return res.redirect("back");
+    }
     logger.info("Starting checkCounts with fixflag=" + req.params.fixflag);
     Student.aggregate([{
             $match: {
