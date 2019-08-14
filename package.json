@@ -25,6 +25,7 @@
     "express-session": "^1.16.1",
     "method-override": "^2.3.10",
     "mongoose": "^5.5.5",
+    "node-cron": "^2.0.3",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
     "passport-local-mongoose": "^4.5.0",
