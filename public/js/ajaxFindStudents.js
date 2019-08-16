@@ -1,23 +1,6 @@
-"use strict";
+'use strict';
 
 /* global $ */
-
-function dateString(d) {
-    var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    var h = d.getHours();
-    var ap;
-    if (h > 12) {
-        h = h - 12;
-        ap = "PM";
-    } else {
-        ap = "AM";
-    }
-    var m = d.getMinutes();
-    if (m == 0) {
-        m = "00";
-    }
-    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
-}
 
 function listStudents(findStr) {
     // console.log('findStr=' + findStr);
@@ -29,13 +12,13 @@ function listStudents(findStr) {
             // console.log('Ajax post returned success');
             if (students) {
                 students.forEach(function (student) {
-                    $('#studentList').append("\n                        <tr>\n                            <td>" + student.fname + "</td>\n                            <td>" + student.lname + "</td>\n                            <td>" + student.schoolName + "</td>\n                            <td>" + student.grade + "</td>\n                            <td>" + student.scName + "</td>\n                            <td>" + (student.sdate ? dateString(new Date(student.sdate)) : '') + "</td>\n                            <td>" + (student.served ? 'Y' : 'N') + "</td>\n                        </tr>\n                        ");
+                    $('#studentList').append('\n                        <tr>\n                            <td>' + student.fname + '</td>\n                            <td>' + student.lname + '</td>\n                            <td>' + student.schoolName + '</td>\n                            <td>' + student.grade + '</td>\n                            <td>' + student.scName + '</td>\n                            <td>' + student.dateStr + '</td>\n                            <td>' + (student.served ? 'Y' : 'N') + '</td>\n                        </tr>\n                        ');
                 });
             }
         },
         error: function error(err) {
             // console.log('Ajax GET returned error: ' + err.responseText);
-            $('#studentList').append("\n                <p>" + ('Error geting data: ' + err.responseText) + "</p>\n                ");
+            $('#studentList').append('\n                <p>' + ('Error geting data: ' + err.responseText) + '</p>\n                ');
         }
     });
 }

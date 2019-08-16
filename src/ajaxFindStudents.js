@@ -1,24 +1,5 @@
 /* global $ */
 
-function dateString(d) {
-    var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    var h = d.getHours();
-    var ap;
-    if (h > 12) {
-        h = h - 12;
-        ap = "PM";
-    }
-    else {
-        ap = "AM";
-    }
-    var m = d.getMinutes();
-    if (m == 0) {
-        m = "00";
-    }
-    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
-}
-
-
 function listStudents(findStr) {
     // console.log('findStr=' + findStr);
     $.ajax({
@@ -37,7 +18,7 @@ function listStudents(findStr) {
                             <td>${student.schoolName}</td>
                             <td>${student.grade}</td>
                             <td>${student.scName}</td>
-                            <td>${student.sdate ? dateString(new Date(student.sdate)) : ''}</td>
+                            <td>${student.dateStr}</td>
                             <td>${student.served ? 'Y' : 'N'}</td>
                         </tr>
                         `

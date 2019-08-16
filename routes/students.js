@@ -27,6 +27,24 @@ router.get("/find", middleware.isLoggedIn, function(req, res) {
         return res.redirect("back");
     }
 
+    function dateString(d) {
+        var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        var h = d.getHours();
+        var ap;
+        if (h > 12) {
+            h = h - 12;
+            ap = "PM";
+        }
+        else {
+            ap = "AM";
+        }
+        var m = d.getMinutes();
+        if (m == 0) {
+            m = "00";
+        }
+        return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
+    }
+
     function studentRay(students) {
         var studRay = [];
         // had to brute force this because school name wouldn't populate
@@ -37,7 +55,7 @@ router.get("/find", middleware.isLoggedIn, function(req, res) {
                 schoolName: student.school ? student.school.name : '',
                 grade: student.grade,
                 scName: student.addedBy ? student.addedBy.name : '',
-                sdate: student.slot ? student.slot.sdate : '',
+                dateStr: student.slot ? dateString(student.slot.sdate) : '',
                 served: student.served
             });
         });
@@ -46,7 +64,7 @@ router.get("/find", middleware.isLoggedIn, function(req, res) {
 
     // search on schoolCode or last name
     if (req.query.schoolCode) {
-// logger.debug('schoolCode=' + req.query.schoolCode);
+        // logger.debug('schoolCode=' + req.query.schoolCode);
 
         Student.find({ schoolCode: req.query.schoolCode }, { _id: 0 })
             .sort({ "lname": 1, "fname": 1 })
@@ -64,7 +82,7 @@ router.get("/find", middleware.isLoggedIn, function(req, res) {
             });
     }
     else {
-// logger.debug('lname=' + req.query.lastName);
+        // logger.debug('lname=' + req.query.lastName);
         // could return a lot of matches so limit to 20
         Student.find({ lname: { $regex: new RegExp('.*' + req.query.lastName + '.*'), $options: 'i' } }, { _id: 0 })
             .limit(20)
@@ -91,7 +109,7 @@ router.get("/", middleware.isLoggedIn,
             // logger.debug("skipping to next students handler");
             next();
         }
-        else { // list all students
+        else { // list all students (only used by web admin)
             // logger.debug("after next");
             Student.find()
                 .sort({ "lname": 1, "fname": 1 })
@@ -153,7 +171,7 @@ router.get("/", middleware.isLoggedIn,
 );
 
 router.get("/schedGrp", middleware.isLoggedIn, function(req, res) {
-// logger.debug('req.query.group=' + req.query.group);
+    // logger.debug('req.query.group=' + req.query.group);
     res.render("students/schedGrp", { groupStr: req.query.group });
 });
 
@@ -215,7 +233,7 @@ router.get("/stats", middleware.isLoggedIn, function(req, res) {
 
     function getFutureSlotsAvail(stats, callback) {
         var d = new Date(Date.now() - 5 * 3600000); // one hour from now in mountain time
-// logger.debug("one hour from now=" + d);
+        // logger.debug("one hour from now=" + d);
         Slot.aggregate([{
                 $match: {
                     $expr: { $gt: ["$sdate", d] }
@@ -440,7 +458,7 @@ router.get("/:id/printPass", middleware.isLoggedIn, function(req, res) {
 
 function updateNewSlot(nbrSlots, newTime) {
     return new Promise((resolve, reject) => {
-// logger.debug("in updateNewSlot");
+        // logger.debug("in updateNewSlot");
         if (newTime) { // there is a new slot
             Slot.findOneAndUpdate({ sdate: new Date(newTime) }, {
                 $inc: { avCnt: -nbrSlots }
@@ -448,7 +466,7 @@ function updateNewSlot(nbrSlots, newTime) {
                 projection: { _id: 1, avCnt: 1 },
                 returnNewDocument: false // returns avCnt before decrement, true doesn't seem to work
             }, function(err, slot) {
-// logger.debug("slot before update=" + slot);
+                // logger.debug("slot before update=" + slot);
                 if (err) {
                     reject(err);
                 }
@@ -463,7 +481,7 @@ function updateNewSlot(nbrSlots, newTime) {
                                     reject(err);
                                 }
                                 else {
-// logger.debug("overfilled slot._id=" + slot._id + "; avCnt=" + slot.avCnt);
+                                    // logger.debug("overfilled slot._id=" + slot._id + "; avCnt=" + slot.avCnt);
                                     reject({
                                         message: "Selected slot (" +
                                             new Date(newTime).
@@ -492,7 +510,7 @@ function fillSlot(newSlotId, slotRequest) {
             updateStudent,
             updateOldSlot
         ], function(err) {
-// logger.debug("ending update waterfall");
+            // logger.debug("ending update waterfall");
             if (err) {
                 reject(err);
             }
@@ -502,7 +520,7 @@ function fillSlot(newSlotId, slotRequest) {
         });
 
         function updateStudent(callback) {
-// logger.debug("in updateStudent with newSlotId=" + newSlotId + ", student id=" + slotRequest._id);
+            // logger.debug("in updateStudent with newSlotId=" + newSlotId + ", student id=" + slotRequest._id);
             if (slotRequest.unSched == "y") {
                 slotRequest.newData.slot = null;
             }
@@ -514,14 +532,14 @@ function fillSlot(newSlotId, slotRequest) {
                     returnNewDocument: false // returns student before update
                 },
                 function(err, student) {
-// logger.debug("in updateStudent, student=" + student);
+                    // logger.debug("in updateStudent, student=" + student);
                     if (err) {
                         callback(err);
                     }
                     else {
                         if (!student) { // student not found; may have been deleted in another window
                             // undo slot update if needed
-// logger.debug("student to update is missing");
+                            // logger.debug("student to update is missing");
                             callback({
                                 studNotFound: true,
                                 message: "Student not found; may have been deleted."
@@ -535,8 +553,8 @@ function fillSlot(newSlotId, slotRequest) {
         }
 
         function updateOldSlot(oldSlotId, newSlotId, callback) {
-// logger.debug("in updateOldSlot with oldSlotId=" + oldSlotId);
-// logger.debug("in updateOldSlot with newSlotId=" + newSlotId);
+            // logger.debug("in updateOldSlot with oldSlotId=" + oldSlotId);
+            // logger.debug("in updateOldSlot with newSlotId=" + newSlotId);
             if (oldSlotId && (newSlotId || slotRequest.unSched == "y")) { // student was scheduled and is either being unscheduled or rescheduled
                 Slot.findByIdAndUpdate(oldSlotId, {
                     $inc: { avCnt: 1 }
@@ -544,7 +562,7 @@ function fillSlot(newSlotId, slotRequest) {
                     projection: { _id: 1, avCnt: 1 },
                     returnNewDocument: false // returns avCnt before increment, true doesn't seem to work
                 }, function(err, slot) {
-// logger.debug("slot before update=" + slot);
+                    // logger.debug("slot before update=" + slot);
                     // can't handle error at this point
                     callback(null);
                 });
@@ -560,8 +578,8 @@ function fillSlot(newSlotId, slotRequest) {
 
 // Update group of student/slots (group schedule)
 router.put("/group/:groupStr", function(req, res) {
-// logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
-// logger.debug('req.params.groupStr=' + req.params.groupStr);
+    // logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
+    // logger.debug('req.params.groupStr=' + req.params.groupStr);
     const unsched = req.body.unschedule;
     const group = JSON.parse(req.params.groupStr);
 
@@ -604,7 +622,7 @@ router.put("/:id", function(req, res) {
         lname: req.body.lastName,
         grade: req.body.grade
     };
-// logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
+    // logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
 
     function filled() {
         req.flash("success", "Successfully updated " + newData.fname + " " + newData.lname + ".");
