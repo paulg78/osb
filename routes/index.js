@@ -25,7 +25,7 @@ router.get("/help", function(req, res) {
 });
 
 //show OSB Info
-router.get("/osbInfo", function(req, res) {
+router.get("/osbInfo", middleware.isLoggedIn, function(req, res) {
     var fs = require('fs');
     fs.readFile('osbInfo.txt', function(err, txt) {
         if (err) {
