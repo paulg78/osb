@@ -1,5 +1,9 @@
 <% include ../partials/header %>
-
+    <%
+    var
+        filled= stats.sched + stats.unsched,
+        unfilled=stats.totalQuota - filled;
+    %>
 <div class="row">
     <h2>Students In Database</h2>
     <table style="font-size: 1.25em;">
@@ -9,24 +13,60 @@
             <td style="text-align:right;"><%= stats.unsched %></td>
         </tr>
         <tr>
-            <td>Scheduled (not yet served):&nbsp;&nbsp;</td>
+            <td>Scheduled but not yet served:&nbsp;&nbsp;</td>
             <td style="text-align:right;"><%= stats.sched - stats.served %></td>
         </tr>
         <tr>
-            <td>Scheduled (served):</td>
+            <td>Scheduled and served:</td>
             <td style="text-align:right;"><%= stats.served %></td>
         </tr>
     </tbody>
     <tfoot style="font-weight: bold">
         <tr>
             <td>Total:</td>
-            <td style="text-align:right;"><%= stats.unsched + stats.sched %></td>
+            <td style="text-align:right;"><%= filled %></td>
         </tr>
     </tfoot>
-</table>
+    </table>
+
+    <h2>Status of Total Allotment</h2>
+    <table style="font-size: 1.25em;">
+        <thead style="font-weight: bold">
+            <tr>
+                <td></td>
+                <td>count</td>
+                <td>&nbsp;&nbsp;percent</td>
+            </tr>
+        </thead>
+        <tbody >
+            <tr>
+                <td>Unfilled:</td>
+                <td style="text-align:right;"><%= unfilled %></td>
+                <td style="text-align:right;"><%= (unfilled * 100 / stats.totalQuota).toFixed(1) %></td>
+            </tr>            <tr>
+                <td>Filled:</td>
+                <td style="text-align:right;"><%= filled %></td>
+                <td style="text-align:right;"><%= (filled * 100 / stats.totalQuota).toFixed(1) %></td>
+            </tr>
+            <tr>
+                <td>Scheduled:&nbsp;&nbsp;</td>
+                <td style="text-align:right;"><%= stats.sched %></td>
+                <td style="text-align:right;"><%= (stats.sched * 100 / stats.totalQuota).toFixed(1) %></td>
+            </tr>
+            <tr>
+                <td>Served:</td>
+                <td style="text-align:right;"><%= stats.served %></td>
+                <td style="text-align:right;"><%= (stats.served * 100 / stats.totalQuota).toFixed(1) %></td>
+            </tr>
+        </tbody>
+    </table>
 <br><br>
 <h4>Remaining allotment to be scheduled: <%= stats.totalQuota - stats.sched %> (of total allotment <%= stats.totalQuota %>)</h4>
-<h4>Future (after <%= stats.futureDate %>) fittings available: <%= stats.futureSlotsAvail %></h4>
+<h4>Future (after <%= stats.futureDate %>) fittings available: <%= stats.futureSlotsAvail %>
+    <% if (stats.totalQuota - stats.sched > stats.futureSlotsAvail) { %>
+        <span class="bg-danger">(Not enough fittings left)</span>
+        <% } %>
+</h4>
 <p>Note: these are slots at least an hour from now, on the assumption the student would need to be notified at least an hour in advance. </p>
 </div>
 

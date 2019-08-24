@@ -74,8 +74,8 @@
                 <th><%= userTot %></th>                                
                 <td></td>                
                 <td><%= qTot %></td>
-                <td><%= (filledTot / qTot).toFixed(1) %></td>
-                <td><%= (schedTot / qTot).toFixed(1) %></td>
+                <td><%= (filledTot * 100 / qTot).toFixed(1) %></td>
+                <td><%= (schedTot * 100 / qTot).toFixed(1) %></td>
                 <td><%= servedTot %></td>
                 <td></td>
             </tr>
