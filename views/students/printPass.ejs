@@ -22,7 +22,8 @@ function dateTimeString(d) {
 
 %>
 <% include ../../public/passport.html %>
-
+<% include ../../public/parentInfo.html %>
+<% include ../../public/parentInfoSp.html %>
 <script>
 $(document).ready(function() {
     $("#year").text(new Date().getFullYear());
@@ -43,6 +44,22 @@ $("#parentShopCB").on('change', function (e) {
     else {
         $("#parentShopText").addClass("hidden");
         $("#parentShopText").addClass("hidden-print");
+    }
+});
+
+$("#spanParInfoCB").on('change', function (e) {
+    // console.log("Span par info CB changed to " + this.checked);
+    if (this.checked) {
+        $("#engParInfo").addClass("hidden");
+        $("#engParInfo").addClass("hidden-print");
+        $("#spanParInfo").removeClass("hidden");
+        $("#spanParInfo").removeClass("hidden-print");
+    }
+    else {
+        $("#engParInfo").removeClass("hidden");
+        $("#engParInfo").removeClass("hidden-print");
+        $("#spanParInfo").addClass("hidden");
+        $("#spanParInfo").addClass("hidden-print");
     }
 });
 

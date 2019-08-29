@@ -83,7 +83,7 @@ if (qrySchool.students) {
      <table id="studentTable" class="table table-striped tablesorter">
          <thead>
             <tr>
-                <th style="width:20px" data-sorter="false"><button id="schedGrp" type="button" class= 'btn-xs btn-primary'>*S</button></th>
+                <th style="width:20px" data-sorter="false"><button id="schedGrp" type="button" class= "btn-xs btn-primary" data-toggle="tooltip" data-placement="right" title="Select students and click *S to schedule or unschedule multiple students.">*S</button></th>
                 <th>First Name</th>
                 <th>Last Name</th>
                 <th>Grade</th>
@@ -126,9 +126,9 @@ if (qrySchool.students) {
                 </td>
                 <td class="hidden-print">
                 <form style="display: inline">
-                    <button type="button" class="editBtn btn btn-xs btn-primary">Edit</button>
+                    <button type="button" class="editBtn btn btn-xs btn-primary" data-toggle="tooltip" data-placement="left" title="Includes scheduling or unscheduling a student">Edit</button>
                     <% if (!student.served && student.slot != null && !missed(student.slot.sdate)) { %>
-                        <button type="button" class="passBtn btn btn-xs btn-primary">Passport</button>
+                        <button type="button" class="passBtn btn btn-xs btn-primary" data-toggle="tooltip" data-placement="left" title="View/Print Passport and Parent Information">Passport</button>
                     <% } %>
                 </form>
                 </td>
@@ -177,7 +177,10 @@ $(document).ready(function() {
         if (selIds.length > 0) {
             window.location.href = "/students/schedGrp?group=" + encodeURIComponent(JSON.stringify({ids: selIds, names: selNames}));     
         }
-	});    
+	});
+	$(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+    })
 });
 </script>
 <script src="/js/ajax.js"></script>

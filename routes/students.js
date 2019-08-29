@@ -146,7 +146,7 @@ router.get("/", middleware.isLoggedIn,
                     return res.redirect("back");
                 }
                 if (qrySchool == null) {
-                    logger.info("School missing from database: " + res.locals.currentUser.schoolCode);
+                    logger.error("School missing from database: " + res.locals.currentUser.schoolCode);
                     req.flash("error", "School missing from database: " + res.locals.currentUser.schoolCode);
                     return res.redirect("back");
                 }
@@ -361,7 +361,8 @@ function getRemaining(schoolCode, callbackfunction) {
                     callbackfunction(0);
                 }
                 else {
-                    // logger.debug("getRemaining: qrySchool=" + qrySchool);          // logger.debug("qrySchool.nbrStudents=" + qrySchool.nbrStudents);
+                    // logger.debug("getRemaining: qrySchool=" + qrySchool);
+                    // logger.debug("qrySchool.nbrStudents=" + qrySchool.nbrStudents);
                     callbackfunction(qrySchool.quota - qrySchool.nbrStudents);
                 }
             }
@@ -538,8 +539,7 @@ function fillSlot(newSlotId, slotRequest) {
                     }
                     else {
                         if (!student) { // student not found; may have been deleted in another window
-                            // undo slot update if needed
-                            // logger.debug("student to update is missing");
+                            logger.error("fillslot failed; student _id not found; slotRequest=" + JSON.stringify(slotRequest) + ", Check counts--will be wrong if student was being rescheduled.");
                             callback({
                                 studNotFound: true,
                                 message: "Student not found; may have been deleted."

@@ -8,7 +8,7 @@ var middleware = require("../middleware");
 
 // Return list of available slots
 router.get("/avail/:need", function(req, res) {
-// logger.debug("req.params.need=" + req.params.need);
+    // logger.debug("req.params.need=" + req.params.need);
     // subtract 6 hours to account for mountain time
     const future = Date.now() - 21600000;
 
@@ -31,7 +31,7 @@ router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function(req, res) {
     if (res.locals.currentUser.role != 'role_wa') {
         return res.redirect("back");
     }
-    logger.info("Starting checkCounts with fixflag=" + req.params.fixflag);
+    logger.debug("Starting checkCounts with fixflag=" + req.params.fixflag);
     Student.aggregate([{
             $match: {
                 slot: {
@@ -67,7 +67,7 @@ router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function(req, res) {
                         else {
                             var nbrMismatch = 0,
                                 nbrOverbook = 0;
-                            
+
                             // logger.debug("slots=" + slots);
                             var j = 0;
                             var jlim = schedStudCounts.length;
@@ -99,10 +99,16 @@ router.get("/checkCounts/:fixflag", middleware.isLoggedIn, function(req, res) {
                                 if (studentCount > slots[i].max) {
                                     logger.info("overbooked id=" + slots[i]._id + ", student count=" + studentCount + ", slot max=" + slots[i].max);
                                     nbrOverbook++;
-                                }                                
+                                }
                             }
-                            req.flash("success", "Ending checkCounts/" + req.params.fixflag + ". Nbr count mismatches=" + nbrMismatch + ", overbooked=" + nbrOverbook);
-                            logger.info("Ending checkCounts. Nbr count mismatches found=" + nbrMismatch + ", overbooked=" + nbrOverbook);
+                            if (req.params.fixflag == "y") {
+                                req.flash("success", "Ran Fixcounts (checkCounts/y). Nbr count mismatches fixed=" + nbrMismatch + ", no changes to overbooked.");
+                                logger.info("Ran fixCounts. Nbr count mismatches fixed=" + nbrMismatch);
+                            }
+                            else {
+                                req.flash("success", "Ran checkCounts/n. Nbr count mismatches=" + nbrMismatch + ", overbooked=" + nbrOverbook);
+                                logger.info("Ran checkCounts. Nbr count mismatches found=" + nbrMismatch + ", overbooked=" + nbrOverbook);
+                            }
                             res.redirect("/login");
                         }
                     });
