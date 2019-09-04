@@ -113,28 +113,31 @@ router.get('/requestpwreset', function(req, res) {
 
 // show username/password reset form for password reset (existing user)
 router.get('/requestpwresetData', function(req, res) {
-    // logger.debug("req.query.email=" + req.query.email);
-    // logger.debug("req.query.schoolCode=" + req.query.schoolCode);
+    // logger.debug("req.query.email='" + req.query.email + "'");
+    // logger.debug("req.query.schoolCode='" + req.query.schoolCode + "'");
 
+    var
+        schoolCodeT = shared.myTrim(req.query.schoolCode),
+        emailT = shared.myTrim(req.query.email).toLowerCase();
     User.findOne({
-            schoolCode: req.query.schoolCode,
-            email: req.query.email.toLowerCase()
+            schoolCode: schoolCodeT,
+            email: emailT
         }, { _id: 0, username: 1, schoolCode: 1 })
         .populate({ path: 'school', select: 'name' })
         .exec(function(err, user) {
             if (err) {
-                req.flash('error', "System error on user lookup " + req.query.email + "-" + req.query.schoolCode);
-                logger.error("System error on user lookup " + req.query.email + "-" + req.query.schoolCode);
+                req.flash('error', "System error on user lookup " + emailT + "-" + schoolCodeT);
+                logger.error("System error on user lookup " + emailT + "-" + schoolCodeT);
                 return res.redirect('/requestpwreset');
             }
             if (user == null) {
-                req.flash('error', "No account found for School Code " + req.query.schoolCode + ", email address " + req.query.email + ". You must register before setting a password.");
+                req.flash('error', "No account found for School Code " + schoolCodeT + ", email address " + emailT + ". You must register before setting a password.");
                 return res.redirect('/requestpwreset');
             }
             else {
                 // logger.debug("in requestpwreset user=" + user);
                 res.render('resetpw', {
-                    schoolCode: req.query.schoolCode,
+                    schoolCode: schoolCodeT,
                     username: user.username,
                     school: user.school ? user.school.name : 'none'
                 });
@@ -153,54 +156,61 @@ router.get('/register', function(req, res) {
 
 // show second registration form
 router.get('/registerData', function(req, res) {
-    // logger.debug("req.query.email=" + req.query.email);
-    // logger.debug("req.query.schoolCode=" + req.query.schoolCode);
+    // logger.debug('In get /registerData');
+    // logger.debug("req.query.email='" + req.query.email + "'");
+    // logger.debug("req.query.schoolCode='" + req.query.schoolCode + "'");
 
-    var email = req.query.email.toLowerCase();
+    var
+        schoolCodeT = shared.myTrim(req.query.schoolCode),
+        emailT = shared.myTrim(req.query.email).toLowerCase();
     var tester = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/; // copied from email-validator package code
 
-    if (!tester.test(email)) {
-        req.flash("error", "Please check email address; " + email + " does not look valid.");
-        return res.redirect('backToregister' + "/" + email + "/" + req.query.schoolCode);
+    if (!tester.test(emailT)) {
+        req.flash("error", "Please check email address; '" + emailT + "' does not look valid.");
+        // redirect fails if emailT is blank
+        if (emailT == '') {
+            emailT = '@';
+        }
+        return res.redirect('backToregister' + "/" + encodeURIComponent(emailT) + "/" + schoolCodeT);
     }
 
     // find/verify school code
     School.findOne({
-        schoolCode: req.query.schoolCode
+        schoolCode: schoolCodeT
     }, { _id: 0, name: 1 }, function(err, school) {
         if (err) {
-            var errmsg = "System error on schoolCode lookup: " + req.query.schoolCode;
+            var errmsg = "System error on schoolCode lookup: " + schoolCodeT;
             req.flash('error', errmsg);
             logger.error(errmsg);
             return res.redirect('back');
         }
         if (school == null) {
-            req.flash('error', "School not found for School Code " + req.query.schoolCode);
+            req.flash('error', "School not found for School Code " + schoolCodeT);
             return res.redirect('back');
         }
         // logger.debug("school=" + school);
         // verify user not yet registered
         User.findOne({
-            schoolCode: req.query.schoolCode,
-            email: email
+            schoolCode: schoolCodeT,
+            email: emailT
         }, function(err, user) {
             if (err) {
-                var errmsg = "System error on user lookup: " + email + "-" + req.query.schoolCode;
+                var errmsg = "System error on user lookup: " + emailT + "-" + schoolCodeT;
                 req.flash('error', errmsg);
                 logger.error(errmsg);
                 return res.redirect('back');
             }
             if (user == null) {
                 res.render('registerData', {
-                    schoolCode: req.query.schoolCode,
-                    email: email,
+                    schoolCode: schoolCodeT,
+                    email: emailT,
                     schoolName: school.name
                 });
             }
             else {
-                req.flash("error", email + " is already registered with School Code " + req.query.schoolCode); // flash doesn't work with res.render
+                req.flash("error", emailT + " is already registered with School Code " + schoolCodeT); // flash doesn't work with res.render
                 // res.redirect("back");  // loses form content
-                res.redirect('backToregister' + "/" + email + "/" + req.query.schoolCode);
+                res.redirect('backToregister' + "/" + encodeURIComponent(emailT) + "/" + schoolCodeT);
             }
         });
     });
@@ -216,61 +226,10 @@ router.get('/backToregister/:email/:schoolCode', function(req, res) {
 });
 
 
-
-// show username/password reset form for registering a new user
-router.post('/register', function(req, res) {
-
-    User.findOne({
-        schoolCode: req.body.schoolCode,
-        email: req.body.email.toLowerCase()
-    }, { username: 1 }, function(err, user) {
-        if (err) {
-            req.flash('error', "System error on user lookup " + req.body.email + "-" + req.body.schoolCode);
-            logger.error("System error on user lookup " + req.body.email + "-" + req.body.schoolCode);
-            return res.redirect('back');
-        }
-        if (user == null) {
-            // create user
-            var newUser = {
-                username: shared.myTrim(req.body.username.toLowerCase()),
-                name: shared.myTrim(req.body.name),
-                role: 'role_sc',
-                schoolCode: shared.myTrim(req.body.schoolCode),
-                email: shared.myTrim(req.body.email)
-            };
-            // Create a new user and save to DB
-            User.create(newUser, function(err) {
-                if (err) {
-                    var msg = err.message;
-                    if (msg.indexOf("E11000") >= 0) { // duplicate key error
-                        msg = newUser.username + " is already in the database";
-                    }
-                    logger.error(msg);
-                    req.flash("error", msg);
-                    res.redirect("back");
-                }
-                else {
-                    req.flash("success", "New user " + newUser.username + " created");
-                    // logger.debug("in requestpwreset user=" + user);
-                    res.render('resetpw', {
-                        schoolCode: req.body.schoolCode,
-                        username: user.username,
-                        school: user.school
-                    });
-                }
-            });
-        }
-        else {
-            req.flash("error", newUser.username + " is already in the database");
-            return res.redirect("back");
-        }
-    });
-});
-
-
 // show username/password reset form
 // used to re-render reset form with an error message
 router.get('/resetpw/:username/:schoolCode/:school', function(req, res) {
+    // logger.debug('In get resetpw');
     res.render('resetpw', {
         schoolCode: req.params.schoolCode,
         username: req.params.username,
@@ -306,7 +265,7 @@ router.post('/resetpw', function(req, res) {
             }
             // logger.debug('school name=' + (user.school ? user.school.name : "none"));
 
-            var resetpwRoute = "/resetpw/" + user.username + "/" + req.body.schoolCode + "/" + (user.school ? user.school.name : "none");
+            var resetpwRoute = "/resetpw/" + encodeURIComponent(user.username) + "/" + req.body.schoolCode + "/" + (user.school ? encodeURIComponent(user.school.name) : "none");
             // logger.debug('resetpwRoute=' + resetpwRoute);
 
             if (req.body.password != req.body.confirm) {
@@ -322,7 +281,7 @@ router.post('/resetpw', function(req, res) {
                 if (err) {
                     // logger.debug("user save error=" + err.message);
                     if (err.message.indexOf("E11000") >= 0) { // duplicate key error
-                        req.flash('error', "Sorry, that username is already in use. Please make up another one.");
+                        req.flash('error', "Sorry, username " + user.username + " is already in use. Please make up another one.");
                     }
                     else {
                         req.flash('error', "Error--new password didn't save.");

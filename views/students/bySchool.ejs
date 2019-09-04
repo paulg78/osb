@@ -57,13 +57,13 @@ if (qrySchool.students) {
                 <h3>Add Student&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span id="addMsg"></span></h3>
                 <span id="newStudCtrl">
                 <div class="form-group">
-                    <input id="fname" class="form-control" type="text" name="firstName" placeholder="first name*">
+                    <input id="fname" class="form-control" type="text" name="firstName" placeholder="first name*" required>
                 </div>
                 <div class="form-group">
-                    <input id="lname" class="form-control" type="text" name="lastName" placeholder="last name*">
+                    <input id="lname" class="form-control" type="text" name="lastName" placeholder="last name*" required>
                 </div>
                 <div class="form-group">
-                    <select id="gradeSelect" class="form-control" name="grade">
+                    <select id="gradeSelect" class="form-control" name="grade" required>
                         <option disabled="disabled" selected="selected" value="">grade* (K-12)</option>
                         <option value="K">K</option>
                         <% for (var i=1; i<13; i++) { %>

@@ -6,11 +6,11 @@
             <form action="/registerData" method="get">
                 <div class="form-group">
                     <h4>Email address:</h4>
-                    <input class="form-control" type="email" name="email" value="<%= email %>" aria-describedby="helpEmail">
+                    <input class="form-control" type="email" name="email" value="<%= email %>" aria-describedby="helpEmail" required>
                     <span id="helpEmail" class="help-block">Enter the school email address you are using with Operation School Bell.</span>
                     <br>
                     <h4>School Code:</h4>
-                    <input class="form-control" type="text" name="schoolCode" value="<%= schoolCode %>" aria-describedby="helpschoolCode">
+                    <input class="form-control" type="text" name="schoolCode" value="<%= schoolCode %>" aria-describedby="helpschoolCode" required>
                     <span id="helpschoolCode" class="help-block">Enter the School Code assigned by the Assistance League. Please contact the Assistance League if you don't know the School Code for your school.</span>
                     <br>
                     <button style="margin-top: 30px;" class="btn btn-lg btn-primary btn-block">Submit</button>

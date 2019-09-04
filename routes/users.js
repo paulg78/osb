@@ -17,14 +17,14 @@ function emailHash(email) {
 
 // REGISTER - add new user to DB
 router.post("/register", function(req, res) {
-    // logger.debug("In User Register");
+    // logger.debug("In User post /Register");
     // logger.debug("req.body.name=" + req.body.name);
     // logger.debug("req.body.phone=" + req.body.phone);
     // logger.debug("req.body.schoolCode=" + req.body.schoolCode);
     // logger.debug("req.body.schoolName=" + req.body.schoolName);
     // logger.debug("req.body.email=" + req.body.email);
 
-    var email = shared.myTrim(req.body.email).toLowerCase();
+    var email = req.body.email;
     var newUser = {
         username: email,
         name: shared.myTrim(req.body.name),
@@ -227,7 +227,7 @@ router.post("/", middleware.isLoggedIn, function(req, res) {
     }
 
     var newUser = {
-        username: shared.myTrim(req.body.username.toLowerCase()),
+        username: shared.myTrim(req.body.username).toLowerCase(),
         name: shared.myTrim(req.body.name),
         role: shared.myTrim(req.body.role),
         schoolCode: shared.myTrim(req.body.schoolCode),
@@ -330,7 +330,7 @@ router.put("/:id", middleware.isLoggedIn, function(req, res) {
     };
 
     if (res.locals.currentUser.role == "role_wa") { // only admin can update key fields
-        newData.username = shared.myTrim(req.body.username.toLowerCase());
+        newData.username = shared.myTrim(req.body.username).toLowerCase();
         newData.schoolCode = shared.myTrim(req.body.schoolCode);
         newData.role = shared.myTrim(req.body.role);
         newData.email = shared.myTrim(req.body.email);
