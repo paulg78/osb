@@ -162,16 +162,16 @@ router.get('/registerData', function(req, res) {
 
     var
         schoolCodeT = shared.myTrim(req.query.schoolCode),
-        emailT = shared.myTrim(req.query.email).toLowerCase();
-    var tester = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/; // copied from email-validator package code
+        emailT = shared.myTrim(req.query.email).toLowerCase(),
+        tester = /^[-!#$%&'*+\/0-9=?A-Z^_a-z{|}~](\.?[-!#$%&'*+\/0-9=?A-Z^_a-z`{|}~])*@[a-zA-Z0-9](-*\.?[a-zA-Z0-9])*\.[a-zA-Z](-?[a-zA-Z0-9])+$/; // copied from email-validator package code
+
+    function errRoute() {
+        return '/backToregister?email=' + encodeURIComponent(emailT) + "&schoolCode=" + schoolCodeT;
+    }
 
     if (!tester.test(emailT)) {
         req.flash("error", "Please check email address; '" + emailT + "' does not look valid.");
-        // redirect fails if emailT is blank
-        if (emailT == '') {
-            emailT = '@';
-        }
-        return res.redirect('backToregister' + "/" + encodeURIComponent(emailT) + "/" + schoolCodeT);
+        return res.redirect(errRoute());
     }
 
     // find/verify school code
@@ -182,11 +182,11 @@ router.get('/registerData', function(req, res) {
             var errmsg = "System error on schoolCode lookup: " + schoolCodeT;
             req.flash('error', errmsg);
             logger.error(errmsg);
-            return res.redirect('back');
+            return res.redirect(errRoute());
         }
         if (school == null) {
             req.flash('error', "School not found for School Code " + schoolCodeT);
-            return res.redirect('back');
+            return res.redirect(errRoute());
         }
         // logger.debug("school=" + school);
         // verify user not yet registered
@@ -198,7 +198,7 @@ router.get('/registerData', function(req, res) {
                 var errmsg = "System error on user lookup: " + emailT + "-" + schoolCodeT;
                 req.flash('error', errmsg);
                 logger.error(errmsg);
-                return res.redirect('back');
+                return res.redirect(errRoute());
             }
             if (user == null) {
                 res.render('registerData', {
@@ -208,9 +208,10 @@ router.get('/registerData', function(req, res) {
                 });
             }
             else {
-                req.flash("error", emailT + " is already registered with School Code " + schoolCodeT); // flash doesn't work with res.render
-                // res.redirect("back");  // loses form content
-                res.redirect('backToregister' + "/" + encodeURIComponent(emailT) + "/" + schoolCodeT);
+                req.flash("error", emailT + " is already registered with School Code " + schoolCodeT);
+                // can't res.render register.ejs since flash doesn't work with res.render
+                // res.redirect("back");  // shows error message but loses form content
+                res.redirect(errRoute());
             }
         });
     });
@@ -218,22 +219,22 @@ router.get('/registerData', function(req, res) {
 
 
 // show first registration form after error
-router.get('/backToregister/:email/:schoolCode', function(req, res) {
+router.get('/backToregister', function(req, res) {
     res.render('register', {
-        email: req.params.email,
-        schoolCode: req.params.schoolCode,
+        email: req.query.email,
+        schoolCode: req.query.schoolCode,
     });
 });
 
 
 // show username/password reset form
 // used to re-render reset form with an error message
-router.get('/resetpw/:username/:schoolCode/:school', function(req, res) {
+router.get('/resetpw', function(req, res) {
     // logger.debug('In get resetpw');
     res.render('resetpw', {
-        schoolCode: req.params.schoolCode,
-        username: req.params.username,
-        school: req.params.school
+        schoolCode: req.query.schoolCode,
+        username: req.query.username,
+        school: req.query.school
     });
 });
 
@@ -265,13 +266,16 @@ router.post('/resetpw', function(req, res) {
             }
             // logger.debug('school name=' + (user.school ? user.school.name : "none"));
 
-            var resetpwRoute = "/resetpw/" + encodeURIComponent(user.username) + "/" + req.body.schoolCode + "/" + (user.school ? encodeURIComponent(user.school.name) : "none");
-            // logger.debug('resetpwRoute=' + resetpwRoute);
+            function resetpwRoute() {
+                return "/resetpw?username=" + encodeURIComponent(user.username) + "&schoolCode=" + req.body.schoolCode + "&school=" + (user.school ? encodeURIComponent(user.school.name) : "none");
+            }
+
+            // logger.debug('resetpwRoute=' + resetpwRoute());
 
             if (req.body.password != req.body.confirm) {
                 // logger.debug("password mismatch");
                 req.flash('error', "Password confirmation doesn't match first password entered.");
-                return res.redirect(resetpwRoute);
+                return res.redirect(resetpwRoute());
             }
             user.username = req.body.newUsername.toLowerCase();
             user.password = req.body.password;
@@ -287,7 +291,7 @@ router.post('/resetpw', function(req, res) {
                         req.flash('error', "Error--new password didn't save.");
                         logger.error("System error on user username/password save: " + err.message);
                     }
-                    res.redirect(resetpwRoute);
+                    res.redirect(resetpwRoute());
                 }
                 else {
                     // logger.debug("user.password after save=" + user.password);
