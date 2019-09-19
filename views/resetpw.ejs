@@ -24,12 +24,8 @@
                 <div class="form-group">
                     <button class="btn btn-lg btn-primary btn-block">Save new username/password</button>
                 </div>
-                <div class="form-group">
-                    <input class="form-control" type="hidden" name="username" value="<%= username %>">
-                </div>   
-                <div class="form-group">
-                    <input class="form-control" type="hidden" name="schoolCode" value="<%= schoolCode %>">
-                </div>                                   
+                <input type="hidden" name="username" value="<%= username %>">
+                <input type="hidden" name="schoolCode" value="<%= schoolCode %>">
             </form>
             <a href="/login">Cancel</a>
         </div>

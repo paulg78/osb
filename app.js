@@ -15,6 +15,7 @@ global.logger = new(winston.Logger)({
   transports: [
     new(winston.transports.Console)({
       level: process.env.APPLOGLEVEL,
+      timestamp: true,
       colorize: false
     })
   ]
@@ -149,3 +150,4 @@ else { // heroku or dev environment
     console.log("Express server listening on port %d in %s mode", this.address().port, app.settings.env);
   });
 }
+logger.info("Zulu time is 6 hours after Mountain Daily Time (Mar-Nov)");
