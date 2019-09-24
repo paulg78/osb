@@ -1,7 +1,7 @@
 <% include ../partials/header %>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/css/theme.bootstrap_3.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.widgets.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.1/css/theme.bootstrap_3.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.1/js/jquery.tablesorter.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.1/js/jquery.tablesorter.widgets.min.js"></script>
 
     <header>
         <h1>
@@ -9,6 +9,7 @@
             <% if(currentUser.role == "role_wa"){ %>
                 <a class="btn btn-primary btn-sm pull-right" href="/users/new">Add New User</a>
             <% }; %>
+            <button type="button" class="btn btn-primary btn-sm pull-right reset">Reset Filters</button> <!-- targeted by the "filter_reset" option -->
         </h1>
     </header>
     <table id="userTable" class="table table-striped tablesorter">
@@ -18,9 +19,9 @@
                 <th>Email</th>
                 <th class="filter-select" data-placeholder="All Schools">School</th>
                 <th>UserName</th>
-                <th>PW</th>
+                <th style="width:5px;">PW</th>
                 <th class="filter-select" data-placeholder="All">Role</th>
-                <th data-sorter="false" data-filter="false"></th>
+                <th style="width:90px;" data-sorter="false" data-filter="false"></th>
             </tr>
         </thead>
         <tbody>
@@ -34,7 +35,7 @@
                         <% } %>
                     </td>
                     <td><%= user.username %></td>
-                    <td><%= user.hasPw %></td>
+                    <td style="text-align: center;"><%= user.hasPw %></td>
                     <td><%= user.role %></td>
                     <td>
                         <% if(currentUser.role == "role_wa" || user.role == "role_sc" || currentUser.username == user.username){ %>
@@ -53,11 +54,11 @@
 $(function(){
   $("#userTable").tablesorter(
       { theme: 'bootstrap',
+        widthFixed : false,
         headerTemplate : '{content} {icon}',
         widgets : [ "uitheme", "filter" ],
+        ignoreCase: false,
         widgetOptions : {
-
-      // filter_anyMatch options was removed in v2.15; it has been replaced by the filter_external option
 
       // If there are child rows in the table (rows with class name from "cssChildRow" option)
       // and this option is true and a match is found anywhere in the child row, then it will make that row

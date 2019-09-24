@@ -1,8 +1,8 @@
 <% include ../partials/header %>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/css/theme.bootstrap_3.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.28.15/js/jquery.tablesorter.widgets.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.1/css/theme.bootstrap_3.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.1/js/jquery.tablesorter.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.1/js/jquery.tablesorter.widgets.min.js"></script>
 
 <%
 function dateString(d) {
@@ -24,7 +24,9 @@ function dateString(d) {
 }
 %>
      <header>
-        <h1>Students <%= h1suffix %></h1>
+        <h1>Students <%= h1suffix %>
+          <button type="button" class="btn btn-primary btn-sm pull-right reset">Reset Filters</button> <!-- targeted by the "filter_reset" option -->
+        </h1>
      </header>
 
      <table id="studentTable" class="table table-striped tablesorter">
@@ -78,14 +80,11 @@ function dateString(d) {
 $(function(){
   $("#studentTable").tablesorter(
       { theme: 'bootstrap',
-        // hidden filter input/selects will resize the columns, so try to minimize the change
         widthFixed : true,
         widgets : [ "uitheme", "filter"],
         headerTemplate : '{content} {icon}',
         ignoreCase: false,
         widgetOptions : {
-
-      // filter_anyMatch options was removed in v2.15; it has been replaced by the filter_external option
 
       // If there are child rows in the table (rows with class name from "cssChildRow" option)
       // and this option is true and a match is found anywhere in the child row, then it will make that row
@@ -200,56 +199,7 @@ $(function(){
 
     }
       });
-
-// Clear stored filters - added v2.25.6
-  $('.resetsaved').click(function(){
-    $('#studentTable').trigger('filterResetSaved');
-
-    // show quick popup to indicate something happened
-    var $message = $('<span class="results"> Reset</span>').insertAfter(this);
-    setTimeout(function(){
-      $message.remove();
-    }, 500);
-    return false;
-  });
-
-  // External search
-  // buttons set up like this:
-  // <button type="button" data-filter-column="4" data-filter-text="2?%">Saved Search</button>
-  $('button[data-filter-column]').click(function(){
-    /*** first method *** data-filter-column="1" data-filter-text="!son"
-      add search value to Discount column (zero based index) input */
-    var filters = [],
-      $t = $(this),
-      col = $t.data('filter-column'), // zero-based index
-      txt = $t.data('filter-text') || $t.text(); // text to add to filter
-
-    filters[col] = txt;
-    // using "table.hasFilters" here to make sure we aren't targeting a sticky header
-    $.tablesorter.setFilters( $('#studentTable'), filters, true ); // new v2.9
-
-    /** old method (prior to tablsorter v2.9 ***
-    var filters = $('table.tablesorter').find('input.tablesorter-filter');
-    filters.val(''); // clear all filters
-    filters.eq(col).val(txt).trigger('search', false);
-    ******/
-
-    /*** second method ***
-      this method bypasses the filter inputs, so the "filter_columnFilters"
-      option can be set to false (no column filters showing)
-    ******/
-    /*
-    var columns = [];
-    columns[5] = '2?%'; // or define the array this way [ '', '', '', '', '', '2?%' ]
-    $('table').trigger('search', [ columns ]);
-    */
-
-    return false;
-  });
-
-
 });
-
 
 </script>
 <script src="/scripts/checkIn.js"></script>
