@@ -27,17 +27,20 @@ function dateTimeString(d) {
     <div class="row">
         <h1 style="text-align: center">Fix <%= student.fname + " " + student.lname %></h1>
         <div style="width: 50%; margin: 25px auto;">
+            <h4>This page enables the AL to correct data for a student served in a time slot that differed from their scheduled date in the database.</h4>
+            <br>
+            <h5>Name and grade schould generally be set only by school counselors.</h5>
             <form action="/students/fix/<%=student._id%>?_method=PUT" method="POST">
                 <div class="form-group">
-                    <label for="fname">First Name*:</label>
+                    <label for="fname">First Name:</label>
                     <input class="form-control" id="fname" type="text" name="firstName" value="<%= student.fname %>">
                 </div>
                 <div class="form-group">
-                    <label for="lname">Last Name*:</label>
+                    <label for="lname">Last Name:</label>
                     <input class="form-control" id="lname" type="text" name="lastName" value="<%= student.lname %>">
                 </div>
                 <div class="form-group">
-                    <label for="grade">Grade (K or 1-12)*:</label>
+                    <label for="grade">Grade (K or 1-12):</label>
                     <select id="gradeSelect" name="grade">
                         <option value="K">K</option>
                         <% for (var i=1; i<13; i++) { %>
@@ -45,6 +48,7 @@ function dateTimeString(d) {
                            <% } %>
                     </select>
                 </div>
+                <h4>You can mark the student as served in a past time slot but cannot schedule or unschedule a student.</h4>
                 <div class="form-group">
                     <label>Served:&nbsp;</label>
                         <input type="checkbox" name="served" id="servedCB" value="y">                    
@@ -57,7 +61,7 @@ function dateTimeString(d) {
                     </div>
                 <% } %>
                 <div id="schedForm" class="form-group">
-                    <label>Schedule student:</label>
+                    <label>Select Served Time Slot:&nbsp;</label>
                     <select id="dateSched" name="dateSched">
                         <option value="" selected>Select date</option>
                     </select>
@@ -66,7 +70,7 @@ function dateTimeString(d) {
                     </select>
                 </div>
                 <div class="form-group">
-                    <button id="saveStudBtn" class="btn btn-lg btn-primary btn-block">Save changes</button>
+                    <button id="saveStudBtn" class="btn btn-lg btn-primary">Save changes</button>
                 </div>
             </form>
             <a href="/students/showFind">Cancel Fix</a>
