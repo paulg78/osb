@@ -12,7 +12,7 @@ function listStudents(findStr) {
             // console.log('Ajax post returned success');
             if (students) {
                 students.forEach(function (student) {
-                    $('#studentList').append('\n                        <tr>\n                            <td>' + student.fname + '</td>\n                            <td>' + student.lname + '</td>\n                            <td>' + student.schoolName + '</td>\n                            <td>' + student.grade + '</td>\n                            <td>' + student.scName + '</td>\n                            <td>' + student.dateStr + '</td>\n                            <td>' + (student.served ? 'Y' : 'N') + '</td>\n                        </tr>\n                        ');
+                    $('#studentList').append('\n                        <tr>\n                            <td>' + student.fname + '</td>\n                            <td>' + student.lname + '</td>\n                            <td>' + student.schoolName + '</td>\n                            <td>' + student.grade + '</td>\n                            <td>' + student.scName + '</td>\n                            <td>' + student.dateStr + '</td>\n                            <td>' + (student.served ? 'Y' : 'N') + '</td>\n                            <td><a href="/students/' + student._id + '/fix" class="btn btn-xs btn-primary">Fix</a></td>\n                        </tr>\n                        ');
                 });
             }
         },

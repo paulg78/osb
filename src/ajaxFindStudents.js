@@ -20,6 +20,7 @@ function listStudents(findStr) {
                             <td>${student.scName}</td>
                             <td>${student.dateStr}</td>
                             <td>${student.served ? 'Y' : 'N'}</td>
+                            <td><a href="/students/${student._id}/fix" class="btn btn-xs btn-primary">Fix</a></td>
                         </tr>
                         `
                     );

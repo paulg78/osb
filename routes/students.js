@@ -56,7 +56,8 @@ router.get("/find", middleware.isLoggedIn, function(req, res) {
                 grade: student.grade,
                 scName: student.addedBy ? student.addedBy.name : '',
                 dateStr: student.slot ? dateString(student.slot.sdate) : '',
-                served: student.served
+                served: student.served,
+                _id: student._id
             });
         });
         return studRay;
@@ -66,7 +67,7 @@ router.get("/find", middleware.isLoggedIn, function(req, res) {
     if (req.query.schoolCode) {
         // logger.debug('schoolCode=' + req.query.schoolCode);
 
-        Student.find({ schoolCode: req.query.schoolCode }, { _id: 0 })
+        Student.find({ schoolCode: req.query.schoolCode })
             .sort({ "lname": 1, "fname": 1 })
             .populate('slot', { _id: 0, sdate: 1 })
             .populate('school', { name: 1 })
@@ -84,7 +85,7 @@ router.get("/find", middleware.isLoggedIn, function(req, res) {
     else {
         // logger.debug('lname=' + req.query.lastName);
         // could return a lot of matches so limit to 20
-        Student.find({ lname: { $regex: new RegExp('.*' + req.query.lastName + '.*'), $options: 'i' } }, { _id: 0 })
+        Student.find({ lname: { $regex: new RegExp('.*' + req.query.lastName + '.*'), $options: 'i' } })
             .limit(20)
             .sort({ "lname": 1, "fname": 1 })
             .populate('slot', { _id: 0, sdate: 1 })
@@ -432,6 +433,25 @@ router.get("/:id/edit", middleware.isLoggedIn, function(req, res) {
         });
 });
 
+// Find student and render fix form
+router.get("/:id/fix", middleware.isLoggedIn, function(req, res) {
+    Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, slot: 1, served: 1 })
+        .populate('slot', { _id: 1, sdate: 1 })
+        .exec(function(err, foundStudent) {
+            if (err) {
+                logger.error(err);
+            }
+            else {
+                if (foundStudent == null) {
+                    return res.redirect("back");
+                }
+                res.render("students/fix", {
+                    student: foundStudent
+                });
+            }
+        });
+});
+
 // Find student and render passport form
 router.get("/:id/printPass", middleware.isLoggedIn, function(req, res) {
     Student.findById(req.params.id, { fname: 1, lname: 1, grade: 1, slot: 1, served: 1, schoolCode: 1 })
@@ -455,6 +475,31 @@ router.get("/:id/printPass", middleware.isLoggedIn, function(req, res) {
             }
         });
 });
+
+
+function fixNewSlot(newTime) {
+    return new Promise((resolve, reject) => {
+        // logger.debug("in fixNewSlot");
+        if (newTime) { // there is a new slot {
+            Slot.findOneAndUpdate({ sdate: new Date(newTime) }, {
+                $inc: { avCnt: -1 }
+            }, {
+                projection: { _id: 1 },
+            }, function(err, slot) {
+                // logger.debug("slot before update=" + slot);
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(slot._id);
+                }
+            });
+        }
+        else {
+            resolve(null);
+        }
+    });
+}
 
 
 function updateNewSlot(nbrSlots, newTime) {
@@ -641,6 +686,44 @@ router.put("/:id", function(req, res) {
             .then(newSlotId => fillSlot(newSlotId, {
                 newData: newData,
                 unSched: req.body.unschedule,
+                _id: req.params.id
+            })).then(filled)
+            .catch(failed);
+    }
+    else {
+        // logger.debug("edit validation error");
+        req.flash("error", result);
+        res.redirect("back");
+    }
+});
+
+// fix student/slots for AL; can't unschedule
+router.put("/fix/:id", function(req, res) {
+    // logger.debug("req.body=" + JSON.stringify(req.body, null, 2));
+    var newData = {
+        fname: req.body.firstName,
+        lname: req.body.lastName,
+        grade: req.body.grade,
+        served: req.body.served == 'y' ? true : false
+    };
+
+    function filled() {
+        req.flash("success", "Successfully updated " + newData.fname + " " + newData.lname + ".");
+        res.redirect("/students/showFind");
+    }
+
+    function failed(err) {
+        logger.error(err.message);
+        req.flash("error", "Changes not saved: " + err.message);
+        res.redirect("/students");
+    }
+
+    var result = studentValid(newData);
+    if (result == "") {
+        fixNewSlot(req.body.timeSched)
+            .then(newSlotId => fillSlot(newSlotId, {
+                newData: newData,
+                unSched: 'n',
                 _id: req.params.id
             })).then(filled)
             .catch(failed);

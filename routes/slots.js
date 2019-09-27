@@ -10,9 +10,9 @@ var middleware = require("../middleware");
 router.get("/avail/:need", function(req, res) {
     // logger.debug("req.params.need=" + req.params.need);
     // subtract 6 hours to account for mountain time
-    const future = Date.now() - 21600000;
+    const nowMT = Date.now() - 21600000;
 
-    Slot.find({ $and: [{ sdate: { $gt: future } }, { avCnt: { $gt: req.params.need - 1 } }] }, { _id: 0, sdate: 1, avCnt: 1 })
+    Slot.find({ $and: [{ sdate: { $gt: nowMT } }, { avCnt: { $gt: req.params.need - 1 } }] }, { _id: 0, sdate: 1, avCnt: 1 })
         .exec(function(err, slots) {
             if (err) {
                 logger.error("error finding avail slots: " + err.message);
@@ -20,6 +20,25 @@ router.get("/avail/:need", function(req, res) {
             }
             else {
                 // logger.debug("avail slots: " + slots);
+                res.json(JSON.stringify(slots));
+            }
+        });
+});
+
+// Return list of past slots
+router.get("/past", function(req, res) {
+    // subtract 6 hours to account for mountain time
+
+    const nowMT = Date.now() - 21600000;
+
+    Slot.find({ sdate: { $lt: nowMT } }, { _id: 0, sdate: 1 })
+        .exec(function(err, slots) {
+            if (err) {
+                logger.error("error finding past slots: " + err.message);
+                res.status(500).send(err.message);
+            }
+            else {
+                // logger.debug("past slots: " + slots);
                 res.json(JSON.stringify(slots));
             }
         });
