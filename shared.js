@@ -10,6 +10,6 @@ module.exports = {
         else {
             return '';
         }
-    },
+    }
 
 };

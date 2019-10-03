@@ -187,7 +187,7 @@ var getPrevNextIds = function(req, res, next) {
 // Show SCHEDULE for next available day (one with open slots)
 router.get("/nextAvail", middleware.isLoggedIn, function(req, res) {
     function mmdd(d) {
-        return toStr2(d.getMonth()) + toStr2(d.getDate());
+        return toStr2(d.getUTCMonth()) + toStr2(d.getUTCDate());
     }
     // var qry = "this.sdate > Date.now() && this.avCnt > 0";
     // logger.debug("* qry=" + qry);
@@ -209,12 +209,12 @@ router.get("/nextAvail", middleware.isLoggedIn, function(req, res) {
                     // logger.debug("slots[0]=" + slots[0]);
                     // get day Id for slot found
 
-                    // var slotMMDD = toStr2(slots[0].sdate.getMonth()) + toStr2(slots[0].sdate.getDate());
+                    // var slotMMDD = toStr2(slots[0].sdate.getUTCMonth()) + toStr2(slots[0].sdate.getUTCDate());
                     var slotMMDD = mmdd(slots[0].sdate);
                     // logger.debug("slotMMDD=" + slotMMDD);
                     for (var i = 0, iLen = global.days.length; i < iLen; i++) {
                         // logger.debug("i=" + i + ", global.days[i].date=" + global.days[i].date + ", mmdd=" + mmdd(global.days[i].date));
-                        // if (slotMMDD == toStr2(global.days[i].date.getMonth()) + toStr2(global.days[i].date.getDate())) {
+                        // if (slotMMDD == toStr2(global.days[i].date.getUTCMonth()) + toStr2(global.days[i].date.getUTCDate())) {
                         if (slotMMDD == mmdd(global.days[i].date)) {
                             // logger.debug("global.days[i]=" + global.days[i]);
                             break;

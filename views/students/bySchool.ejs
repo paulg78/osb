@@ -15,33 +15,15 @@ function missed(date) {
     if (date == null) {
         return false;
     }
-    var mm=(date.getMonth() + 1).toString();
+    var mm=(date.getUTCMonth() + 1).toString();
     if (mm.length == 1) {
         mm="0" + mm;
     }
-    var dd=date.getDate().toString();
+    var dd=date.getUTCDate().toString();
     if (dd.length == 1) {
         dd="0" + dd;
     }
     return todayMMDD > (mm + dd);
-}
-
-function dateString(d) {
-    var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-    var h=d.getHours();
-    var ap;
-    if (h>12) {
-        h=h-12;
-        ap="PM";
-    }
-    else {
-        ap="AM";
-    }
-    var m = d.getMinutes();
-    if (m==0) {
-        m="00";
-    }
-    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
 }
 
 var nbrStudents = 0;
@@ -112,7 +94,7 @@ if (qrySchool.students) {
                 </td>
                 <td>
                     <% if (student.slot && student.slot.sdate) { %>
-                        <%= dateString(student.slot.sdate) %>
+                        <%= dateFunc.DTstring(student.slot.sdate) %>
                     <% } %>
                 </td>
                 <td>

@@ -3,7 +3,7 @@
 
 function dateString(d) {
     var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000);
+    return dayNames[d.getUTCDay()] + " " + (d.getUTCMonth() + 1) + "/" + d.getUTCDate() + "/" + (d.getFullYear() - 2000);
 }
 
 function timeString(d) {
@@ -16,7 +16,7 @@ function timeString(d) {
     else {
         ap = "AM";
     }
-    var m = d.getMinutes();
+    var m = d.getUTCMinutes();
     if (m == 0) {
         m = "00";
     }
@@ -35,7 +35,7 @@ function getPastDates() {
             var prevmd = "";
             for (i = 0; i < slots.length; i++) {
                 d = new Date(slots[i].sdate);
-                md = d.getMonth() + "-" + d.getDate();
+                md = d.getUTCMonth() + "-" + d.getUTCDate();
                 if (md != prevmd) {
                     dateSel.add(new Option(dateString(d), slots[i].sdate));
                     prevmd = md;
@@ -55,12 +55,12 @@ $("#dateSched").on('change', function(e) {
         var slots = JSON.parse($("#slotsAvail").text());
         var i, d, md;
         var sel = new Date(this.value);
-        var selmd = sel.getMonth() + "-" + sel.getDate();
+        var selmd = sel.getUTCMonth() + "-" + sel.getUTCDate();
         // remove any previous options
         $("#timeSched").children('option:not(:first)').remove();
         for (i = 0; i < slots.length; i++) {
             d = new Date(slots[i].sdate);
-            md = d.getMonth() + "-" + d.getDate();
+            md = d.getUTCMonth() + "-" + d.getUTCDate();
             if (md == selmd) {
                 timeSel.add(new Option(timeString(new Date(slots[i].sdate)), slots[i].sdate));
             }

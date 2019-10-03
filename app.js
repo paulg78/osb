@@ -132,6 +132,7 @@ app.use(function(req, res, next) {
   next();
 });
 
+app.locals.dateFunc = require('./dateFunc');
 app.use("/", indexRoutes);
 app.use("/users", userRoutes);
 app.use("/students", studentRoutes);

@@ -1,26 +1,4 @@
 <% include ../partials/header %>
-
-<%
-
-function dateTimeString(d) {
-    var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-    var h=d.getHours();
-    var ap;
-    if (h>12) {
-        h=h-12;
-        ap="PM";
-    }
-    else {
-        ap="AM";
-    }
-    var m = d.getMinutes();
-    if (m==0) {
-        m="00";
-    }
-    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
-}
-
-%>
 <% include ../../public/passport.html %>
 <% include ../../public/parentInfo.html %>
 <% include ../../public/parentInfoSp.html %>
@@ -32,7 +10,7 @@ $(document).ready(function() {
     $("#grade").text('<%= student.grade %>');
     $("#schoolName").text('<%= student.school.name %>');
     $("#user").text('<%= currentUser.name %>');
-    $("#sched").text('<%= dateTimeString(student.slot.sdate) %>');    
+    $("#sched").text('<%= dateFunc.DTstring(student.slot.sdate) %>');    
 });
 
 $("#parentShopCB").on('change', function (e) {

@@ -6,6 +6,7 @@ var School = require("../models/school");
 var Slot = require("../models/slot");
 var middleware = require("../middleware");
 var async = require('async');
+var dateFunc = require('../dateFunc');
 /* global logger */
 
 
@@ -27,24 +28,6 @@ router.get("/find", middleware.isLoggedIn, function(req, res) {
         return res.redirect("back");
     }
 
-    function dateString(d) {
-        var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        var h = d.getHours();
-        var ap;
-        if (h > 12) {
-            h = h - 12;
-            ap = "PM";
-        }
-        else {
-            ap = "AM";
-        }
-        var m = d.getMinutes();
-        if (m == 0) {
-            m = "00";
-        }
-        return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
-    }
-
     function studentRay(students) {
         var studRay = [];
         // had to brute force this because school name wouldn't populate
@@ -55,7 +38,7 @@ router.get("/find", middleware.isLoggedIn, function(req, res) {
                 schoolName: student.school ? student.school.name : '',
                 grade: student.grade,
                 scName: student.addedBy ? student.addedBy.name : '',
-                dateStr: student.slot ? dateString(student.slot.sdate) : '',
+                dateStr: student.slot ? dateFunc.DTstring(student.slot.sdate) : '',
                 served: student.served,
                 _id: student._id
             });
@@ -155,11 +138,11 @@ router.get("/", middleware.isLoggedIn,
                 // logger.debug("qrySchool=" + qrySchool);
                 // logger.debug("qrySchool.students=" + qrySchool.students);
                 var today = new Date();
-                var mm = (today.getMonth() + 1).toString();
+                var mm = (today.getUTCMonth() + 1).toString();
                 if (mm.length == 1) {
                     mm = "0" + mm;
                 }
-                var dd = today.getDate().toString();
+                var dd = today.getUTCDate().toString();
                 if (dd.length == 1) {
                     dd = "0" + dd;
                 }
@@ -256,7 +239,7 @@ router.get("/stats", middleware.isLoggedIn, function(req, res) {
                     else {
                         stats.futureSlotsAvail = 0;
                     }
-                    stats.futureDate = d.toLocaleString();
+                    stats.futureDate = dateFunc.DTstring(d);
                 }
                 callback(err, stats);
             });
@@ -280,16 +263,15 @@ router.get("/stats", middleware.isLoggedIn, function(req, res) {
             });
     }
 
-
 });
 
 
-router.get("/:dateSched", middleware.isLoggedIn, function(req, res) {
+router.get("/:dayId", middleware.isLoggedIn, function(req, res) {
     if (res.locals.currentUser.role == 'role_sc') {
         return res.redirect("back");
     }
-    // logger.debug("req.params.dateSched=" + req.params.dateSched);
-    Day.findOne({ date: new Date(req.params.dateSched) }, { _id: 0 })
+    // logger.debug("req.params.dayId=" + req.params.dayId);
+    Day.findById(req.params.dayId)
         .populate('slots', { _id: 1 })
         .exec(function(err, foundDay) {
             if (err) {
@@ -316,7 +298,7 @@ router.get("/:dateSched", middleware.isLoggedIn, function(req, res) {
                                 res.render("students/index", {
                                     students: queryResponse,
                                     hideFilter: true,
-                                    h1suffix: "Scheduled for " + foundDay.date.toLocaleDateString("en-US", { weekday: 'long', year: '2-digit', month: '2-digit', day: 'numeric' })
+                                    h1suffix: "Scheduled for " + dateFunc.dayString(foundDay.date)
                                 });
                             }
                         });
@@ -530,8 +512,7 @@ function updateNewSlot(nbrSlots, newTime) {
                                     // logger.debug("overfilled slot._id=" + slot._id + "; avCnt=" + slot.avCnt);
                                     reject({
                                         message: "Selected slot (" +
-                                            new Date(newTime).
-                                        toLocaleDateString("en-US", { year: '2-digit', month: '2-digit', day: 'numeric', hour: '2-digit', minute: '2-digit' }) +
+                                            dateFunc.DTstring(new Date(newTime)) +
                                         ") filled before you saved changes."
                                     });
                                 }

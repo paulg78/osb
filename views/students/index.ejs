@@ -4,25 +4,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.1/js/jquery.tablesorter.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.1/js/jquery.tablesorter.widgets.min.js"></script>
 
-<%
-function dateString(d) {
-    var dayNames = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
-    var h=d.getHours();
-    var ap;
-    if (h>12) {
-        h=h-12;
-        ap="PM";
-    }
-    else {
-        ap="AM";
-    }
-    var m = d.getMinutes();
-    if (m==0) {
-        m="00";
-    }
-    return dayNames[d.getDay()] + " " + (d.getMonth() + 1) + "/" + d.getDate() + "/" + (d.getFullYear() - 2000) + " " + h + ":" + m + " " + ap;
-}
-%>
      <header>
         <h1>Students <%= h1suffix %>
           <button type="button" class="btn btn-primary btn-sm pull-right reset">Reset Filters</button> <!-- targeted by the "filter_reset" option -->
@@ -59,7 +40,7 @@ function dateString(d) {
             </td>
             <td>
               <% if (student.slot != null) { %>
-                  <%= dateString(student.slot.sdate) %>
+                  <%= dateFunc.DTstring(student.slot.sdate) %>
                   <% } %>
             </td>
             <td>
