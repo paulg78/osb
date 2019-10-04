@@ -45,9 +45,12 @@ router.post("/createSchedule", middleware.isLoggedIn, function(req, res) {
                         slotCallback({ message: "Time invalid; format must be hh:mm" });
                     }
                     else {
-                        var d = new Date(day.date);
-                        d.setHours(hm[0]);
-                        d.setMinutes(hm[1]);
+                        // add leading zero to time if missing, e.g. 8:15 -> 08:15
+                        if (time.length < 5) {
+                            time = "0" + time;
+                        }
+                        // logger.debug('date string=' + scheduleArray[row][0] + 'T' + time + 'Z');
+                        var d = new Date(scheduleArray[row][0] + 'T' + time + 'Z');
                         var slot = {
                             sdate: d,
                             max: scheduleArray[row + 1][col],
@@ -84,14 +87,15 @@ router.post("/createSchedule", middleware.isLoggedIn, function(req, res) {
             logger.info("async day iteratee called");
             logger.info("row=" + row);
             var day = {
-                date: scheduleArray[row][0],
+                date: new Date(scheduleArray[row][0] + 'T00:00Z'),
                 slots: []
             };
             saveSlots(row, day, function(slotErr) {
                 if (slotErr) {
                     dayCallback(slotErr);
                 }
-                else
+                else {
+
                     // save day
                     Day.create(day, function(dayErr, newDay) {
                         if (dayErr) {
@@ -104,6 +108,7 @@ router.post("/createSchedule", middleware.isLoggedIn, function(req, res) {
                             dayCallback(null);
                         }
                     });
+                }
             });
         },
         function(err) {
@@ -145,9 +150,6 @@ router.get("/", middleware.isLoggedIn, function(req, res) {
                 }
                 else {
                     global.days = days;
-                    // global.days.forEach(function (day) {
-                    // logger.debug("day=" + day);
-                    // });
                     res.render("days/index");
                 }
             });
