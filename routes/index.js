@@ -91,7 +91,15 @@ router.post('/login', function(req, res, next) {
             if (err) return next(err);
             // logger.debug("logged in user=" + user);
             if (user.role == 'role_sc') {
-                return res.redirect('/students');
+                // logger.debug("process.env.SCenabled=" + process.env.SCenabled);
+                if (process.env.SCenabled == 'Y') {
+                    return res.redirect('/students');
+                }
+                else {
+                    req.logout();
+                    req.flash('error', 'The Operation School Bell website is inactive until next year.');
+                    return res.redirect('/');
+                }
             }
             else {
                 return res.redirect('/days');
@@ -148,10 +156,16 @@ router.get('/requestpwresetData', function(req, res) {
 
 // show first registration form
 router.get('/register', function(req, res) {
-    res.render('register', {
-        email: '',
-        schoolCode: ''
-    });
+    if (process.env.SCenabled == 'Y') {
+        res.render('register', {
+            email: '',
+            schoolCode: ''
+        });
+    }
+    else {
+        req.flash('error', 'The Operation School Bell website is inactive until next year.');
+        return res.redirect('/');
+    }
 });
 
 // show second registration form
