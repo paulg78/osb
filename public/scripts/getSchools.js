@@ -1,5 +1,5 @@
 'use strict';
-/* global $ Option */
+/* global $ */
 
 function getSchools() {
     $.ajax({

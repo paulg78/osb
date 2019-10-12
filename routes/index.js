@@ -79,7 +79,7 @@ router.post('/login', function(req, res, next) {
     // logger.debug("at login, req.body=" + req.body.username + "-" + req.body.password);
     passport.authenticate('local', function(err, user, info) {
         if (err) {
-            req.flash('error', err.message);
+            req.flash('error', err.message + ';info=' + info.message);
             return res.redirect('/login');
         }
         else if (!user) {

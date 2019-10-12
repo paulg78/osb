@@ -47,7 +47,7 @@ $('#findStudentForm').submit(function(e) {
     listStudents($(this).serialize());
 });
 
-$("#schoolList").on('change', function(e) {
+$("#schoolList").on('change', function() {
     if (this.selectedIndex > 0) { // selected a school
         // console.log("changed school to " + this.value);
         $("#lname").val('');

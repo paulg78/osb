@@ -338,7 +338,7 @@ router.put("/:id", middleware.isLoggedIn, function(req, res) {
 
     User.findByIdAndUpdate(req.params.id, {
         $set: newData
-    }, function(err, user) {
+    }, function(err) {
         if (err) {
             logger.error("edit error");
             req.flash("error", err.message);

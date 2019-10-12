@@ -1,5 +1,5 @@
 'use strict';
-/* global $ Option */
+/* global $ */
 
 function dateString(d) {
     var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -48,7 +48,7 @@ function getPastDates() {
     // console.log("finished getPastDates");
 }
 
-$("#dateSched").on('change', function(e) {
+$("#dateSched").on('change', function() {
     var timeSel = document.getElementById('timeSched');
     if (this.selectedIndex > 0) { // selected a real date
         // console.log("changed date to " + this.value);

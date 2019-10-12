@@ -276,7 +276,7 @@ router.get("/:dayId", middleware.isLoggedIn, getPrevNextIds, function(req, res) 
                                     // logger.debug("stud=" + queryResponse[i].fullName);
                                     // find slot
                                     var foundj = -1;
-                                    for (var j = 0, jLim = foundDay.slots.length; j < jLim; j++) {
+                                    for (j = 0; j < jLim; j++) {
                                         if (queryResponse[i].slot != null && queryResponse[i].slot.toString() == foundDay.slots[j]._id) {
                                             foundj = j;
                                             break;

@@ -1,5 +1,5 @@
 'use strict';
-/* global $ Option */
+/* global $ */
 
 function dateString(d) {
     var dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
@@ -48,7 +48,7 @@ function getAvailDates(need) {
     // console.log("finished getAvailDates");
 }
 
-$("#dateSched").on('change', function(e) {
+$("#dateSched").on('change', function() {
     var timeSel = document.getElementById('timeSched');
     if (this.selectedIndex > 0) { // selected a real date
         // console.log("changed date to " + this.value);
@@ -62,7 +62,7 @@ $("#dateSched").on('change', function(e) {
             d = new Date(slots[i].sdate);
             md = d.getUTCMonth() + "-" + d.getUTCDate();
             if (md == selmd) {
-                timeSel.add(new Option(timeString(new Date(slots[i].sdate)) + ' (' + slots[i].avCnt + '\)', slots[i].sdate));
+                timeSel.add(new Option(timeString(new Date(slots[i].sdate)) + ' (' + slots[i].avCnt + ')', slots[i].sdate));
             }
         }
         timeSel.disabled = false;
@@ -73,7 +73,7 @@ $("#dateSched").on('change', function(e) {
     timeSel.selectedIndex = 0;
 });
 
-$("#unschedCB").on('change', function(e) {
+$("#unschedCB").on('change', function() {
     // console.log("unsched CB changed to " + this.checked);
     if (this.checked) {
         $("#schedForm").hide();

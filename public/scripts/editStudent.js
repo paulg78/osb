@@ -1,5 +1,5 @@
 'use strict';
-/* global $ Option */
+/* global $ */
 
 $("#delStudBtn").on('click', function(e) {
     if (confirm("Ready to delete " + $("#fname").val() + " " + $("#lname").val() + ".  Click Cancel or OK.") != true) {

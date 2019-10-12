@@ -153,7 +153,7 @@ router.post("/", function(req, res) {
         quota: req.body.quota,
         district: req.body.district,
         schoolCode: shared.myTrim(req.body.schoolCode)
-    }, function(err, newlyCreated) {
+    }, function(err) {
         if (err) {
             logger.error(err.errmsg);
             if (err.code == 11000) {
@@ -166,8 +166,6 @@ router.post("/", function(req, res) {
             res.redirect("back");
         }
         else {
-            //redirect back to schools page
-            // logger.debug(newlyCreated);
             res.redirect("/schools");
         }
     });
@@ -208,7 +206,7 @@ router.put("/:id", function(req, res) {
 
     School.findByIdAndUpdate(req.params.id, {
         $set: newData
-    }, function(err, school) {
+    }, function(err) {
         if (err) {
             logger.error("edit error");
             req.flash("error", err.message);
@@ -216,7 +214,6 @@ router.put("/:id", function(req, res) {
         }
         else {
             req.flash("success", "Successfully Updated!");
-            // res.redirect("/schools/" + school._id);
             res.redirect("/schools");
         }
     });

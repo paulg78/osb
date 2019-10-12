@@ -1,6 +1,6 @@
 /* global $ */
 
-$(".checkIn").on('click', function (e) {
+$(".checkIn").on('click', function () {
     var btn = $(this);
     // var studentId = btn.siblings("[name=studentId]").text();
     // console.log("studentId=" + studentId);  // logs in browser

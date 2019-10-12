@@ -13,7 +13,7 @@ var dateFunc = require('../dateFunc');
 // show find/list students form
 // List Students (all or by school)
 router.get("/showFind", middleware.isLoggedIn,
-    function(req, res, next) {
+    function(req, res) {
         if (res.locals.currentUser.role == 'role_sc') {
             res.redirect("back");
         }
