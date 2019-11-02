@@ -5,7 +5,7 @@ var User = require("../models/user");
 var School = require("../models/school");
 var shared = require("../shared");
 var middleware = require("../middleware");
-
+const inactiveMsg = 'The Operation School Bell website is inactive until the start of the next school year.';
 /* global logger */
 
 //root route
@@ -97,7 +97,7 @@ router.post('/login', function(req, res, next) {
                 }
                 else {
                     req.logout();
-                    req.flash('error', 'The Operation School Bell website is inactive until next year.');
+                    req.flash('error', inactiveMsg);
                     return res.redirect('/');
                 }
             }
@@ -163,7 +163,7 @@ router.get('/register', function(req, res) {
         });
     }
     else {
-        req.flash('error', 'The Operation School Bell website is inactive until next year.');
+        req.flash('error', inactiveMsg);
         return res.redirect('/');
     }
 });
