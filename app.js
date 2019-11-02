@@ -152,3 +152,4 @@ else { // heroku or dev environment
   });
 }
 logger.info("Zulu time is 6 hours after Mountain Daily Time (Mar-Nov)");
+console.log("(School counselor login enabled) process.env.SCenabled=" + process.env.SCenabled);
