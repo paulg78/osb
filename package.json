@@ -14,7 +14,7 @@
   "author": "Paul Gilbert",
   "license": "ISC",
   "dependencies": {
-    "async": "^2.6.3",
+    "async": "^3.2.2",
     "bcrypt-nodejs": "^0.0.3",
     "body-parser": "^1.19.0",
     "compression": "^1.7.4",
